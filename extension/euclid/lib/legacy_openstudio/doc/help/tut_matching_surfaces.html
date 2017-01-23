@@ -25,13 +25,13 @@ over[2] = "images/ln_release_notes_on.gif";
 
 
 function msover(num) {
-	loadImage = "Image" + num;
-	document.images[loadImage].src = over[num]
+    loadImage = "Image" + num;
+    document.images[loadImage].src = over[num]
 }
 
 function msout(num) {
-	loadImage = "Image" + num;
-	document.images[loadImage].src = normal[num]
+    loadImage = "Image" + num;
+    document.images[loadImage].src = normal[num]
 }
 // -->
 </script>
@@ -59,25 +59,25 @@ function msout(num) {
 
 
 <table cellpadding="0" cellspacing="0" border="0" width="100%">
-	<tr>
-		<td colspan="3" width="100%">
+    <tr>
+        <td colspan="3" width="100%">
 
-			<table cellspacing="0" border="0" width="100%" cellpadding="0">
-				<tr>
-					<td class="subsitephoto" width="100%" bgcolor="#000066"><a href="index.html"><img src="images/spacer.gif" alt="OpenStudio Documentation" width="333" height="52"></a></td>
-					<td><img src="images/spacer.gif" alt="" width="2" height="1"></td>
-				</tr>
-			</table>
+            <table cellspacing="0" border="0" width="100%" cellpadding="0">
+                <tr>
+                    <td class="subsitephoto" width="100%" bgcolor="#000066"><a href="index.html"><img src="images/spacer.gif" alt="OpenStudio Documentation" width="333" height="52"></a></td>
+                    <td><img src="images/spacer.gif" alt="" width="2" height="1"></td>
+                </tr>
+            </table>
 
-		</td>
+        </td>
 
-	</tr>
+    </tr>
 <!-- end of third column -->
 
 <!-- start of left navigation, first column -->
 
-	<tr valign="top">
-		<td valign="top" width="176"><!-- left navigation include -->
+    <tr valign="top">
+        <td valign="top" width="176"><!-- left navigation include -->
 <!--stopindex-->
 <img src="images/spacer.gif" alt="" width="1" height="3"><br>
 
@@ -89,14 +89,14 @@ function msout(num) {
 <a href="release_notes.html" onMouseOver="msover('2')" onMouseOut="msout('2')"><img src="images/ln_release_notes_off.gif" alt="Release Notes" width="176" height="19" border="0" name="Image2"></a><br>
 <img src="images/gray.gif" alt="" width="176" height="7"><br>
 <!--startindex-->
-	</td>
-	<td valign="top" bgcolor="#CCCCCC"><img src="images/spacer.gif" alt="" width="1" height="1"></td>
+    </td>
+    <td valign="top" bgcolor="#CCCCCC"><img src="images/spacer.gif" alt="" width="1" height="1"></td>
 
 
 <!-- main content -->
-		<td valign="top" width="100%">
-			<table cellspacing="0" border="0" cellpadding="12" width="100%">
-				<tr>
+        <td valign="top" width="100%">
+            <table cellspacing="0" border="0" cellpadding="12" width="100%">
+                <tr>
           <td valign="top">
 
 
@@ -115,25 +115,25 @@ function msout(num) {
        <H3>Method 1</H3>
      <ul>
      <li>This method uses SketchUp's drawing tools and inference locks.</li>
-	 <li>Enter into the zone where you want to draw your new surface, but leave the other zones visible.</li>
-	 <li>Use the line tool to draw lines that snap to objects in another zone. SketchUp will indicate this with a pop-up note that reads "Endpoint Outside Activity".</li>
-	 <li>You may have to navigate around the model with the pan and orbit tools to draw all the edges of your surface.</li>
-	 <li>If geometries in other zones are in your way, you can temporarily hide them. Select them and then right-click->hide, or go to "hide" in the edit menu.</li>
-	 <br>
+     <li>Enter into the zone where you want to draw your new surface, but leave the other zones visible.</li>
+     <li>Use the line tool to draw lines that snap to objects in another zone. SketchUp will indicate this with a pop-up note that reads "Endpoint Outside Activity".</li>
+     <li>You may have to navigate around the model with the pan and orbit tools to draw all the edges of your surface.</li>
+     <li>If geometries in other zones are in your way, you can temporarily hide them. Select them and then right-click->hide, or go to "hide" in the edit menu.</li>
+     <br>
      <img src="dialogs/tut_surface_matching_01.png" alt="" width="500">
      <br>
      <p2i>(Credit: David Goldwasser/NREL)</P2i>
      <br>
-	 <P2i>This drawing uses line tool and SketchUp's  inference locks to snap to geometry in other EnergyPlus zones. </P2i>
-	 <P2i></P2i>
+     <P2i>This drawing uses line tool and SketchUp's  inference locks to snap to geometry in other EnergyPlus zones. </P2i>
+     <P2i></P2i>
      <br>
      <br>
      <img src="dialogs/tut_surface_matching_01b.png" alt="" width="500"><br>
-	 <p2i>(Credit: David Goldwasser/NREL)</P2i>
-	 <br>
-	 <P2i>Click on second point in another EnergyPlus zone</P2i>
-	 <br>
-	 <br>
+     <p2i>(Credit: David Goldwasser/NREL)</P2i>
+     <br>
+     <P2i>Click on second point in another EnergyPlus zone</P2i>
+     <br>
+     <br>
      <img src="dialogs/tut_surface_matching_01c.png" alt="" width="500"><br>
      <p2i> (Credit: David Goldwasser/NREL)</P2i>
      <br>
@@ -146,10 +146,10 @@ function msout(num) {
      <P2i>Final surface in EnergyPlus zone. </P2i>
      <br>
      <br>
-  	 <li>The example above has a smaller zone sharing two edges with a larger zone. If instead the smaller zone only shared one edge with the larger zone, if for example it was centered horizontally with the larger zone, then you have to do things a little differently.</li>
-  	 <li>You would have to first split the base surface into two base surfaces by adding an edge all  the way across the larger base surface (pictured below). Then you could draw the vertical edges to complete the surface to be matched. If you don't create the horizontal edge first OpenStudio could interpret your new surface as a subsurface instead of a base surface; as if it was a door vs. a wall.</li>
-  	 <li>If you use method two in this scenario, you would still have to draw the full length horizontal edge before pasting in the copy of the surface edges.</li>
-  	 <br>
+     <li>The example above has a smaller zone sharing two edges with a larger zone. If instead the smaller zone only shared one edge with the larger zone, if for example it was centered horizontally with the larger zone, then you have to do things a little differently.</li>
+     <li>You would have to first split the base surface into two base surfaces by adding an edge all  the way across the larger base surface (pictured below). Then you could draw the vertical edges to complete the surface to be matched. If you don't create the horizontal edge first OpenStudio could interpret your new surface as a subsurface instead of a base surface; as if it was a door vs. a wall.</li>
+     <li>If you use method two in this scenario, you would still have to draw the full length horizontal edge before pasting in the copy of the surface edges.</li>
+     <br>
 <img src="dialogs/tut_surface_matching_05.png" alt="" width="500"><br>
      <p2i> (Credit: David Goldwasser/NREL)</P2i>
           </ul>
@@ -160,23 +160,23 @@ function msout(num) {
      <li>Double click the surface  you want to duplicate in another zone.</li>
      <li>Select the face and its bounding edges. </li>
      <li>Shift-click on the face to unselect it (this prevents  the face-normal of the new copy from being reversed), but leave the edges  selected. &nbsp;</li>
-	 <li>Copy the selection, exit from the current zone,  and enter into the zone that needs the new surface. Choose Paste in Place  (edit/paste in place). There is no default shortcut set for &quot;paste in  place&quot;, but a separate tutorial shows you how to <a href="tut_shortcuts.html">create your own shortcuts.</a></li>
-	 <br><img src="dialogs/tut_surface_matching_02.png" alt="" width="500"><br>
-	 <P2i>(Credit: David Goldwasser/NREL)</P2i>
-	 <br>
-	 <P2i>Select a face and its edges by double clicking.</P2i>
-	 <br>
-	 <br>
-	 <br><img src="dialogs/tut_surface_matching_02b.png" alt="" width="500"><br>
-	 <P2i>(Credit: David Goldwasser/NREL)</P2i>
-	 <P2i><br>
-	   Shift-click to unselect the face. </P2i>
-	 <br><br>
-	 <br><img src="dialogs/tut_surface_matching_03.png" alt="" width="500"><br>
-	 <P2i>(Credit: David Goldwasser/NREL)</P2i>
-	 <br>
-	 <P2i>Here you can see the resulting edges and surface in the second EnergyPlus Zone.</P2i>
-	 <br><br>
+     <li>Copy the selection, exit from the current zone,  and enter into the zone that needs the new surface. Choose Paste in Place  (edit/paste in place). There is no default shortcut set for &quot;paste in  place&quot;, but a separate tutorial shows you how to <a href="tut_shortcuts.html">create your own shortcuts.</a></li>
+     <br><img src="dialogs/tut_surface_matching_02.png" alt="" width="500"><br>
+     <P2i>(Credit: David Goldwasser/NREL)</P2i>
+     <br>
+     <P2i>Select a face and its edges by double clicking.</P2i>
+     <br>
+     <br>
+     <br><img src="dialogs/tut_surface_matching_02b.png" alt="" width="500"><br>
+     <P2i>(Credit: David Goldwasser/NREL)</P2i>
+     <P2i><br>
+       Shift-click to unselect the face. </P2i>
+     <br><br>
+     <br><img src="dialogs/tut_surface_matching_03.png" alt="" width="500"><br>
+     <P2i>(Credit: David Goldwasser/NREL)</P2i>
+     <br>
+     <P2i>Here you can see the resulting edges and surface in the second EnergyPlus Zone.</P2i>
+     <br><br>
      </ul>
 </li></ul>
 </div>
@@ -207,17 +207,17 @@ function msout(num) {
 </div>
 
 
-					</td>
-				</tr>
-			</table>
+                    </td>
+                </tr>
+            </table>
 <P2i><A href="#top">Back to Top</A></P2i>
 <!-- end of main content table -->
 
 
-		</td>
+        </td>
         <td>
         <div class="leftgrey"><img src="images/rn_features_head.gif" alt="Features" width="249" height="20" border="0" style="display:block;">
-				<div style="padding-bottom:2px;"><a href="http://apps1.eere.energy.gov/buildings/energyplus/openstudio.cfm"><img src="images/feat_openstudio_openstudio.gif" alt="OpenStudio - Learn More" width="249"  height="73" border="0"></a></div>
+                <div style="padding-bottom:2px;"><a href="http://apps1.eere.energy.gov/buildings/energyplus/openstudio.cfm"><img src="images/feat_openstudio_openstudio.gif" alt="OpenStudio - Learn More" width="249"  height="73" border="0"></a></div>
 
                <div style="padding-bottom:2px;"><a href="http://www.energyplus.gov"><img src="images/feat_openstudio_energyplus.gif" alt="EnergyPlus - Learn More" width="249"  height="73" border="0"></a></div>
 
@@ -225,7 +225,7 @@ function msout(num) {
 
                <div style="padding-bottom:2px;"><a href="http://www.buildings.energy.gov"><img src="images/feat_openstudio_btp.gif" alt="DOE's Building Technologies Program - Learn More" width="249"  height="73" border="0"></a></div>
         </td>
-	</tr>
+    </tr>
 </table>
 
 
@@ -237,13 +237,13 @@ function msout(num) {
 <br><a href="#end"><img src="images/spacer.gif" alt="Skip footer navigation to end of page." height="10" width="1" border="0"></a><br>
 
 <table cellspacing="0" cellpadding="0" width="0" border="0" align="center">
-	<tr>
-		<td><p class="footer"><a href="http://www.eere.energy.gov/site_administration/privacy.html">Security &amp; Privacy</a> | <a href="http://www.eere.energy.gov/buildings/">Building Technologies Program Home</a> | <a href="http://www.eere.energy.gov">EERE Home</a></p>
+    <tr>
+        <td><p class="footer"><a href="http://www.eere.energy.gov/site_administration/privacy.html">Security &amp; Privacy</a> | <a href="http://www.eere.energy.gov/buildings/">Building Technologies Program Home</a> | <a href="http://www.eere.energy.gov">EERE Home</a></p>
 
 <p class="doe">U.S. Department of Energy</p>
 
 <a name="end"><img src="images/spacer.gif" alt="" height="1" width="1" border="0"></a></p></td>
-		</tr>
+        </tr>
 </table>
 
 

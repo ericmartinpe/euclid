@@ -6,7 +6,7 @@
 module LegacyOpenStudio
 
   class TimeInterval
-    
+
     attr_reader :start_time, :end_time, :length
 
 
@@ -21,7 +21,7 @@ module LegacyOpenStudio
       # Uses the EnergyPlus definition of a time interval where the end time is included in the interval, but start time is not.
       return(time > @start_time and time <= @end_time)
     end
-  
+
   end
-  
+
 end

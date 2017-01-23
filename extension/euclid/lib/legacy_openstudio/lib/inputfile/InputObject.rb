@@ -18,7 +18,7 @@ module LegacyOpenStudio
       @context = ''
 
       if (@class_definition = Plugin.data_dictionary.get_class_def(class_name))
-      
+
         if (fields.nil? or fields.empty?)
           @fields = @class_definition.default_values  # Fill minimum and required defaults
         else
@@ -94,7 +94,7 @@ module LegacyOpenStudio
                 a += 1
               end
               line.insert(a, token)
-              
+
               b = a + token.length  # Make sure next replace starts looking after this token
 
             else
@@ -103,7 +103,7 @@ module LegacyOpenStudio
               a = line.index(field, b)
               b = a + field.length
               line = line[0...a] + token + line[b..-1]
-              
+
               b = a + token.length  # Make sure next replace starts looking after this token
 
             end
@@ -222,17 +222,17 @@ module LegacyOpenStudio
     #def fields
     #  return(@fields)
     #end
-    
+
     # probably means you can't set individual fields, e.g., obj.fields[3] = "EXTERIOR"
-    
+
     #def fields=(array)
     #  @fields = array
     #  @class_name = array[0]
-      
+
       # lookup the obj_def
-      
+
       # update any dependencies or references
-    
+
     #end
 
 
@@ -254,7 +254,7 @@ module LegacyOpenStudio
     # add option to put vertices on one line
     # add option to put report variables on one line  (maybe read from IDD?)
 # - append new fields, remove old fields
-# - check for required commas and semicolons...insert if needed    
+# - check for required commas and semicolons...insert if needed
     def format_context
 
       if (@context.nil? or @context.empty?)
@@ -293,7 +293,7 @@ module LegacyOpenStudio
         if (seg = context.scan(/#{token}\s*,/)[0])
           seg.sub!(/,/, ';')
           context.sub!(/#{token}\s*,/, seg)
-          
+
           # Remove any trailing comments, namely old field names.
           i = context.index(/#{token}\s*;.*\n/)
           last_line = context.scan(/#{token}\s*;.*\n/)[0]

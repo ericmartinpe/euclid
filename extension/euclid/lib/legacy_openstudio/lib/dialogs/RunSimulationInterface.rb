@@ -56,20 +56,20 @@ module LegacyOpenStudio
       else
         run_period = objects.to_a.first
         # Only can handle the first run period currently; multiple run periods are actually allowed in EnergyPlus.
-        
+
         @hash['START_MONTH'] = run_period.fields[2]
         @hash['START_DATE'] = run_period.fields[3]
         @hash['END_MONTH'] = run_period.fields[4]
-        @hash['END_DATE'] = run_period.fields[5]       
+        @hash['END_DATE'] = run_period.fields[5]
         @hash['START_DAY'] = run_period.fields[6].upcase
-        
+
         if (@hash['START_MONTH'] == "1" and @hash['START_DATE'] == "1" and @hash['END_MONTH'] == "12" and @hash['END_DATE'] == "31")
           @hash['ANNUAL_SIMULATION'] = true
         else
           @hash['ANNUAL_SIMULATION'] = false
         end
       end
-      
+
       @hash['REPORT_ABUPS'] = Plugin.model_manager.get_attribute("Report ABUPS")
       @hash['ABUPS_FORMAT'] = Plugin.model_manager.get_attribute("ABUPS Format")
       @hash['ABUPS_UNITS'] = Plugin.model_manager.get_attribute("ABUPS Units")
@@ -119,7 +119,7 @@ module LegacyOpenStudio
       Plugin.model_manager.set_attribute("Report Daylighting", @hash['REPORT_DAYLIGHTING'])
       Plugin.model_manager.set_attribute("Report Zone Loads", @hash['REPORT_ZONE_LOADS'])
       Plugin.model_manager.set_attribute("Report User Variables", @hash['REPORT_USER_VARS'])
-      
+
       Plugin.model_manager.set_attribute("Close Shell", @hash['CLOSE_SHELL'])
       Plugin.model_manager.set_attribute("Show ERR", @hash['SHOW_ERR'])
       Plugin.model_manager.set_attribute("Show ABUPS", @hash['SHOW_ABUPS'])
@@ -161,12 +161,12 @@ module LegacyOpenStudio
       run_period.fields[4] = @hash['END_MONTH']
       run_period.fields[5] = @hash['END_DATE']
       run_period.fields[6] = @hash['START_DAY']
-      
+
       # DLM@20101109: this fix removes a warning in the E+ error file but introduces a fatal error
       # when the last field of the run period object is blank
       # fill in fields to required length
       #(7..11).each {|i| run_period.fields[i] = "" if not run_period.fields[i]}
-      
+
       return(true)
     end
 

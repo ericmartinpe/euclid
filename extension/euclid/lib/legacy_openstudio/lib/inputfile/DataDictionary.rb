@@ -9,30 +9,30 @@ require("legacy_openstudio/lib/inputfile/ClassDefinition")
 module LegacyOpenStudio
 
   class DataDictionary
-  
+
     attr_reader :path, :object_list_hash, :class_hash
-    
+
 
     def DataDictionary.open(path)
       return(new(path))
     end
 
     def initialize(path)
-    
+
       if (path.nil?)
-      
+
         puts "DataDictionary.initialize:  no path"
-        
+
       elsif (not File.exist?(path))
-      
+
         puts "DataDictionary.initialize:  bad path"
-        
+
       else
 
         # check for cached file
         cached_path = path + ".cache"
         if File.exists?(cached_path) and (File.new(path).mtime < File.new(cached_path).mtime)
-                  
+
           # load cached file
           File.open(cached_path, 'r') do |file|
             cached = Marshal.load(file)
@@ -40,15 +40,15 @@ module LegacyOpenStudio
             @object_list_hash = cached.object_list_hash
             @class_hash = cached.class_hash
           end
-                  
+
         else
-        
+
           @path = path
           @object_list_hash = Hash.new
           @class_hash = Hash.new
 
           parse  # need a way to indicate error on return
-          
+
           # path may not be writable, File.writable? is not giving good results
           begin
             # save to cache
@@ -57,13 +57,13 @@ module LegacyOpenStudio
             end
           rescue
           end
-          
+
         end
-        
+
       end
     end
-    
-    
+
+
     def DataDictionary.version(path)
       version_string = nil
 
@@ -136,12 +136,12 @@ module LegacyOpenStudio
   private
 
     def parse
-    
+
       # This routine parses the IDD and creates a local database of object and field definitions
       # Currently, ~98% of objects in the IDD are handled; WindowGlassSpectralData is one that is not.
 
       sort_index = 0
-      
+
       # current group
       group = ""
 
@@ -175,10 +175,10 @@ module LegacyOpenStudio
               class_def = ClassDefinition.new
               sort_index += 1
               class_def.sort_index = sort_index
-              
+
               # set the group
               class_def.group = group
-  
+
               # set the name
               if (i = line.index(','))
                 class_def.name = line[0...i].strip
@@ -236,19 +236,19 @@ module LegacyOpenStudio
                   if (defined? field_def)
                     key = line[(i + 11)..(line.length)].strip
                     field_def.object_list_keys << key
-                    
+
                     # Add key to object_list_hash
                     if (not @object_list_hash.has_key?(key))
                       @object_list_hash[key] = []
                     end
-                    
+
                   end
-                  
+
                 elsif (i = line.index("\\object-list"))
                   if (defined? field_def)
                     field_def.object_list = line[(i + 13)..(line.length)].strip
                   end
-                  
+
                 end
 
                 #if (last_field && line.strip.empty?) then break end

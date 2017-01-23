@@ -30,15 +30,15 @@ module LegacyOpenStudio
         end
       end
     end
-    
+
     # onDeleteModel
-    
+
     # onEraseAll
-    
+
     #def onTransactionStart(model)
       #puts "onTransactionStart"
     #end
-   
+
     #def onTransactionEnd(model)
       #puts "onTransactionEnd"
     #end
@@ -46,15 +46,15 @@ module LegacyOpenStudio
     #def onTransactionUndo(model)
       #puts "onTransactionUndo"
     #end
-    
+
     # onTransactionRedo
 
     #def onTransactionCommit(model)
       #puts "onTransactionCommit"
     #end
-    
+
     # onTransactionAbort
-    
+
     # onTransactionEmpty
 
   end

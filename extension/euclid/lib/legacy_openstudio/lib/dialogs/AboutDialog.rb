@@ -21,7 +21,7 @@ module LegacyOpenStudio
 
 
     def show
-      @container.show_modal    
+      @container.show_modal
     end
 
   end

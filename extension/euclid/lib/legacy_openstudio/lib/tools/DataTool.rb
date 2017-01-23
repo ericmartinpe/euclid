@@ -20,7 +20,7 @@ module LegacyOpenStudio
       if (v = @ip.vertex)
         #Sketchup.set_status_text("World Coordinates:  " + v.position.to_s)
       else
-        
+
         if (face = @ip.face)
           if (drawing_interface = face.drawing_interface)
 
@@ -43,7 +43,7 @@ module LegacyOpenStudio
               tooltip = variable_def.object_name + "\n"
               tooltip += variable_def.set_name + "\n"
               tooltip += value.round_to(Plugin.model_manager.length_precision).to_s + " " + variable_def.units
-              
+
               if (Plugin.model_manager.results_manager.normalize)
                 if (Plugin.model_manager.units_system == "SI")
                   tooltip += "/m2"
@@ -61,12 +61,12 @@ module LegacyOpenStudio
             tooltip = "No EnergyPlus object found."
           end
         else
-          tooltip = ""  
+          tooltip = ""
         end
 
         view.tooltip = tooltip
       end
-      
+
     end
 
   end

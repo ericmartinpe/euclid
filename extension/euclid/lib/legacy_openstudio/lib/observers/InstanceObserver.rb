@@ -9,12 +9,12 @@ module LegacyOpenStudio
   # SelectionObserver does not provide any event.  Fortunately, InstanceObserver, which
   # also happens to work for Groups, DOES give an event that can be used.
   class InstanceObserver < Sketchup::InstanceObserver
-  
+
     def initialize(drawing_interface=nil)
       # for drawing interfaces that want update_entity on close
       @drawing_interface = drawing_interface
     end
-    
+
     def onOpen(group)
     end
 

@@ -139,7 +139,7 @@ function disableElement(elementName) {
 
   for (var i = 0; i < elements.length; i++) {
     element = elements[i];
-      
+
     if (element.tagName == 'BUTTON') {
       // Do not change the background color for buttons
       elements[i].disabled = true;
@@ -151,12 +151,12 @@ function disableElement(elementName) {
       }
       else {
         elements[i].disabled = true;
-        elements[i].style.backgroundColor = document.bgColor;   
+        elements[i].style.backgroundColor = document.bgColor;
       }
     }
     else {
       elements[i].disabled = true;
-      elements[i].style.backgroundColor = document.bgColor;    
+      elements[i].style.backgroundColor = document.bgColor;
     }
   }
 }
@@ -168,7 +168,7 @@ function enableElement(elementName) {
 
   for (var i = 0; i < elements.length; i++) {
     element = elements[i];
-      
+
     if (element.tagName == 'BUTTON') {
       // Do not change the background color for buttons
       elements[i].disabled = false;
@@ -180,12 +180,12 @@ function enableElement(elementName) {
       }
       else {
         elements[i].disabled = false;
-        elements[i].style.backgroundColor = "#ffffff";   
+        elements[i].style.backgroundColor = "#ffffff";
       }
     }
     else {
       elements[i].disabled = false;
-      elements[i].style.backgroundColor = "#ffffff";    
+      elements[i].style.backgroundColor = "#ffffff";
     }
   }
 }
@@ -354,11 +354,11 @@ function daysInMonth(month) {
     case '12':
       days_in_month = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31";
       break;
-      
+
     default:
       days_in_month = "0";  // A bad month was passed in
   }
-  
+
   return(days_in_month);
 }
 

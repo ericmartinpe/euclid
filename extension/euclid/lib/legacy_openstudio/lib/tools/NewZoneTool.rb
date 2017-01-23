@@ -21,7 +21,7 @@ module LegacyOpenStudio
 
     def onLButtonUp(flags, x, y, view)
       super
-      
+
       model = Sketchup.active_model
       active_path = model.active_path
 

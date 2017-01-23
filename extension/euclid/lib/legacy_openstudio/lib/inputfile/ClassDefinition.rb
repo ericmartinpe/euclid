@@ -27,7 +27,7 @@ module LegacyOpenStudio
     def default_values
       values = [ @name ]
       for field_def in @field_definitions[1...@min_fields]
-        values << field_def.default_value 
+        values << field_def.default_value
       end
       return(values)
     end

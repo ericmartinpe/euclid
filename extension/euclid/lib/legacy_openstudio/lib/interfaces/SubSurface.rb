@@ -21,21 +21,21 @@ module LegacyOpenStudio
       @input_object = InputObject.new("FENESTRATIONSURFACE:DETAILED")
       @input_object.fields[1] = Plugin.model_manager.input_file.new_unique_object_name
       @input_object.fields[2] = default_surface_type
-      @input_object.fields[3] = ""  
+      @input_object.fields[3] = ""
       @input_object.fields[4] = ""  # Base Surface
       @input_object.fields[5] = ""
       @input_object.fields[6] = ""
       @input_object.fields[7] = ""
       @input_object.fields[8] = ""
       @input_object.fields[9] = ""
-      
+
       @input_object.fields[3] = default_construction # do after setting boundary conditions
 
-      @input_object.fields[12] = 0  # kludge to make fields list long enough for call below 
+      @input_object.fields[12] = 0  # kludge to make fields list long enough for call below
 
       super
     end
-    
+
 
     def check_input_object
       # All base surfaces should already be drawn.
@@ -48,7 +48,7 @@ module LegacyOpenStudio
 
 
         # This is the wrong place to do this, but no one else has set '@parent' yet, which is relied on by 'surface_polygon' later.
-        @parent = parent_from_input_object   
+        @parent = parent_from_input_object
 
 
         # Check the base surface
@@ -168,13 +168,13 @@ module LegacyOpenStudio
 
       #points = @entity.polygon.reduce.points
       #if (points.length > 4)
-      
+
         #puts "Oops!  Too many vertices!"
-        
+
         # Draw an edge from the first vertex to the 4th
-        
+
         #@entity.parent.entities.add_line(points[0], points[3])
-        
+
         #Sketchup.undo  # oh yeah can't undo because observer has already assigned some things.
         #return(false)
       #end
@@ -223,7 +223,7 @@ module LegacyOpenStudio
           else
             next_point = @entity.outer_polygon.points[i + 1]
           end
-          midpoints << Geom.linear_combination(0.5, this_point, 0.5, next_point) 
+          midpoints << Geom.linear_combination(0.5, this_point, 0.5, next_point)
         end
 
         # Find midpoint that is lowest in the z-direction
@@ -249,12 +249,12 @@ module LegacyOpenStudio
 
       return(surface_type)
     end
-    
+
     def exterior?
       return (@input_object.fields[5].nil? or @input_object.fields[5].to_s.empty?)
     end
 
-    def default_construction    
+    def default_construction
       case (default_surface_type.upcase)
       when "WINDOW", "GLASSDOOR", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER"
         if exterior?
@@ -269,14 +269,14 @@ module LegacyOpenStudio
           construction_name = Plugin.model_manager.construction_manager.default_door_int
         end
       end
-      
+
       return(construction_name)
     end
-    
+
     def in_selection?(selection)
       return (selection.contains?(@entity) or selection.contains?(@parent.entity) or (not @parent.parent.nil? and selection.contains?(@parent.parent.entity)))
     end
-    
+
     def multiplier
       value = @input_object.fields[9].to_i
       if (value > 0)
@@ -289,7 +289,7 @@ module LegacyOpenStudio
     def area
       return(self.unit_area * self.multiplier)
     end
-    
+
     def name
       return @input_object.fields[1]
     end
@@ -326,7 +326,7 @@ module LegacyOpenStudio
         end
       end
     end
-    
+
     # match this sub surface to another sub surface
     def set_other_side_sub_surface(other)
       @input_object.fields[5] = other.name
@@ -340,7 +340,7 @@ module LegacyOpenStudio
           end
 
     end
-    
+
     # unmatch this sub surface with any other sub surface
     def unset_other_side_sub_surface
       @input_object.fields[5] = ""

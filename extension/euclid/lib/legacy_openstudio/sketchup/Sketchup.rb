@@ -10,7 +10,7 @@ require("legacy_openstudio/sketchup/Geom")
 class Array
 
   def is_subset_of?(other)
-  
+
     for element in self
 
       element_matched = false
@@ -27,11 +27,11 @@ class Array
         return(false)
       end
     end
-  
+
     return(true)
   end
-  
-  
+
+
   def is_same_set?(other)
     if (self.length == other.length and self.is_subset_of?(other))
       return(true)
@@ -46,7 +46,7 @@ end
 class Float
 
   def round_to(decimal_places = 0)
-    if (decimal_places > 0)    
+    if (decimal_places > 0)
       precision = (10**(decimal_places)).to_f
       return((self * precision).round / precision)
     else
@@ -130,7 +130,7 @@ class Sketchup::Entity
   def input_object_context
     # optional storage of comments, to rebuild IDF exactly.
   end
-  
+
 end
 
 
@@ -275,9 +275,9 @@ end
 class Sketchup::Entities
 
   #alias_method :_add_face, :add_face
-  
+
   # not working yet...
-  
+
   # Override the add_face method to recognize polygons
   def xxx_add_face(*args)
     base_face = nil
@@ -305,10 +305,10 @@ class Sketchup::Loop
 
   def polygon_loop
     points = []
-    self.vertices.each do |vertex| 
+    self.vertices.each do |vertex|
       # DLM@20100920: weird bug in SU 8 that vertices can also return attribute dictionary for a loop's vertices
       if vertex.class == Sketchup::Vertex
-        points << vertex.position 
+        points << vertex.position
       end
     end
     return(Geom::PolygonLoop.new(points))
@@ -365,7 +365,7 @@ end
 class Sketchup::ShadowInfo
 
   # Still need to reconcile daylight saving time between EnergyPlus and SketchUp
-  
+
 
   def time
     # API bug:  ShadowTime is returning the hour incorrectly in UTC/GMT time, but the time zone is (correctly) the local one.

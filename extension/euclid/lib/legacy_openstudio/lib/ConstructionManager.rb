@@ -132,10 +132,10 @@ module LegacyOpenStudio
       #Sketchup.active_model.rendering_options["MaterialTransparency"] = true
 
     end
-    
-    
+
+
     def reset_defaults
-    
+
       # These default construction names are just suggestions, the user can change them in preferences
 
       @default_floor_ext = "Exterior Floor"
@@ -146,74 +146,74 @@ module LegacyOpenStudio
 
       @default_roof_ext = "Exterior Roof"
       @default_roof_int = "Interior Ceiling"
-      
+
       @default_window_ext = "Exterior Window"
       @default_window_int = "Interior Window"
 
       @default_door_ext = "Exterior Door"
       @default_door_int = "Interior Door"
-      
+
       @default_save_path = ""
-      
+
     end
-    
-    
+
+
     def check_defaults
       object_names = constructions.collect { |object| object.name }
       object_names = object_names.sort
-      
+
       not_found = []
-      
+
       if not object_names.include?(@default_floor_ext)
-        not_found << @default_floor_ext 
+        not_found << @default_floor_ext
         @default_floor_ext = ""
       end
-      
+
       if not object_names.include?(@default_floor_int)
-        not_found << @default_floor_int 
+        not_found << @default_floor_int
         @default_floor_int = ""
       end
-      
+
       if not object_names.include?(@default_wall_ext)
-        not_found << @default_wall_ext 
+        not_found << @default_wall_ext
         @default_wall_ext = ""
       end
-      
+
       if not object_names.include?(@default_wall_int)
-        not_found << @default_wall_int 
+        not_found << @default_wall_int
         @default_wall_int = ""
       end
-      
+
       if not object_names.include?(@default_roof_ext)
-        not_found << @default_roof_ext 
+        not_found << @default_roof_ext
         @default_roof_ext = ""
       end
-      
+
       if not object_names.include?(@default_roof_int)
-        not_found << @default_roof_int 
+        not_found << @default_roof_int
         @default_roof_int = ""
       end
-      
+
       if not object_names.include?(@default_window_ext)
-        not_found << @default_window_ext 
+        not_found << @default_window_ext
         @default_window_ext = ""
       end
-      
+
       if not object_names.include?(@default_window_int)
-        not_found << @default_window_int 
+        not_found << @default_window_int
         @default_window_int = ""
       end
-      
+
       if not object_names.include?(@default_door_ext)
-        not_found << @default_door_ext 
+        not_found << @default_door_ext
         @default_door_ext = ""
       end
-      
+
       if not object_names.include?(@default_door_int)
-        not_found << @default_door_int 
+        not_found << @default_door_int
         @default_door_int = ""
       end
-      
+
       if not_found.size > 0
         result = UI.messagebox("File does not contain default construction names.\nDo you want to set these before drawing new geometry?", MB_YESNO)
         if result == 6 # Yes
@@ -231,7 +231,7 @@ module LegacyOpenStudio
       end
       return(material)
     end
-    
+
     def constructions
       result = Plugin.model_manager.input_file.find_objects_by_class_name("CONSTRUCTION", "CONSTRUCTION:INTERNALSOURCE",
                     "CONSTRUCTION:CFACTORUNDERGROUNDWALL", "CONSTRUCTION:FFACTORGROUNDFLOOR", "CONSTRUCTION:WINDOWDATAFILE")

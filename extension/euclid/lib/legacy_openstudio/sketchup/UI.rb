@@ -49,7 +49,7 @@ module UI
   def UI.open_panel(*args)
     if (args[1])
       dir = args[1]
-      
+
       if (not dir.empty?)
 
         if (RUBY_PLATFORM =~ /mswin/ || RUBY_PLATFORM =~ /mingw/)  # Windows
@@ -101,9 +101,9 @@ module UI
   def UI.save_panel(*args)
     if (args[1])
       dir = args[1]
-      
+
       if (not dir.empty?)
-      
+
         if (RUBY_PLATFORM =~ /mswin/ || RUBY_PLATFORM =~ /mingw/)  # Windows
           # Replace / with \\ for the file separator
           dir = dir.split("/").join("\\")
@@ -119,7 +119,7 @@ module UI
             dir += "/"
           end
         end
-      
+
         if (not File.directory?(dir))
           puts "UI.save_panel received bad directory: " + dir
           args[1] = ""
@@ -147,5 +147,5 @@ module UI
     return(path)
   end
 
-  
+
 end

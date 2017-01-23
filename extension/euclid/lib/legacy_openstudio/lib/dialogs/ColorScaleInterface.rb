@@ -12,7 +12,7 @@ module LegacyOpenStudio
 
     def initialize
       super
-      
+
       @dialog = ColorScaleDialog.new(nil, self, @hash)
     end
 
@@ -32,7 +32,7 @@ module LegacyOpenStudio
       else
         units = ""
       end
-      
+
       if normalize
         normalize_suffix = ""
         if (Plugin.model_manager.units_system == "SI")

@@ -29,15 +29,15 @@ module LegacyOpenStudio
 
       @variable_defs = Hash.new
       @run_periods = []
-      
+
       update_progress.update_progress(0, "Reading Output File")
 
       if (File.exists?(path))
-      
+
         @path = path
-        
+
         if Plugin.read_pref("Cache Eso Results")
-        
+
           # check for cached results
           cached_path = path + ".cache"
           if File.exists?(cached_path) and (File.new(path).mtime < File.new(cached_path).mtime)
@@ -50,9 +50,9 @@ module LegacyOpenStudio
               @run_periods = cached.run_periods
               @data_series = cached.data_series
             end
-            
+
           else
-          
+
             # read data
             read_output_file(update_progress)
 
@@ -64,16 +64,16 @@ module LegacyOpenStudio
               end
             rescue
             end
-            
+
           end
-          
+
         else
-          
+
           # just read the data
           read_output_file(update_progress)
-          
+
         end
-        
+
       else
         puts "OutputFile.open:  bad path"
       end
@@ -106,11 +106,11 @@ module LegacyOpenStudio
         # 63474,2,AHU-2,AirLoopHVAC Minimum Outdoor Air Fraction !Hourly
         # 699,2,4D61FFZONEHVAC:IDEALLOADSAIRSYSTEM,Ideal Loads Air Sensible Cooling Rate[W] !Hourly
         match_data = /(\d+),(\d+),?(.*?),(.*?)(\[.*?\])?\s?!([^\[]*)/.match(line)
-        
+
         if match_data.nil? or match_data.length < 7
           puts line
         end
-     
+
         key = match_data[1].to_i
         type = match_data[2].to_i
         object_name = match_data[3].strip
@@ -122,7 +122,7 @@ module LegacyOpenStudio
           units = match_data[5].gsub(/[\[\]]/,"").strip
         end
         frequency = match_data[6].strip
-        
+
         case(frequency.upcase)
         when "EACH CALL"
           frequency = VARIABLE_FREQUENCY_DETAILED
@@ -136,7 +136,7 @@ module LegacyOpenStudio
           frequency = VARIABLE_FREQUENCY_MONTHLY
         when "RUNPERIOD", "ENVIRONMENT", "ANNUAL"
           frequency = VARIABLE_FREQUENCY_RUN_PERIOD
-        end        
+        end
 
         @variable_defs[key] = OutputVariableDefinition.new
         @variable_defs[key].key = key
@@ -149,7 +149,7 @@ module LegacyOpenStudio
 
 
     #read_run_periods
-    
+
       # NOTE:  Because of the format of the ESO file, if hourly (or shorter) variables are not reported, it is impossible
       #        to determine the actual start and end dates of the run period.  Generally, the user will have the hourly
       #        variables if the plan to do any visualization of data.  Yes, the run period information is available in the
@@ -169,10 +169,10 @@ module LegacyOpenStudio
 
         case(key)
         when 1  # New environment, new run period
-          
+
           # Start a new run period
           run_period = OutputRunPeriod.new
-          run_period.variable_defs = @variable_defs  # This is instead of creating an OutputDataDictionary class          
+          run_period.variable_defs = @variable_defs  # This is instead of creating an OutputDataDictionary class
           run_period.name = array[1].strip
           run_period.latitude = array[2].strip
           run_period.longitude = array[3].strip
@@ -204,7 +204,7 @@ module LegacyOpenStudio
 
         if (key > 1 and key < 6)
           run_period.length = array[1].to_i  # Days of simulation
-          
+
           # assume annual simulation
           update_progress.update_progress((100.0 * array[1].to_f/365.0), "Reading Output File")
 
@@ -213,16 +213,16 @@ module LegacyOpenStudio
             run_period.start_date = date
           end
         end
-        
+
       end
-      
+
       # ResultsManager also calls 'finalize' but with better dates...don't want to call it twice.
-      #@run_periods.each { |run_period| run_period.finalize }  
+      #@run_periods.each { |run_period| run_period.finalize }
 
       file.close
     end
-    
-    
+
+
     def get_variable_key(name, object_name)
       for variable_def in @variable_defs.values
         if (variable_def.name == name and variable_def.object_name == object_name)

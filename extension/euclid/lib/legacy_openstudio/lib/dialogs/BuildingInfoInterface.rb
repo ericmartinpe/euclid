@@ -8,7 +8,7 @@ require("legacy_openstudio/lib/dialogs/DialogInterface")
 module LegacyOpenStudio
 
   class BuildingInfoInterface < DialogInterface
-  
+
     def populate_hash
 
       @drawing_interface = Plugin.model_manager.selected_drawing_interface
@@ -17,7 +17,7 @@ module LegacyOpenStudio
         @input_object = @drawing_interface.input_object
 
         @hash['NAME'] = @input_object.fields[1]
-        @hash['ROTATION'] = @input_object.fields[2]        
+        @hash['ROTATION'] = @input_object.fields[2]
         @hash['TERRAIN'] = @input_object.fields[3].upcase
         @hash['LOADS_TOLERANCE'] = @input_object.fields[4]
         @hash['TEMPERATURE_TOLERANCE'] = @input_object.fields[5]
@@ -34,7 +34,7 @@ module LegacyOpenStudio
           if (zone.include_in_building_floor_area?)
             floor_area += zone.floor_area
           end
-          
+
           exterior_area += zone.exterior_area
           exterior_glazing_area += zone.exterior_glazing_area
         end
@@ -55,7 +55,7 @@ module LegacyOpenStudio
           floor_area = floor_area.to_feet.to_feet
           exterior_area = exterior_area.to_feet.to_feet
         end
-        
+
         @hash['FLOOR_AREA'] = floor_area.round_to(Plugin.model_manager.length_precision).to_s + " " + Plugin.model_manager.units_hash['m2'][i]
         @hash['EXTERIOR_AREA'] = exterior_area.round_to(Plugin.model_manager.length_precision).to_s + " " + Plugin.model_manager.units_hash['m2'][i]
         @hash['PERCENT_GLAZING'] = percent_glazing.round_to(1).to_s + " %"
@@ -85,10 +85,10 @@ module LegacyOpenStudio
       if (@input_object != input_object_copy)
         Plugin.model_manager.input_file.modified = true
       end
-      
+
       # Update drawing interface
       Plugin.model_manager.building.on_change_input_object
-      
+
       return(true)
     end
 

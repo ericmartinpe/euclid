@@ -8,9 +8,9 @@ require("legacy_openstudio/lib/dialogs/DialogInterface")
 module LegacyOpenStudio
 
   class NoSelectionInfoInterface < DialogInterface
-  
+
     # Empty class!
-    
+
   end
 
 end

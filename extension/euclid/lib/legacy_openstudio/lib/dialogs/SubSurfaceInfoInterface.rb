@@ -76,7 +76,7 @@ module LegacyOpenStudio
 
         when "OUTDOORS", "GROUND", "GROUNDFCFACTORMETHOD", "GROUNDSLABPREPROCESSORAVERAGE",
               "GROUNDSLABPREPROCESSORCORE", "GROUNDSLABPREPROCESSORPERIMETER",
-              "GROUNDBASEMENTPREPROCESSORAVERAGEWALL", "GROUNDBASEMENTPREPROCESSORAVERAGEFLOOR", 
+              "GROUNDBASEMENTPREPROCESSORAVERAGEWALL", "GROUNDBASEMENTPREPROCESSORAVERAGEFLOOR",
               "GROUNDBASEMENTPREPROCESSORUPPERWALL", "GROUNDBASEMENTPREPROCESSORLOWERWALL"
           # OUTSIDE_BOUNDARY_OBJECT should be blank or disabled
 
@@ -110,7 +110,7 @@ module LegacyOpenStudio
       else
         @input_object.fields[7] = @hash['SHADING_DEVICE']
       end
-      
+
       if (frame_divider = Plugin.model_manager.input_file.find_object_by_class_and_name("WINDOWPROPERTY:FRAMEANDDIVIDER", @hash['FRAME_DIVIDER']))
         @input_object.fields[8] = frame_divider
       else

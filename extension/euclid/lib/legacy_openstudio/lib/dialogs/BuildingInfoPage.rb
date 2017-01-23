@@ -8,7 +8,7 @@ require("legacy_openstudio/lib/dialogs/Dialogs")
 module LegacyOpenStudio
 
   class BuildingInfoPage < Page
-  
+
     def add_callbacks
       super
       @container.web_dialog.add_action_callback("on_change_element") { |d, p| on_change_element(d, p) }

@@ -19,7 +19,7 @@ module LegacyOpenStudio
         @hash['DETACHED_SHADING_CLASS'] = @input_object.class_name
         @hash['NAME'] = @input_object.fields[1]
         @hash['TRANSMITTANCE'] = @input_object.fields[2].to_s
-        
+
         # Need better method here
         if (Plugin.model_manager.units_system == "SI")
           i = 0
@@ -62,7 +62,7 @@ module LegacyOpenStudio
 
       return(true)
     end
-    
+
   end
 
 end

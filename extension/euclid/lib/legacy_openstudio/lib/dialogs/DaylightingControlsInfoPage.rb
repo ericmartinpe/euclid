@@ -31,10 +31,10 @@ module LegacyOpenStudio
       update_elements
       report
     end
-    
-    
+
+
     def update_elements
-      
+
       num_points = @hash['NUMPOINTS'].to_i
       if num_points == 1
         disable_element('X2')

@@ -13,7 +13,7 @@ module LegacyOpenStudio
       super
       @container = WindowContainer.new("Surface Search", 550, 400, 150, 150)
       @container.set_file(Plugin.dir + "/lib/dialogs/html/SurfaceSearch.html")
-      
+
       @hash['CLASS'] = ""
       @hash['NAME'] = ""
       @hash['TYPE'] = ""
@@ -24,9 +24,9 @@ module LegacyOpenStudio
       @hash['SHADING_CONTROL_NAME'] = ""
       @hash['FRAME_AND_DIVIDER_NAME'] = ""
       @hash['SCENE_NAME'] = ""
-      
+
       @last_report = ""
-      
+
       # do profiling
       @profile = false
 
@@ -44,13 +44,13 @@ module LegacyOpenStudio
       @container.web_dialog.add_action_callback("on_last_report") { on_last_report }
       @container.web_dialog.add_action_callback("on_cancel") { on_cancel }
     end
-    
+
     def on_load
       super
       set_select_options("CLASS", ["", "BuildingSurface:Detailed", "FenestrationSurface:Detailed", "Shading:Site:Detailed", "Shading:Building:Detailed", "Shading:Zone:Detailed"])
       on_change_class
-    end 
-    
+    end
+
     def on_change_element(d, p)
       super
     end
@@ -60,11 +60,11 @@ module LegacyOpenStudio
       case (@hash['CLASS'])
 
       when ""
-      
+
         enable_element("CLASS")
         enable_element("NAME")
         enable_element("CONSTRUCTION")
-        
+
         @hash['TYPE'] = ""
         disable_element("TYPE")
         @hash['OUTSIDE_BOUNDARY_CONDITION'] = ""
@@ -77,11 +77,11 @@ module LegacyOpenStudio
         disable_element("SHADING_CONTROL_NAME")
         @hash['FRAME_AND_DIVIDER_NAME'] = ""
         disable_element("FRAME_AND_DIVIDER_NAME")
-        
+
         object_names = Plugin.model_manager.construction_manager.constructions.collect { |object| object.name }
         object_names = [""].concat(object_names.sort)
         set_select_options("CONSTRUCTION", object_names)
-      
+
       when "BuildingSurface:Detailed"
 
         enable_element("CLASS")
@@ -91,20 +91,20 @@ module LegacyOpenStudio
         enable_element("OUTSIDE_BOUNDARY_CONDITION")
         enable_element("SUN")
         enable_element("WIND")
-        
+
         @hash['SHADING_CONTROL_NAME'] = ""
         disable_element("SHADING_CONTROL_NAME")
         @hash['FRAME_AND_DIVIDER_NAME'] = ""
         disable_element("FRAME_AND_DIVIDER_NAME")
-                
+
         set_select_options("TYPE", ["", "Floor", "Wall", "Ceiling", "Roof"])
-        
+
         object_names = Plugin.model_manager.construction_manager.constructions.collect { |object| object.name }
         object_names = [""].concat(object_names.sort)
         set_select_options("CONSTRUCTION", object_names)
-        set_select_options("OUTSIDE_BOUNDARY_CONDITION", ["", "Surface", "Adiabatic", "Zone", "Outdoors", "Ground", "GroundFCfactorMethod", 
-                                                                                  "GroundSlabPreprocessorAverage", "GroundSlabPreprocessorCore", "GroundSlabPreprocessorPerimeter", 
-                                                                                  "GroundBasementPreprocessorAverageWall", "GroundBasementPreprocessorAverageFloor", 
+        set_select_options("OUTSIDE_BOUNDARY_CONDITION", ["", "Surface", "Adiabatic", "Zone", "Outdoors", "Ground", "GroundFCfactorMethod",
+                                                                                  "GroundSlabPreprocessorAverage", "GroundSlabPreprocessorCore", "GroundSlabPreprocessorPerimeter",
+                                                                                  "GroundBasementPreprocessorAverageWall", "GroundBasementPreprocessorAverageFloor",
                                                                                   "GroundBasementPreprocessorUpperWall", "GroundBasementPreprocessorLowerWall",
                                                                                   "OtherSideCoefficients", "OtherSideConditionsModel"])
         set_select_options("SUN", ["", "SunExposed", "NoSun"])
@@ -122,20 +122,20 @@ module LegacyOpenStudio
         enable_element("CONSTRUCTION")
         enable_element("SHADING_CONTROL_NAME")
         enable_element("FRAME_AND_DIVIDER_NAME")
-        
+
         @hash['OUTSIDE_BOUNDARY_CONDITION'] = ""
         disable_element("OUTSIDE_BOUNDARY_CONDITION")
         @hash['SUN'] = ""
         disable_element("SUN")
         @hash['WIND'] = ""
         disable_element("WIND")
-        
+
         set_select_options("TYPE", ["", "Window", "Door", "Glass Door", "Tubular Daylight Dome", "Tubular Daylight Diffuser"])
-        
+
         object_names = Plugin.model_manager.construction_manager.constructions.collect { |object| object.name }
         object_names = [""].concat(object_names.sort)
         set_select_options("CONSTRUCTION", object_names)
-        
+
         set_select_options("OUTSIDE_BOUNDARY_CONDITION", [""])
         set_select_options("SUN", [""])
         set_select_options("WIND", [""])
@@ -147,11 +147,11 @@ module LegacyOpenStudio
         object_names = Plugin.model_manager.input_file.find_objects_by_class_name("WindowProperty:FrameAndDivider").collect { |object| object.name }
         object_names = [""].concat(object_names.sort)
         set_select_options("FRAME_AND_DIVIDER_NAME", object_names)
-        
+
         update
-        
+
       when "Shading:Site:Detailed", "Shading:Building:Detailed", "Shading:Zone:Detailed"
-      
+
         enable_element("CLASS")
         enable_element("NAME")
 
@@ -169,7 +169,7 @@ module LegacyOpenStudio
         disable_element("SHADING_CONTROL_NAME")
         @hash['FRAME_AND_DIVIDER_NAME'] = ""
         disable_element("FRAME_AND_DIVIDER_NAME")
-        
+
         set_select_options("TYPE", [""])
         set_select_options("CONSTRUCTION", [""])
         set_select_options("OUTSIDE_BOUNDARY_CONDITION", [""])
@@ -181,64 +181,64 @@ module LegacyOpenStudio
         update
 
       end
-      
+
     end
-    
+
     def on_search_model
-    
+
       # this was not stopping object info window from flickering
       #result = Sketchup.active_model.selection.remove_observer(Plugin.model_manager.selection_observer)
 
       model = Sketchup.active_model
       model.selection.clear
       model.entities.each {|e| model.selection.add(e)}
-      selected_entities = search(model.selection)   
+      selected_entities = search(model.selection)
       model.selection.clear
       model.selection.add(selected_entities)
 
       #Sketchup.active_model.selection.add_observer(Plugin.model_manager.selection_observer)
     end
-    
+
     def on_search_selection
       model = Sketchup.active_model
       search(model.selection)
     end
-    
+
     def search(selection)
-    
+
       if selection.empty?
         UI.messagebox("Selection is empty, please select objects for searching or choose 'Search in Entire Model'.")
         return []
       end
-      
+
       @last_report = "Search results:\n"
-      
+
       selected_entities = []
-      
+
       model = Sketchup.active_model
       model.start_operation("Surface Search", true)
-      
+
       begin
-      
+
         if @profile
           require 'legacy_openstudio/stdruby/profiler'
           Profiler__::start_profile
         end
-        
+
         progress_dialog = ProgressDialog.new
 
         # hide all zones, surfaces, sub surfaces, and shading surfaces, and edges
         Plugin.model_manager.zones.each { |zone| zone.entity.hidden = true }
-        Plugin.model_manager.base_surfaces.each do |base_surface| 
-          base_surface.entity.hidden = true 
+        Plugin.model_manager.base_surfaces.each do |base_surface|
+          base_surface.entity.hidden = true
           base_surface.entity.edges.each { |edge| edge.hidden = true }
         end
-        Plugin.model_manager.sub_surfaces.each do |sub_surface| 
-          sub_surface.entity.hidden = true 
+        Plugin.model_manager.sub_surfaces.each do |sub_surface|
+          sub_surface.entity.hidden = true
           sub_surface.entity.edges.each { |edge| edge.hidden = true }
         end
-        Plugin.model_manager.shading_surfaces.each do |shading_surface| 
-          shading_surface.entity.hidden = true 
+        Plugin.model_manager.shading_surfaces.each do |shading_surface|
+          shading_surface.entity.hidden = true
           shading_surface.entity.edges.each { |edge| edge.hidden = true }
         end
 
@@ -271,15 +271,15 @@ module LegacyOpenStudio
               shading_control.empty? and frame_and_divider.empty?
 
                # unhide face
-               Plugin.model_manager.base_surfaces[index].entity.visible = true    
+               Plugin.model_manager.base_surfaces[index].entity.visible = true
                selected_entities << Plugin.model_manager.base_surfaces[index].entity
 
                # unhide edges
                Plugin.model_manager.base_surfaces[index].entity.edges.each {|edge| edge.visible = true }
 
                # unhide zone
-               Plugin.model_manager.base_surfaces[index].parent.entity.visible = true      
-               
+               Plugin.model_manager.base_surfaces[index].parent.entity.visible = true
+
                # add to report
                @last_report << "#{input_object.class_name}, #{input_object.fields[1].to_s}\n"
 
@@ -305,21 +305,21 @@ module LegacyOpenStudio
               input_object.fields[8].to_s.upcase.include?(frame_and_divider)
 
                # unhide face
-               Plugin.model_manager.sub_surfaces[index].entity.visible = true  
+               Plugin.model_manager.sub_surfaces[index].entity.visible = true
                selected_entities << Plugin.model_manager.sub_surfaces[index].entity
 
                # unhide edges
                Plugin.model_manager.sub_surfaces[index].entity.edges.each {|edge| edge.visible = true }
 
                # unhide base surface
-               #Plugin.model_manager.sub_surfaces[index].parent.entity.visible = true   
+               #Plugin.model_manager.sub_surfaces[index].parent.entity.visible = true
 
                # unhide base surface edges
                Plugin.model_manager.sub_surfaces[index].parent.entity.edges.each {|edge| edge.visible = true }
 
                # unhide zone
-               Plugin.model_manager.sub_surfaces[index].parent.parent.entity.visible = true   
-               
+               Plugin.model_manager.sub_surfaces[index].parent.parent.entity.visible = true
+
                # add to report
                @last_report << "#{input_object.class_name}, #{input_object.fields[1].to_s}\n"
             end
@@ -345,25 +345,25 @@ module LegacyOpenStudio
                shading_control.empty? and frame_and_divider.empty?
 
                # unhide face
-               Plugin.model_manager.shading_surfaces[index].entity.visible = true 
+               Plugin.model_manager.shading_surfaces[index].entity.visible = true
                selected_entities << Plugin.model_manager.shading_surfaces[index].entity
 
                # unhide edges
                Plugin.model_manager.shading_surfaces[index].entity.edges.each {|edge| edge.visible = true }
 
                # unhide base surface
-               #Plugin.model_manager.shading_surfaces[index].parent.entity.visible = true   
+               #Plugin.model_manager.shading_surfaces[index].parent.entity.visible = true
 
                # unhide base surface edges
                Plugin.model_manager.shading_surfaces[index].parent.entity.edges.each {|edge| edge.visible = true }
 
                # unhide zone
-               Plugin.model_manager.shading_surfaces[index].parent.parent.entity.visible = true      
-               
+               Plugin.model_manager.shading_surfaces[index].parent.parent.entity.visible = true
+
                # add to report
                @last_report << "#{input_object.class_name}, #{input_object.fields[1].to_s}\n"
             end
-            
+
           end
         end
 
@@ -383,7 +383,7 @@ module LegacyOpenStudio
             progress_dialog.update_progress(100*index.to_f/num_shading_surfaces.to_f, "Searching Detached Shading Surfaces")
 
             input_object = Plugin.model_manager.shading_surfaces[index].input_object
-            
+
             if Plugin.model_manager.shading_surfaces[index].in_selection?(selection) and
                input_object.fields[0].to_s.upcase.include?(idf_class) and
                input_object.fields[1].to_s.upcase.include?(name) and
@@ -392,22 +392,22 @@ module LegacyOpenStudio
                shading_control.empty? and frame_and_divider.empty?
 
                # unhide face
-               Plugin.model_manager.shading_surfaces[index].entity.visible = true 
+               Plugin.model_manager.shading_surfaces[index].entity.visible = true
                selected_entities << Plugin.model_manager.shading_surfaces[index].entity
 
                # unhide edges
                Plugin.model_manager.shading_surfaces[index].entity.edges.each {|edge| edge.visible = true }
 
                # unhide zone
-               Plugin.model_manager.shading_surfaces[index].parent.entity.visible = true     
-               
+               Plugin.model_manager.shading_surfaces[index].parent.entity.visible = true
+
                # add to report
                @last_report << "#{input_object.class_name}, #{input_object.fields[1].to_s}\n"
             end
-           
-          end        
-        end      
-      
+
+          end
+        end
+
         if @profile
           puts "Profiling results in #{Dir.pwd}"
           File.open(Dir.pwd + "/SurfaceSearchDialog.profile", 'w') do |file|
@@ -420,28 +420,28 @@ module LegacyOpenStudio
         progress_dialog.destroy
       end
 
-      model.commit_operation 
-      
+      model.commit_operation
+
       return selected_entities
 
     end
-    
+
     def on_unhide_all
       # unhide all
       model = Sketchup.active_model
       model.start_operation("Unhide All", true)
-      
+
       Plugin.model_manager.zones.each { |zone| zone.entity.visible = true }
-      Plugin.model_manager.all_surfaces.each do |surface| 
-        surface.entity.visible = true 
+      Plugin.model_manager.all_surfaces.each do |surface|
+        surface.entity.visible = true
         surface.entity.edges.each { |edge| edge.visible = true }
       end
-        
+
       model.commit_operation
-    end    
+    end
 
     def on_save_scene
-    
+
       # this does not seem to remember which surfaces are hidden within each group (Zone)
 
       # 1 - Camera Location,
@@ -451,21 +451,21 @@ module LegacyOpenStudio
       # 16 - Hidden Geometry,
       # 32 - Visible Layers,
       # 64 - Active Section Planes.
-      
+
       scene_name = @hash['SCENE_NAME']
       if not scene_name or scene_name.empty?
         UI.messagebox("Please enter a scene name.")
-        return 
+        return
       end
-      
+
       # see if page already exists
       model = Sketchup.active_model
       pages = model.pages
       if pages[scene_name]
         UI.messagebox("Please enter a unique scene name.")
-        return 
+        return
       end
-      
+
       # get current page, make a default one if no pages
       current_page = pages.selected_page
       if current_page.nil?
@@ -479,7 +479,7 @@ module LegacyOpenStudio
         current_page.use_shadow_info = false
         current_page.use_style = false
       end
-      
+
       page = pages.add(scene_name)
       page.use_axes = false
       page.use_camera = false
@@ -491,13 +491,13 @@ module LegacyOpenStudio
       page.use_style = false
       page.update(16)
       page.update(32)
-      
+
       puts page.hidden_entities
-      
+
       pages.selected_page = current_page
-      
-    end   
-    
+
+    end
+
     def on_last_report
       if (Plugin.platform == Platform_Windows)
         Plugin.dialog_manager.show(LastReportInterface)
@@ -507,11 +507,11 @@ module LegacyOpenStudio
         UI.messagebox @last_report,MB_MULTILINE
       end
     end
-    
+
     def on_cancel
       close
     end
-    
+
   end
 
 end

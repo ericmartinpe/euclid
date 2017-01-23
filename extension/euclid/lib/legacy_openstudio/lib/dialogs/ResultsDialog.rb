@@ -29,7 +29,7 @@ module LegacyOpenStudio
       super
       script = "drawChart(" + $results.inspect + ")"
       # drawChart cannot handle 0.0!!!
-    
+
       @container.web_dialog.execute_script(script)
     end
 

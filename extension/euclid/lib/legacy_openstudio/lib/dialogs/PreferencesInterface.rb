@@ -17,9 +17,9 @@ module LegacyOpenStudio
 
 
     def populate_hash
-    
+
       # Another interesting way if the automatic conversion between string and boolean doesn't work out
-      #@hash['SHOW_DRAWING'] = Plugin.read_pref("Show Drawing") ? "true" : "false" 
+      #@hash['SHOW_DRAWING'] = Plugin.read_pref("Show Drawing") ? "true" : "false"
 
       @hash['INTERZONE_SURFACES'] = Plugin.read_pref("Interzone Surfaces Behavior")
       @hash['PROJECT_SUB_SURFACES'] = Plugin.read_pref("Project Sub Surfaces")
@@ -84,7 +84,7 @@ module LegacyOpenStudio
       Plugin.write_pref("Server Timeout", @hash['SERVER_TIMEOUT'])
       Plugin.write_pref("Text Editor Path", @hash['TEXT_EDITOR_PATH'])
       Plugin.write_pref("EnergyPlus Path", @hash['EXE_PATH'])
-      
+
       return(true)
     end
 

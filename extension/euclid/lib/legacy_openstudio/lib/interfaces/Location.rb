@@ -5,7 +5,7 @@
 require("legacy_openstudio/lib/interfaces/DrawingInterface")
 require("legacy_openstudio/lib/observers/ShadowInfoObserver")
 
-      
+
 module LegacyOpenStudio
 
   class Location < DrawingInterface
@@ -49,7 +49,7 @@ module LegacyOpenStudio
 
 
     def check_entity
-      return(false) 
+      return(false)
     end
 
 

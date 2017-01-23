@@ -11,7 +11,7 @@ module LegacyOpenStudio
 
     def initialize(input_object)
       super
-      #Plugin.model_manager.drawing_manager.materials << self 
+      #Plugin.model_manager.drawing_manager.materials << self
       return(self)
     end
 
@@ -35,30 +35,30 @@ module LegacyOpenStudio
 
     def initialize(obj)
       super
-      
+
       @first_vertex_field = 3
       @zone = nil   # really only the BaseSurface that needs this zone ref---take that back, subs and attached shading need it too.
 
       @input_object = nil
       @entity = nil  # Reference to the native SketchUp entity:  group, face, material, etc.
       @zone = nil
-      
+
       @points = []
-      
+
       if (object.class == InputObject)
         new_from_input_object(object)
       elsif (object.class == Sketchup::Face)
         new_from_entity(object)
       end
 
-      #Plugin.model_manager.drawing_manager.daylighting_detailed_points << self 
-      
+      #Plugin.model_manager.drawing_manager.daylighting_detailed_points << self
+
       return(self)
     end
 
 
     def new_from_input_object(input_object)
-    
+
       # Drawing interface is being created because an input object is being loaded
       # Can either create/draw a new entity, or relink to an existing entity.
       # This method might be pretty similar across drawing classes.
@@ -86,7 +86,7 @@ module LegacyOpenStudio
         Plugin.model_manager.add_error("NO ZONE WAS ADDED.\n\n")
       end
 
-      #@zone.daylighting_detailed_points << self 
+      #@zone.daylighting_detailed_points << self
 
     end
 
@@ -122,10 +122,10 @@ module LegacyOpenStudio
       # create its own group
 
       # create the construction points
-      for point in @points      
+      for point in @points
         @entity = group_entity.entities.add_cpoint(point)
       end
-      
+
       @entity.input_object_key = key  # persistent link
       @entity.drawing_interface = self
 

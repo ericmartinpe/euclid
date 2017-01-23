@@ -6,7 +6,7 @@
 module LegacyOpenStudio
 
   class DataSeries
-  
+
     attr_accessor :variable_def, :values, :interval
     attr_accessor :length, :min, :max, :sum, :average
     #attr_accessor :intervals  # Later deal with varying time intervals between values for Detailed reporting...
@@ -21,7 +21,7 @@ module LegacyOpenStudio
     def inspect
       return(self)
     end
-    
+
     def units
       return(@variable_def.units)
     end
@@ -38,12 +38,12 @@ module LegacyOpenStudio
       if (@interval.contains?(time))
         # Get the time step
         #@variable.time_step(time)
-        
-        
+
+
         case(@variable_def.frequency)
         when VARIABLE_FREQUENCY_RUN_PERIOD
           time_step = @interval.length  # This never gets interpolated
-          
+
         when VARIABLE_FREQUENCY_MONTHLY
           # varies!
           time_step = 2592000  # 30 days
@@ -56,7 +56,7 @@ module LegacyOpenStudio
           time_step = 3600.0
 
         when VARIABLE_FREQUENCY_TIME_STEP
-          
+
           # better to break modularity and rely on the plugin than get the wrong answer
           objects = Plugin.model_manager.input_file.find_objects_by_class_name("Timestep")
           if (objects.empty?)
@@ -80,10 +80,10 @@ module LegacyOpenStudio
 
           elapsed_time_step = time - @interval.start_time - index * time_step
           return( ((values[index - 1] * (time_step - elapsed_time_step)) + (values[index] * elapsed_time_step)) / time_step )
-        
+
         else
           return(values[index])
-          
+
         end
       else
         return(nil)
@@ -103,10 +103,10 @@ module LegacyOpenStudio
       @average = @sum / @length  # Depends if intervals are equal or not
 
       #@integral =? # Depends if intervals are equal or not, also if averaged or summed variable
-      
+
       #@month_sums = []  # Useful for reporting
     end
 
   end
-  
+
 end

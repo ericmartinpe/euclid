@@ -30,7 +30,7 @@ module LegacyOpenStudio
 
     def on_load
       super
-      
+
       # Manually trigger onChange for start and end months to set the day popup options
       @container.execute_function("setDateOptions()")
 
@@ -43,11 +43,11 @@ module LegacyOpenStudio
     def on_match_time_period
 
       run_period_objects = Plugin.model_manager.input_file.find_objects_by_class_name("RUNPERIOD")
- 
+
       if (not run_period_objects.empty?)
-      
+
         run_period = run_period_objects.to_a.first
-      
+
         @hash['START_MONTH'] = run_period.fields[2]
         set_element_value("START_MONTH", run_period.fields[2])
 
@@ -92,5 +92,5 @@ module LegacyOpenStudio
     end
 
   end
-  
+
 end

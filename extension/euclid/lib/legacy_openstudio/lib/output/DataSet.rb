@@ -10,7 +10,7 @@ module LegacyOpenStudio
   class DataSet
     # This is a set of DataSeries objects that have been collected for some purpose.
     # A DataSet is more dynamic than the DataSeries objects (which are static)--DataSeries can be added later.
-  
+
     attr_accessor :data_series
 
 
@@ -30,14 +30,14 @@ module LegacyOpenStudio
 
 
     #def each
-    
+
     #end
 
 
     def length
       return(@data_series.length)
     end
-    
+
     def units
       result = ''
       if @data_series.length > 0
@@ -100,21 +100,21 @@ module LegacyOpenStudio
       # Dumps the data set to a CSV file, mainly for testing right now.
 
       file = File.new(path, 'w')
-      
+
       # Write header
       header = "Time Stamp,"
       @data_series.each { |series| header += series.variable_def.display_name + "," }
       file.puts(header)
-      
+
       # Need a way to loop through the different time intervals...  maybe have master interval list in RunPeriod
 
       for i in 0...@data_series[0].length
         line = "0:00,"
-        
+
         for data_series in @data_series
           line += data_series.values[i].to_s + ","
         end
-        
+
         file.puts(line)
       end
 

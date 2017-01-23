@@ -13,7 +13,7 @@ module LegacyOpenStudio
       super
       @dialog = SurfaceMatchingDialog.new(nil, self, @hash)
     end
-    
+
   end
 
 end

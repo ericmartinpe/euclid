@@ -8,11 +8,11 @@ require 'legacy_openstudio/lib/interfaces/OutputIlluminanceMap'
 module LegacyOpenStudio
 
   class NewOutputIlluminanceMapTool < Tool
-  
+
     def initialize
       @cursor = UI.create_cursor(Plugin.dir + "/lib/resources/icons/OriginToolCursor-14x20.tiff", 3, 3)
     end
-    
+
     def onMouseMove(flags, x, y, view)
       super
       # Should apply user's precision setting here   --automatically done, I think
@@ -46,7 +46,7 @@ module LegacyOpenStudio
         Sketchup.send_action("selectSelectionTool:")
         return false
       end
-      
+
       # test to see if there are already any Output Illuminance Maps in this zone
       Plugin.model_manager.output_illuminance_maps.each do |output_illuminance_map|
         if output_illuminance_map.zone == this_zone.input_object
@@ -55,9 +55,9 @@ module LegacyOpenStudio
           return false
         end
       end
-      
+
       Sketchup.active_model.start_operation("Output:IlluminanceMap")
-      
+
       initial_position = @ip.position
       if @ip.face
         # bump up or in by 30" if placed on a face
@@ -65,19 +65,19 @@ module LegacyOpenStudio
         distance.length = 30.0
         initial_position = initial_position - distance
       end
-      
+
       output_illuminance_map = OutputIlluminanceMap.new
       output_illuminance_map.create_input_object
       output_illuminance_map.zone = this_zone
       output_illuminance_map.sketchup_min = initial_position
       output_illuminance_map.reset_lengths
-      output_illuminance_map.draw_entity 
+      output_illuminance_map.draw_entity
 
       Sketchup.active_model.selection.clear
       Sketchup.active_model.selection.add(output_illuminance_map.entity)
- 
+
       Sketchup.send_action("selectScaleTool:")
- 
+
       Sketchup.active_model.commit_operation
 
     end

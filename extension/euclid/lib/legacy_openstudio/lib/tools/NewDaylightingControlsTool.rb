@@ -8,11 +8,11 @@ require 'legacy_openstudio/lib/interfaces/DaylightingControls'
 module LegacyOpenStudio
 
   class NewDaylightingControlsTool < Tool
-  
+
     def initialize
       @cursor = UI.create_cursor(Plugin.dir + "/lib/resources/icons/OriginToolCursor-14x20.tiff", 3, 3)
     end
-    
+
     def onMouseMove(flags, x, y, view)
       super
       # Should apply user's precision setting here   --automatically done, I think
@@ -57,7 +57,7 @@ module LegacyOpenStudio
       end
 
       Sketchup.active_model.start_operation("Daylighting:Controls")
-      
+
       initial_position = @ip.position
       if @ip.face
         # bump up or in by 30" if placed on a face
@@ -65,18 +65,18 @@ module LegacyOpenStudio
         distance.length = 30.0
         initial_position = initial_position - distance
       end
-      
+
       daylighting_controls = DaylightingControls.new
       daylighting_controls.create_input_object
       daylighting_controls.zone = this_zone
       daylighting_controls.sketchup_sensor1 = initial_position
       daylighting_controls.reset_lengths
-      daylighting_controls.draw_entity 
+      daylighting_controls.draw_entity
 
       Sketchup.active_model.selection.add(daylighting_controls.entity)
- 
+
       Sketchup.send_action("selectSelectionTool:")
- 
+
       Sketchup.active_model.commit_operation
 
     end

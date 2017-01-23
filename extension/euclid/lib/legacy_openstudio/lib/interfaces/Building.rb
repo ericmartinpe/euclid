@@ -21,7 +21,7 @@ module LegacyOpenStudio
 
       super
     end
-    
+
     # Updates the input object with the current state of the entity.
     def update_input_object
       super
@@ -35,7 +35,7 @@ module LegacyOpenStudio
     def parent_from_input_object
       return(Plugin.model_manager.model_interface)
     end
-    
+
     # Building is unlike other drawing interface because it does not actually create the entity.
     # Instead it gets the current ShadowInfo object.
     def create_entity
@@ -45,7 +45,7 @@ module LegacyOpenStudio
     # Drawing interfaces that don't correspond directly to a SketchUp entity (SurfaceGeometry, Building)
     # should return false here.
     def check_entity
-      return(false) 
+      return(false)
     end
 
     # Updates the entity with the current state of the input object.
@@ -55,7 +55,7 @@ module LegacyOpenStudio
         #@entity["NorthAngle"] = -@input_object.fields[2].to_f
 
         # we will always draw detailed surfaces with true North = y
-        # we want shadows to look right so synch up NorthAngle in SketchUp with detailed surface system     
+        # we want shadows to look right so synch up NorthAngle in SketchUp with detailed surface system
         if @entity["NorthAngle"] != 0
           if not @first_time_message
             @first_time_message = true
@@ -66,13 +66,13 @@ module LegacyOpenStudio
         end
       end
     end
-    
+
     def on_change_entity
       # normally would update the idf object
       #update_input_object
       #Plugin.dialog_manager.update(BuildingInfoInterface)
       #Plugin.dialog_manager.update(ObjectInfoInterface)
-      
+
       # here we just overwrite the entity with our idf object
       update_entity
     end
@@ -80,14 +80,14 @@ module LegacyOpenStudio
     def parent_from_entity
       return(Plugin.model_manager.model_interface)
     end
-    
+
     def add_observers
       if (valid_entity?)
         @observer = ShadowInfoObserver.new(self)
         @entity.add_observer(@observer)
       end
     end
-    
+
     def azimuth
       return(@input_object.fields[2].to_f)
     end

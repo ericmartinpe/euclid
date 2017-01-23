@@ -21,7 +21,7 @@ require("legacy_openstudio/lib/dialogs/ObjectInfoDialog")
 module LegacyOpenStudio
 
   class ObjectInfoInterface < DialogInterface
-  
+
     def initialize(container = nil)
       super
       @dialog = ObjectInfoDialog.new(nil, self, @hash)
@@ -58,15 +58,15 @@ module LegacyOpenStudio
       when "LegacyOpenStudio::DetachedShadingSurface"
         @active_interface = DetachedShadingSurfaceInfoInterface.new
         @hash = @active_interface.hash
-        
+
       when "LegacyOpenStudio::OutputIlluminanceMap"
         @active_interface = OutputIlluminanceMapInfoInterface.new
         @hash = @active_interface.hash
-        
+
       when "LegacyOpenStudio::DaylightingControls"
         @active_interface = DaylightingControlsInfoInterface.new
         @hash = @active_interface.hash
-        
+
       else  # NilClass
         @active_interface = NoSelectionInfoInterface.new
         @hash = Hash.new
@@ -86,7 +86,7 @@ module LegacyOpenStudio
         return(false)
       end
     end
-    
+
   end
 
 end

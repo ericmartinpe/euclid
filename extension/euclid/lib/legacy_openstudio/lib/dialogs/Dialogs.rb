@@ -15,7 +15,7 @@ module LegacyOpenStudio
     attr_reader :container
 
     def initialize(container, interface, hash)
-      @container = container  # In subclasses @container must be created before calling add_callbacks    
+      @container = container  # In subclasses @container must be created before calling add_callbacks
       @interface = interface  # The dialog reports back to this object using:  @interface.report
       @hash = hash
     end
@@ -53,7 +53,7 @@ module LegacyOpenStudio
     def on_key(d, p)
       if (p == "27")  # Escape key
         on_cancel
-      end        
+      end
     end
 
 
@@ -64,11 +64,11 @@ module LegacyOpenStudio
 
       key = args[0]
       value = args[1]
-      
+
       if (args.length > 2)
         puts "Dialog.on_change_element: web dialog element with commas passed in"
       end
-      
+
       # Not sure if this is a good idea
       if (value == 'true')
         value = true
@@ -99,7 +99,7 @@ module LegacyOpenStudio
 
 
     def show
-      @container.show    
+      @container.show
     end
 
 
@@ -206,7 +206,7 @@ module LegacyOpenStudio
           path = ""
         end
         @container.execute_function("setElementSource('" + name + "', '" + path + "')")
-      end    
+      end
     end
 
 
@@ -215,17 +215,17 @@ module LegacyOpenStudio
       if (id.nil?)
         puts "Dialog: nil id passed to get_element_value_by_id"
         value = nil
-      else 
+      else
         value = @container.web_dialog.get_element_value(id)
       end
       return(value)
     end
 
-    
+
     def disable_element(name)
       if (name.nil?)
         puts "Dialog:  nil name passed to disable_element"
-      else      
+      else
         @container.execute_function("disableElement('" + name + "')")
       end
     end
@@ -234,7 +234,7 @@ module LegacyOpenStudio
     def enable_element(name)
       if (name.nil?)
         puts "Dialog:  nil name passed to enable_element"
-      else      
+      else
         @container.execute_function("enableElement('" + name + "')")
       end
     end
@@ -243,7 +243,7 @@ module LegacyOpenStudio
     def hide_element(name)
       if (name.nil?)
         puts "Dialog:  nil name passed to hide_element"
-      else      
+      else
         @container.execute_function("hideElement('" + name + "')")
       end
     end
@@ -252,7 +252,7 @@ module LegacyOpenStudio
     def show_element(name)
       if (name.nil?)
         puts "Dialog:  nil name passed to show_element"
-      else      
+      else
         @container.execute_function("showElement('" + name + "')")
       end
     end
@@ -261,7 +261,7 @@ module LegacyOpenStudio
     def mark_element(name)
       if (name.nil?)
         puts "Dialog:  nil name passed to mark_element"
-      else      
+      else
         @container.execute_function("markElement('" + name + "')")
       end
     end
@@ -270,7 +270,7 @@ module LegacyOpenStudio
     def unmark_element(name)
       if (name.nil?)
         puts "Dialog:  nil name passed to unmark_element"
-      else      
+      else
         @container.execute_function("unmarkElement('" + name + "')")
       end
     end
@@ -282,9 +282,9 @@ module LegacyOpenStudio
 
     def add_callbacks
       super
-      @container.web_dialog.add_action_callback("on_ok") { on_ok }  
+      @container.web_dialog.add_action_callback("on_ok") { on_ok }
     end
-    
+
 
     def on_key(d, p)
       super
@@ -292,19 +292,19 @@ module LegacyOpenStudio
         on_ok
       end
     end
-    
+
 
     def on_ok
       if (report)
         close
       end
     end
-    
+
   end
 
 
-  class PropertiesDialog < MessageDialog  # Abstract class for all properties dialogs    
-    
+  class PropertiesDialog < MessageDialog  # Abstract class for all properties dialogs
+
     def add_callbacks
       super
       @container.web_dialog.add_action_callback("on_apply") { on_apply }
@@ -351,9 +351,9 @@ module LegacyOpenStudio
     def add_callbacks
       super
       @container.web_dialog.add_action_callback("on_next") { on_next }
-      @container.web_dialog.add_action_callback("on_back") { on_back }    
+      @container.web_dialog.add_action_callback("on_back") { on_back }
     end
-    
+
 
     def on_key(d, p)
       super
@@ -432,8 +432,8 @@ module LegacyOpenStudio
       @container = container
       add_callbacks
     end
-    
-    
+
+
     def add_callbacks
       # Be careful with callbacks from FrameContainers...could accidentally overwrite the callback for the WindowContainer!
       @container.web_dialog.add_action_callback("on_load_page") { on_load_page }
@@ -451,15 +451,15 @@ module LegacyOpenStudio
 
 # might be able to replace all WizardPage with just Page...
   class WizardPage < Page
-  
+
     attr_accessor :prev_page, :next_page
-    
+
     def initialize(container, interface, hash)
       super
       @prev_page = nil
       @next_page = nil
     end
-  
+
   end
-  
+
 end

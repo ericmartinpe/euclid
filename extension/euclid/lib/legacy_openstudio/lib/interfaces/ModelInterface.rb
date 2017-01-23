@@ -130,7 +130,7 @@ module LegacyOpenStudio
 
       # Create hash table of entities that have an EnergyPlus key.
       # (Meaning they were associated with an input object at one time.)
-      # NOTE:  This currently requires that SurfaceGroups are all at the top level (no nesting) 
+      # NOTE:  This currently requires that SurfaceGroups are all at the top level (no nesting)
       #        and all Surfaces are located at the top level inside of a SurfaceGroup.
       #        This might have to be revisited later.
       entity_hash = Hash.new
@@ -168,7 +168,7 @@ module LegacyOpenStudio
       for drawing_interface in drawing_interfaces
         # Delete each pair from the hash as it is found for efficiency.
         drawing_interface.entity = entity_hash.delete(drawing_interface.input_object.key)
-        
+
         # drawing_interface.set_entity(entity_hash.delete(drawing_interface.input_object.key)) maybe?
         #   I'm effectively doing 'drawing_interface.new_from_input_object_and_entity'
       end

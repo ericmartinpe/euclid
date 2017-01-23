@@ -26,7 +26,7 @@ module LegacyOpenStudio
       set_select_options("TRANSMITTANCE", [""].concat(object_names.sort))
 
       #super
-      
+
       # Don't set the background color because it causes the dialog to flash.
       #@container.execute_function("setBackgroundColor('" + default_dialog_color + "')")
       update_units

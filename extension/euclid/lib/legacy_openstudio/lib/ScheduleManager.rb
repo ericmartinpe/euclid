@@ -11,7 +11,7 @@ module LegacyOpenStudio
     def initialize
 
     end
-    
+
     def new_schedule_stub
 
       if (results = UI.inputbox(['Schedule Name:  '], [''], 'Add New Schedule Stub'))

@@ -34,9 +34,9 @@ module LegacyOpenStudio
           Plugin.model_manager.paint
         end
       }
-      
+
     end
 
   end
-  
+
 end

@@ -7,7 +7,7 @@ require("legacy_openstudio/lib/dialogs/DialogInterface")
 module LegacyOpenStudio
 
   class ZoneInfoInterface < DialogInterface
-  
+
     def populate_hash
 
       @drawing_interface = Plugin.model_manager.selected_drawing_interface
@@ -16,7 +16,7 @@ module LegacyOpenStudio
         @input_object = @drawing_interface.input_object
 
         @hash['NAME'] = @input_object.fields[1]
-        @hash['ROTATION'] = @input_object.fields[2]        
+        @hash['ROTATION'] = @input_object.fields[2]
         @hash['MULTIPLIER'] = @input_object.fields[7]
 
         if (@input_object.fields[13].nil?)
@@ -73,8 +73,8 @@ module LegacyOpenStudio
           @input_object.fields[13] = 'No'
         end
       end
-      
-      
+
+
       # Update object text with changes
       @hash['OBJECT_TEXT'] = @input_object.to_idf
 

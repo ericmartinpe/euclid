@@ -16,20 +16,20 @@ module LegacyOpenStudio
 
     def onMouseMove(flags, x, y, view)
       super
-      
+
       # Should apply user's precision setting here   --automatically done, I think
       # Also:  show relative coordinates?
       Sketchup.set_status_text("Set Zone Origin = " + @ip.position.to_s)
-      
+
       view.tooltip = "Set Zone Origin"
     end
 
 
     def onLButtonUp(flags, x, y, view)
       super
-      
+
       # set the origin on the zone object
-      
+
       Sketchup.active_model.tools.pop_tool
     end
 

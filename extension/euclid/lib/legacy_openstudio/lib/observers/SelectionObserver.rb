@@ -6,7 +6,7 @@
 module LegacyOpenStudio
 
   class SelectionObserver < Sketchup::SelectionObserver
-    
+
     def onSelectionAdded(*args)
       # Called when a new entity is added and selected.
       #puts "SelectionObserver.onSelectionAdded"
@@ -29,7 +29,7 @@ module LegacyOpenStudio
 
 
     def onSelectionRemoved(selection)
-      # Not sure when this is called.    
+      # Not sure when this is called.
       #puts "SelectionObserver.onSelectionRemoved"
     end
 

@@ -13,15 +13,15 @@ module LegacyOpenStudio
       super
       @dialog = ThermostatDialog.new(nil, self, @hash)
     end
-    
+
     def to_new
       @dialog.to_new
     end
-    
+
     def to_existing
       @dialog.to_existing
     end
-    
+
   end
 
 end

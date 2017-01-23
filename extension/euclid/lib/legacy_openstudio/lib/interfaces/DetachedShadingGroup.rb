@@ -61,11 +61,11 @@ module LegacyOpenStudio
         update_parent_from_entity  # kludge...this is out of place here, but works:  it adds itself as a child of model interface
         #paint_entity
 
-        #add_observers  # should be added ModelInterface  
+        #add_observers  # should be added ModelInterface
       else
         puts "DrawingInterface.create_from_entity:  check_entity failed"
       end
-      
+
       return(self)
     end
 

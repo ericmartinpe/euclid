@@ -5,7 +5,7 @@
 module LegacyOpenStudio
 
   class UpdateManager
-  
+
     def initialize
       @web_dialog = nil
       @url = "http://openstudio.sourceforge.net/update.html"
@@ -27,7 +27,7 @@ module LegacyOpenStudio
       @web_dialog.show
 
       # if page doesn't load in 5 seconds pop up dialog
-      @timer = UI.start_timer(5, false) { 
+      @timer = UI.start_timer(5, false) {
         if (verbose)
           button = UI.messagebox(Plugin.name + " was unable to connect to the update server.\nCheck your internet connection and try again later.", MB_RETRYCANCEL)
           if (button == 4)
@@ -44,11 +44,11 @@ module LegacyOpenStudio
 
 
     def on_load(verbose)
-      
+
       if @timer
         UI.stop_timer(@timer)
       end
-      
+
       @version = @web_dialog.get_element_value("version")
       close_web_dialog
 
@@ -57,16 +57,16 @@ module LegacyOpenStudio
 
       # Kludge:  Give a very brief delay to allow the WebDialog to fully close.
       @second_timer = UI.start_timer(1, false) {
-      
+
         if @second_timer
           UI.stop_timer(@second_timer)
         end
-        
+
         # Version numbering scheme is (major).(minor).(maintenance).(build), e.g. 0.9.4.1
         installed_version_key = ''; Plugin.version.split('.').each { |e| installed_version_key += e.rjust(4, '0') }
         newest_version_key = ''; @version.split('.').each { |e| newest_version_key += e.rjust(4, '0') }
         skip_version_key = Plugin.read_pref('Skip Update')
-      
+
         if (installed_version_key < newest_version_key)
           if (newest_version_key != skip_version_key or verbose)
             button = UI.messagebox("A newer version (" + @version + ") of OpenStudio is ready for download.\n" +

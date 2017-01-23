@@ -51,7 +51,7 @@ module LegacyOpenStudio
 
       return(true)
     end
-    
+
 
   end
 

@@ -16,7 +16,7 @@ module LegacyOpenStudio
       h = Plugin.platform_select(800, 840)
       @container = WindowContainer.new("Zone Loads", w, h, 150, 150)
       @container.set_file(Plugin.dir + "/lib/dialogs/html/ZoneLoads.html")
-      
+
       # value_hash is actual values in metric units, this is what gets saved and written to idf
       @value_hash = Hash.new
       @value_hash['PEOPLE_DENSITY'] = 0.0
@@ -36,7 +36,7 @@ module LegacyOpenStudio
       @value_hash['INFILTRATION_SCHEDULE'] = ""
       @value_hash['ADD_IDEAL_LOADS'] = true
       @value_hash['THERMOSTAT_NAME'] = ""
-      
+
       # hash is what is presented
       @hash['DEFAULT_SAVE_PATH'] = ""
       @hash['PEOPLE_DENSITY_TEXT'] = ""
@@ -62,12 +62,12 @@ module LegacyOpenStudio
       @hash['INFILTRATION_SCHEDULE'] = ""
       @hash['ADD_IDEAL_LOADS'] = true
       @hash['THERMOSTAT_NAME'] = ""
-      
+
       @last_report = ""
-      
+
       add_callbacks
     end
-    
+
     def reset_values
       @value_hash['PEOPLE_DENSITY'] = 0.05382 # 5 people/1000ft2
       @value_hash['OCCUPANCY_SCHEDULE'] = "Office Occupancy Schedule"
@@ -76,7 +76,7 @@ module LegacyOpenStudio
       @value_hash['LIGHTS_SCHEDULE'] = "Office Lights Schedule"
       @value_hash['ELEC_EQUIPMENT_DENSITY'] = 10.7639104 # 1.0 W/ft2
       @value_hash['ELEC_EQUIPMENT_SCHEDULE'] = "Office Equipment Schedule"
-      @value_hash['GAS_EQUIPMENT_DENSITY'] = 0.0000 
+      @value_hash['GAS_EQUIPMENT_DENSITY'] = 0.0000
       @value_hash['GAS_EQUIPMENT_SCHEDULE'] = "Office Equipment Schedule"
       @value_hash['OA_PER_PERSON'] = 0.00236 # 5 cfm/person
       @value_hash['OA_PER_PERSON_SCHEDULE'] = @value_hash['OCCUPANCY_SCHEDULE']
@@ -114,8 +114,8 @@ module LegacyOpenStudio
         @hash['OA_PER_AREA_SCHEDULE'] = @value_hash['OA_PER_AREA_SCHEDULE']
         @hash['INFILTRATION_RATE'] = @value_hash['INFILTRATION_RATE'].round_to(4).to_s
         @hash['INFILTRATION_SCHEDULE'] = @value_hash['INFILTRATION_SCHEDULE']
-        @hash['ADD_IDEAL_LOADS'] = @value_hash['ADD_IDEAL_LOADS']    
-        @hash['THERMOSTAT_NAME'] = @value_hash['THERMOSTAT_NAME']          
+        @hash['ADD_IDEAL_LOADS'] = @value_hash['ADD_IDEAL_LOADS']
+        @hash['THERMOSTAT_NAME'] = @value_hash['THERMOSTAT_NAME']
       else
         i = 1
         m2_over_ft2 = 0.092903
@@ -139,14 +139,14 @@ module LegacyOpenStudio
         @hash['OA_PER_PERSON_SCHEDULE'] = @value_hash['OA_PER_PERSON_SCHEDULE']
         @hash['OA_PER_AREA_TEXT'] = "  Outdoor Air per Area " + Plugin.model_manager.units_hash['L/sec/m2'][i] + ":"
         @hash['OA_PER_AREA'] = (m3s_to_cfm*m2_over_ft2*@value_hash['OA_PER_AREA']).round_to(6).to_s
-        @hash['OA_PER_AREA_SCHEDULE'] = @value_hash['OA_PER_AREA_SCHEDULE']  
+        @hash['OA_PER_AREA_SCHEDULE'] = @value_hash['OA_PER_AREA_SCHEDULE']
         @hash['INFILTRATION_RATE'] = @value_hash['INFILTRATION_RATE'].round_to(4).to_s
         @hash['INFILTRATION_SCHEDULE'] = @value_hash['INFILTRATION_SCHEDULE']
-        @hash['ADD_IDEAL_LOADS'] = @value_hash['ADD_IDEAL_LOADS'] 
-        @hash['THERMOSTAT_NAME'] = @value_hash['THERMOSTAT_NAME']       
+        @hash['ADD_IDEAL_LOADS'] = @value_hash['ADD_IDEAL_LOADS']
+        @hash['THERMOSTAT_NAME'] = @value_hash['THERMOSTAT_NAME']
       end
     end
-    
+
     # translate from hash to value hash
     def update_value_hash
 
@@ -168,11 +168,11 @@ module LegacyOpenStudio
         @value_hash['OA_PER_PERSON_SCHEDULE'] = @hash['OA_PER_PERSON_SCHEDULE']
         @value_hash['OA_PER_AREA_TEXT'] = @hash['OA_PER_AREA_TEXT']
         @value_hash['OA_PER_AREA'] = ls_to_m3s*@hash['OA_PER_AREA'].to_f
-        @value_hash['OA_PER_AREA_SCHEDULE'] = @hash['OA_PER_AREA_SCHEDULE']    
+        @value_hash['OA_PER_AREA_SCHEDULE'] = @hash['OA_PER_AREA_SCHEDULE']
         @value_hash['INFILTRATION_RATE'] = @hash['INFILTRATION_RATE'].to_f
         @value_hash['INFILTRATION_SCHEDULE'] = @hash['INFILTRATION_SCHEDULE']
-        @value_hash['ADD_IDEAL_LOADS'] = @hash['ADD_IDEAL_LOADS']   
-        @value_hash['THERMOSTAT_NAME'] = @hash['THERMOSTAT_NAME']          
+        @value_hash['ADD_IDEAL_LOADS'] = @hash['ADD_IDEAL_LOADS']
+        @value_hash['THERMOSTAT_NAME'] = @hash['THERMOSTAT_NAME']
       else
         i = 1
         m2_over_ft2 = 0.092903
@@ -193,11 +193,11 @@ module LegacyOpenStudio
         @value_hash['OA_PER_PERSON_SCHEDULE'] = @hash['OA_PER_PERSON_SCHEDULE']
         @value_hash['OA_PER_AREA_TEXT'] = @hash['OA_PER_AREA_TEXT']
         @value_hash['OA_PER_AREA'] = cfm_to_m3s*ft2_over_m2*@hash['OA_PER_AREA'].to_f
-        @value_hash['OA_PER_AREA_SCHEDULE'] = @hash['OA_PER_AREA_SCHEDULE']      
+        @value_hash['OA_PER_AREA_SCHEDULE'] = @hash['OA_PER_AREA_SCHEDULE']
         @value_hash['INFILTRATION_RATE'] = @hash['INFILTRATION_RATE'].to_f
         @value_hash['INFILTRATION_SCHEDULE'] = @hash['INFILTRATION_SCHEDULE']
-        @value_hash['ADD_IDEAL_LOADS'] = @hash['ADD_IDEAL_LOADS']  
-        @value_hash['THERMOSTAT_NAME'] = @hash['THERMOSTAT_NAME']      
+        @value_hash['ADD_IDEAL_LOADS'] = @hash['ADD_IDEAL_LOADS']
+        @value_hash['THERMOSTAT_NAME'] = @hash['THERMOSTAT_NAME']
       end
     end
 
@@ -219,31 +219,31 @@ module LegacyOpenStudio
       @container.web_dialog.add_action_callback("on_set_all") { on_set_all }
       @container.web_dialog.add_action_callback("on_last_report") { on_last_report }
     end
-    
+
     def on_load
       super
       update
-    end 
-    
+    end
+
     # update the html page from the hash
     def update
-    
+
       @value_hash = Plugin.model_manager.zone_loads_manager if not Plugin.model_manager.zone_loads_manager.nil?
-    
+
       update_hash
-      
+
       schedule_names = Plugin.model_manager.input_file.find_objects_by_class_name("SCHEDULE:YEAR", "SCHEDULE:COMPACT", "SCHEDULE:FILE").collect { |object| object.name }
       schedule_names = schedule_names.sort
 
-      set_select_options("OCCUPANCY_SCHEDULE", schedule_names)  
-      set_select_options("ACTIVITY_SCHEDULE", schedule_names)  
-      set_select_options("LIGHTS_SCHEDULE", schedule_names)  
-      set_select_options("ELEC_EQUIPMENT_SCHEDULE", schedule_names)  
-      set_select_options("GAS_EQUIPMENT_SCHEDULE", schedule_names)  
-      set_select_options("OA_PER_PERSON_SCHEDULE", schedule_names) 
-      set_select_options("OA_PER_AREA_SCHEDULE", schedule_names) 
-      set_select_options("INFILTRATION_SCHEDULE", schedule_names)  
-      
+      set_select_options("OCCUPANCY_SCHEDULE", schedule_names)
+      set_select_options("ACTIVITY_SCHEDULE", schedule_names)
+      set_select_options("LIGHTS_SCHEDULE", schedule_names)
+      set_select_options("ELEC_EQUIPMENT_SCHEDULE", schedule_names)
+      set_select_options("GAS_EQUIPMENT_SCHEDULE", schedule_names)
+      set_select_options("OA_PER_PERSON_SCHEDULE", schedule_names)
+      set_select_options("OA_PER_AREA_SCHEDULE", schedule_names)
+      set_select_options("INFILTRATION_SCHEDULE", schedule_names)
+
       if @hash['ADD_IDEAL_LOADS']
         thermostat_names = Plugin.model_manager.input_file.find_objects_by_class_name("HVACTEMPLATE:THERMOSTAT").collect { |object| object.name }
         thermostat_names = thermostat_names.sort
@@ -252,7 +252,7 @@ module LegacyOpenStudio
         enable_element("ADD_THERMOSTATS")
         enable_element("EDIT_THERMOSTATS")
         enable_element("REFRESH_THERMOSTATS")
-        set_select_options("THERMOSTAT_NAME", thermostat_names)  
+        set_select_options("THERMOSTAT_NAME", thermostat_names)
       else
         disable_element("THERMOSTAT_NAME")
         disable_element("ADD_THERMOSTATS")
@@ -260,26 +260,26 @@ module LegacyOpenStudio
         disable_element("REFRESH_THERMOSTATS")
         set_select_options("THERMOSTAT_NAME", thermostat_names)
       end
-      
+
       super
     end
-    
+
     # update the hash from html page
     def report
       update_value_hash
       Plugin.model_manager.zone_loads_manager = @value_hash
       super
-    end    
-    
+    end
+
     def on_report_update
       report
       update
     end
-    
+
     def on_open
       if (@hash['DEFAULT_SAVE_PATH'].empty?)
         dir = Plugin.model_manager.input_file_dir
-        file_name = "*.zone_loads"      
+        file_name = "*.zone_loads"
       else
         dir = File.dirname(@hash['DEFAULT_SAVE_PATH'])
         file_name = File.basename(@hash['DEFAULT_SAVE_PATH'])
@@ -287,10 +287,10 @@ module LegacyOpenStudio
 
       if (file_path = UI.open_panel("Locate Zone Loads Preferences", dir, file_name))
         file_path = file_path.split("\\").join("/")
-      
+
         if (File.exists?(file_path))
           begin
-        
+
             File.open(file_path, 'r') do |file|
               @value_hash = Marshal.load(file)
             end
@@ -308,54 +308,54 @@ module LegacyOpenStudio
         else
           UI.messagebox("Zone loads preferences file does not exist", MB_OK)
         end
-      end      
+      end
     end
-    
+
     def on_new_schedule
       report
       Plugin.model_manager.schedule_manager.new_schedule_stub
       update
     end
-    
+
     def on_add_thermostats
       report
       Plugin.dialog_manager.show(ThermostatInterface)
       Plugin.dialog_manager.active_interface(ThermostatInterface).to_new
       update
     end
-    
+
     def on_edit_thermostats
       report
       Plugin.dialog_manager.show(ThermostatInterface)
       Plugin.dialog_manager.active_interface(ThermostatInterface).to_existing
       update
     end
-    
+
     def on_refresh_thermostats
       report
       update
     end
-    
+
     def on_reset
       reset_values
       update
     end
-    
+
     def on_ok
       report
       update
       close
     end
-    
+
     def on_save
       report
       update
-      
+
       if (@hash['DEFAULT_SAVE_PATH'].empty?)
         on_save_as
         return
       end
-      
+
       if (File.exists?(@hash['DEFAULT_SAVE_PATH']))
         result = UI.messagebox("File exists, are you sure you want to overwrite?", MB_YESNO)
         if result == 7 # No
@@ -371,89 +371,89 @@ module LegacyOpenStudio
         UI.messagebox("Save failed", MB_OK)
       end
     end
-    
+
     def on_save_as
       report
       if (@hash['DEFAULT_SAVE_PATH'].empty?)
         dir = Plugin.model_manager.input_file_dir
-        file_name = Plugin.model_manager.input_file_name + ".zone_loads"      
+        file_name = Plugin.model_manager.input_file_name + ".zone_loads"
       else
         dir = File.dirname(@hash['DEFAULT_SAVE_PATH'])
         file_name = File.basename(@hash['DEFAULT_SAVE_PATH'])
       end
 
-      if (file_path = UI.save_panel("Locate Zone Loads Preferences", dir, file_name))    
+      if (file_path = UI.save_panel("Locate Zone Loads Preferences", dir, file_name))
         @hash['DEFAULT_SAVE_PATH'] = file_path
         update
         on_save
       end
     end
-    
+
     def on_cancel
       close
     end
-    
+
     def get_schedule(name)
       Plugin.model_manager.input_file.find_objects_by_class_name("SCHEDULE:YEAR", "SCHEDULE:COMPACT", "SCHEDULE:FILE").each { |object| return object if object.name.upcase == name.upcase}
       return ""
     end
-    
+
     def get_thermostat(name)
       Plugin.model_manager.input_file.find_objects_by_class_name("HVACTEMPLATE:THERMOSTAT").each { |object| return object if object.name.upcase == name.upcase}
       return ""
     end
-    
+
     def remove_objects_in_zone(class_name, zone_name_index, zone_name)
-      Plugin.model_manager.input_file.find_objects_by_class_name(class_name).each do |object| 
+      Plugin.model_manager.input_file.find_objects_by_class_name(class_name).each do |object|
         if object.fields[zone_name_index].to_s.upcase == zone_name.upcase
           @last_report << "Removing #{object.class_name} '#{object.fields[1]}' from Zone '#{zone_name}'\n"
-          Plugin.model_manager.input_file.delete_object(object) 
+          Plugin.model_manager.input_file.delete_object(object)
         end
       end
     end
-    
+
     def add_object_to_zone(object, zone_name)
       @last_report << "Adding #{object.class_name} '#{object.fields[1]}' to Zone '#{zone_name}'\n"
       Plugin.model_manager.input_file.add_object(object)
     end
-    
+
     def on_set_selected
       report
       model = Sketchup.active_model
       set_loads(model.selection)
     end
-    
+
     def on_set_all
       report
       model = Sketchup.active_model
       model.selection.clear
       model.entities.each {|e| model.selection.add(e)}
-      set_loads(model.selection) 
+      set_loads(model.selection)
       model.selection.clear
     end
-    
+
     def set_loads(selection)
-    
+
       if selection.empty?
         UI.messagebox("Please select zones that you wish to add loads to before applying.")
         return false
       end
-      
+
       result = nil
       if @hash['ADD_IDEAL_LOADS']
         result = UI.messagebox(
 "Warning this will remove all objects of type
 'People', 'Lights', 'ElectricEquipment', 'GasEquipment',
-'ZoneVentilation:DesignFlowRate', 'ZoneInfiltration:DesignFlowRate', and 
-'HVACTemplate:Zone:IdealLoadsAirSystem' within the selection.\n  
-This operation cannot be undone.\n  
+'ZoneVentilation:DesignFlowRate', 'ZoneInfiltration:DesignFlowRate', and
+'HVACTemplate:Zone:IdealLoadsAirSystem' within the selection.\n
+This operation cannot be undone.\n
 Do you want to continue?", MB_OKCANCEL)
     else
         result = UI.messagebox(
 "Warning this will remove all objects of type
 'People', 'Lights', 'ElectricEquipment', 'GasEquipment',
-'ZoneVentilation:DesignFlowRate', and 'ZoneInfiltration:DesignFlowRate' within the selection.\n  
-This operation cannot be undone.\n  
+'ZoneVentilation:DesignFlowRate', and 'ZoneInfiltration:DesignFlowRate' within the selection.\n
+This operation cannot be undone.\n
 Do you want to continue?", MB_OKCANCEL)
     end
 
@@ -462,13 +462,13 @@ Do you want to continue?", MB_OKCANCEL)
       if result == 2 # cancel
         return false
       end
-      
+
       Plugin.model_manager.zones.each do |zone|
         # selection must contain zone
         next if not (selection.contains?(zone.entity))
-        
+
         zone_name = zone.input_object.name
-        
+
         # remove existing People, Lights, ElectricEquipment, GasEquipment, and ZoneInfiltration:DesignFlowRate, HVACTemplate:Zone:IdealLoadsAirSystem
         remove_objects_in_zone("People", 2, zone_name)
         remove_objects_in_zone("Lights", 2, zone_name)
@@ -476,7 +476,7 @@ Do you want to continue?", MB_OKCANCEL)
         remove_objects_in_zone("GasEquipment", 2, zone_name)
         remove_objects_in_zone("ZoneVentilation:DesignFlowRate", 2, zone_name)
         remove_objects_in_zone("ZoneInfiltration:DesignFlowRate", 2, zone_name)
-        
+
         if @hash['ADD_IDEAL_LOADS']
           remove_objects_in_zone("HVACTemplate:Zone:IdealLoadsAirSystem", 1, zone_name)
           #remove_objects_in_zone("HVACTemplate:Zone:FanCoil", 1, zone_name)
@@ -486,7 +486,7 @@ Do you want to continue?", MB_OKCANCEL)
           #remove_objects_in_zone("HVACTemplate:Zone:VAV", 1, zone_name)
           #remove_objects_in_zone("HVACTemplate:Zone:VAV:FanPowered", 1, zone_name)
         end
-        
+
         # People
         if @value_hash['PEOPLE_DENSITY'] > 0
           input_object = InputObject.new("People")
@@ -512,7 +512,7 @@ Do you want to continue?", MB_OKCANCEL)
           input_object.fields[20] = ""  # Thermal Comfort Model 3 Type
           add_object_to_zone(input_object, zone_name)
         end
-        
+
         # Lights
         if @value_hash['LIGHTS_DENSITY'] > 0
           input_object = InputObject.new("Lights")
@@ -541,7 +541,7 @@ Do you want to continue?", MB_OKCANCEL)
           input_object.fields[2] = zone_name  # Zone Name
           input_object.fields[3] = get_schedule(@hash['ELEC_EQUIPMENT_SCHEDULE'] ) # Schedule Name
           input_object.fields[4] = "Watts/Area" # Design Level Calculation Method
-          input_object.fields[5] = "" # Design Level 
+          input_object.fields[5] = "" # Design Level
           input_object.fields[6] = @value_hash['ELEC_EQUIPMENT_DENSITY'].round_to(4).to_s # Watts per Zone Floor Area
           input_object.fields[7] = "" # Watts per Person
           input_object.fields[8] = "" # Fraction Latent
@@ -558,7 +558,7 @@ Do you want to continue?", MB_OKCANCEL)
           input_object.fields[2] = zone_name  # Zone Name
           input_object.fields[3] = get_schedule(@hash['GAS_EQUIPMENT_SCHEDULE'] ) # Schedule Name
           input_object.fields[4] = "Watts/Area" # Design Level Calculation Method
-          input_object.fields[5] = "" # Design Level 
+          input_object.fields[5] = "" # Design Level
           input_object.fields[6] = @value_hash['GAS_EQUIPMENT_DENSITY'].round_to(4).to_s # Watts per Zone Floor Area
           input_object.fields[7] = "" # Watts per Person
           input_object.fields[8] = "" # Fraction Latent
@@ -589,9 +589,9 @@ Do you want to continue?", MB_OKCANCEL)
           input_object.fields[15] = ""  # Velocity Squared Term Coefficient
           add_object_to_zone(input_object, zone_name)
         end
-        
+
         # ZoneVentilation:DesignFlowRate
-        if @value_hash['OA_PER_AREA'] > 0 
+        if @value_hash['OA_PER_AREA'] > 0
           input_object = InputObject.new("ZoneVentilation:DesignFlowRate")
           input_object.fields[1] = "#{zone_name} Ventilation per Area" # Name
           input_object.fields[2] = zone_name  # Zone Name
@@ -636,13 +636,13 @@ Do you want to continue?", MB_OKCANCEL)
           input_object.fields[2] = get_thermostat(@hash['THERMOSTAT_NAME']) # Template Thermostat Name
           add_object_to_zone(input_object, zone_name)
         end
-        
+
         Plugin.model_manager.input_file.modified = true
- 
+
       end
-      
+
     end
-    
+
     def on_last_report
       if (Plugin.platform == Platform_Windows)
         Plugin.dialog_manager.show(LastReportInterface)
@@ -652,7 +652,7 @@ Do you want to continue?", MB_OKCANCEL)
         UI.messagebox @last_report,MB_MULTILINE
       end
     end
-    
+
   end
 
 end

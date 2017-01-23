@@ -29,7 +29,7 @@ module LegacyOpenStudio
       if (v = @ip.vertex)
         #Sketchup.set_status_text("World Coordinates:  " + v.position.to_s)
       else
-        #    view.tooltip = ""    
+        #    view.tooltip = ""
         view.tooltip = get_tooltip(@ip.face, flags)
         #Sketchup.set_status_text("")
       end
@@ -60,11 +60,11 @@ module LegacyOpenStudio
 
     def get_tooltip(face, flags)
       if (face)
-      
+
       id_string = face.get_attribute('OpenStudio', 'DrawingInterface')
       #puts(ObjectSpace._id2ref(id_string.to_i))
       #puts face.drawing_interface
-      
+
         if (drawing_interface = face.drawing_interface)
           if (input_object = drawing_interface.input_object)
 
@@ -97,7 +97,7 @@ module LegacyOpenStudio
           tooltip = "No EnergyPlus object found."
         end
       else
-        tooltip = ""  
+        tooltip = ""
       end
 
       return(tooltip)
@@ -115,7 +115,7 @@ module LegacyOpenStudio
 #        puts "relative coordinates"
 #        $f.vertices.each { |v| puts v.position }
 #        puts
-        
+
 #        puts "insertion point"
 #        puts $f.parent.insertion_point
 
@@ -123,7 +123,7 @@ module LegacyOpenStudio
 #        puts "world coordinates"
 #        $f.vertices.each { |v| puts (v.position).transform(t) }
 #        puts
-        
+
 
         #puts "DrawingInterface="
         #puts $f.drawing_interface
@@ -134,7 +134,7 @@ module LegacyOpenStudio
       end
 
       $ip = @ip.position
-      
+
       puts
       puts "Face=>       " + $f.to_s
       puts "Interface=>  " + $f.drawing_interface.to_s
@@ -142,19 +142,19 @@ module LegacyOpenStudio
       puts "Key=>        " + $f.input_object_key.to_s
       #puts "Base Face=>  " + DrawingUtils.find_base_face($f).to_s   # this is not working right
       puts
-      
+
       $g = $f.parent.instances.first
-      
+
       #puts "Group=>      " + $g.to_s
       #puts "Grp Intrfc=> " + $g.drawing_interface.to_s
       #puts "Entities=>   " + $g.entities.to_s
       #puts "Entities[]=> " + $g.entities.to_a.to_s
 
-      
+
       #puts $f.entityID
-      
+
       #$f.drawing_interface.surface_polygon.points.each { |v| puts v.display }
-      
+
       #puts $f
       #puts $f.drawing_interface
       #$f.vertices.each { |v| puts v.position.display }
@@ -165,14 +165,14 @@ module LegacyOpenStudio
       #else
       #  puts "face DOES NOT contain point"
       #end
-      
+
     #  puts $f.classify_point($ip)
       # 1 = inside of all edges
       # 2 = on an edge
       # 4 = on a vertex
       # 8 = off the face completely, but still in the same plane
       # 16 = off the face completely, and not even on the same plane
-      
+
       #PointUnknown = 0;
       #PointInside = 1;
       #PointOnEdge = 2;

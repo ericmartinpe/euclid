@@ -12,8 +12,8 @@ module LegacyOpenStudio
     def initialize
       super
       @dialog = ZoneLoadsDialog.new(nil, self, @hash)
-    end  
-    
+    end
+
   end
 
 end

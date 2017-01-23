@@ -143,9 +143,9 @@ module LegacyOpenStudio
       @surface_search_cmd.large_icon = Plugin.dir + "/lib/resources/icons/SurfaceSearch-24.png"
       @surface_search_cmd.tooltip = "Search Surfaces"
       @surface_search_cmd.status_bar_text = "Search Surfaces"
-      @surface_search_cmd.set_validation_proc { Plugin.dialog_manager.validate(SurfaceSearchInterface) if (Plugin.dialog_manager) } 
-      
-      
+      @surface_search_cmd.set_validation_proc { Plugin.dialog_manager.validate(SurfaceSearchInterface) if (Plugin.dialog_manager) }
+
+
       @outliner_cmd = UI::Command.new("Outliner") { UI.show_inspector("Outliner") }
       @outliner_cmd.small_icon = Plugin.dir + "/lib/resources/icons/Outliner-16.png"
       @outliner_cmd.large_icon = Plugin.dir + "/lib/resources/icons/Outliner-24.png"
@@ -154,7 +154,7 @@ module LegacyOpenStudio
       @outliner_cmd.set_validation_proc { MF_ENABLED }  # No obvious way to check if already open or not
 
 
-      # Choose Zone Origin  ....  Set Zone Origin  
+      # Choose Zone Origin  ....  Set Zone Origin
       #@zone_origin_cmd = UI::Command.new("Set Zone Origin") { Sketchup.active_model.tools.push_tool(OriginTool.new) }
 
 
@@ -196,31 +196,31 @@ module LegacyOpenStudio
       @surface_matching_cmd.large_icon = Plugin.dir + "/lib/resources/icons/SurfaceMatchingSelected-24.png"
       @surface_matching_cmd.tooltip = "Surface Matching"
       @surface_matching_cmd.status_bar_text = "Match surfaces of selected objects across Zones"
-      @surface_matching_cmd.set_validation_proc { Plugin.dialog_manager.validate(SurfaceMatchingInterface) if (Plugin.dialog_manager) } 
+      @surface_matching_cmd.set_validation_proc { Plugin.dialog_manager.validate(SurfaceMatchingInterface) if (Plugin.dialog_manager) }
 
       @set_default_constructions_cmd = UI::Command.new("Default Constructions") { Plugin.dialog_manager.show(DefaultConstructionsInterface) }
       @set_default_constructions_cmd.small_icon = Plugin.dir + "/lib/resources/icons/SetDefaultConstPrefs-16.png"
       @set_default_constructions_cmd.large_icon = Plugin.dir + "/lib/resources/icons/SetDefaultConstPrefs-24.png"
       @set_default_constructions_cmd.tooltip = "Default Constructions"
       @set_default_constructions_cmd.status_bar_text = "Change the default constructions used for new surfaces and surface matching"
-      @set_default_constructions_cmd.set_validation_proc { Plugin.dialog_manager.validate(DefaultConstructionsInterface) if (Plugin.dialog_manager) } 
-     
+      @set_default_constructions_cmd.set_validation_proc { Plugin.dialog_manager.validate(DefaultConstructionsInterface) if (Plugin.dialog_manager) }
+
       @zone_loads_cmd = UI::Command.new("Zone Loads") { Plugin.dialog_manager.show(ZoneLoadsInterface) }
       @zone_loads_cmd.small_icon = Plugin.dir + "/lib/resources/icons/ZoneLoads-16.png"
       @zone_loads_cmd.large_icon = Plugin.dir + "/lib/resources/icons/ZoneLoads-24.png"
       @zone_loads_cmd.tooltip = "Zone Loads"
       @zone_loads_cmd.status_bar_text = "Add Zone Loads"
-      @zone_loads_cmd.set_validation_proc { Plugin.dialog_manager.validate(ZoneLoadsInterface) if (Plugin.dialog_manager) } 
+      @zone_loads_cmd.set_validation_proc { Plugin.dialog_manager.validate(ZoneLoadsInterface) if (Plugin.dialog_manager) }
 
       @edit_thermostats_cmd = UI::Command.new("Edit Thermostats") { Plugin.dialog_manager.show(ThermostatInterface) }
-      @edit_thermostats_cmd.set_validation_proc { Plugin.dialog_manager.validate(ThermostatInterface) if (Plugin.dialog_manager) } 
+      @edit_thermostats_cmd.set_validation_proc { Plugin.dialog_manager.validate(ThermostatInterface) if (Plugin.dialog_manager) }
 
       @new_construct_cmd = UI::Command.new("New Construction Stub") { Plugin.model_manager.construction_manager.new_construction_stub }
       @new_construct_cmd.set_validation_proc { MF_ENABLED }
-      
+
       @new_schedule_cmd = UI::Command.new("New Schedule Stub") { Plugin.model_manager.schedule_manager.new_schedule_stub }
       @new_schedule_cmd.set_validation_proc { MF_ENABLED }
-      
+
       @run_cmd = UI::Command.new("Run Simulation...") { Plugin.dialog_manager.show(RunSimulationInterface) }
       @run_cmd.small_icon = Plugin.dir + "/lib/resources/icons/RunEnergyPlus-16.png"
       @run_cmd.large_icon = Plugin.dir + "/lib/resources/icons/RunEnergyPlus-24.png"
@@ -248,7 +248,7 @@ module LegacyOpenStudio
 
   # Render Style / View Mode
 
-      @hide_rest_cmd = UI::Command.new("Hide Rest of Model") { 
+      @hide_rest_cmd = UI::Command.new("Hide Rest of Model") {
         Sketchup.active_model.rendering_options["InactiveHidden"] = (not Sketchup.active_model.rendering_options["InactiveHidden"]) }
       @hide_rest_cmd.small_icon = Plugin.dir + "/lib/resources/icons/HideRest-16.png"
       @hide_rest_cmd.large_icon = Plugin.dir + "/lib/resources/icons/HideRest-24.png"
@@ -439,7 +439,7 @@ module LegacyOpenStudio
 
 
   # Preferences
-  
+
       @prefs_cmd = UI::Command.new("Preferences") { Plugin.dialog_manager.show(PreferencesInterface) }
       @prefs_cmd.set_validation_proc { MF_ENABLED }
 
@@ -459,7 +459,7 @@ module LegacyOpenStudio
 
       @about_cmd = UI::Command.new("About OpenStudio...") { Plugin.dialog_manager.show(AboutInterface) }
       @about_cmd.set_validation_proc { MF_ENABLED }
-      
+
       # validation_procs to add:
       #  Close - can't close if nothing is open
 
@@ -524,7 +524,7 @@ module LegacyOpenStudio
 
 
       # Add the Rendering menu
-      
+
       @rendering_menu.add_item(@hide_rest_cmd)
       @rendering_menu.add_item(@hidden_geom_cmd)
       @rendering_menu.add_item(@xray_cmd)
@@ -541,7 +541,7 @@ module LegacyOpenStudio
       @rendering_menu.add_item(@data_tool_cmd)
 
       # Add the Animation menu
-      
+
       @animation_menu.add_item(@rwd_to_start_cmd)
       @animation_menu.add_item(@rwd_anim_cmd)
       @animation_menu.add_item(@play_anim_cmd)
@@ -556,8 +556,8 @@ module LegacyOpenStudio
       @help_menu.add_item(@help_cmd)
 
     end
-    
-    
+
+
     def create_toolbars
 
       # Add the EnergyPlus command toolbar
@@ -591,7 +591,7 @@ module LegacyOpenStudio
       @command_toolbar.restore
 
       # Add the EnergyPlus Rendering toolbar
-      
+
       @rendering_toolbar = UI::Toolbar.new(Plugin.name + " Rendering")
       @rendering_toolbar.add_item(@hide_rest_cmd)
       @rendering_toolbar.add_item(@hidden_geom_cmd)
@@ -620,35 +620,35 @@ module LegacyOpenStudio
       @rendering_toolbar.restore
 
     end
-    
-    
+
+
     def create_context_menu
       # This method could be cleaned up a bit
-    
+
       floor_type_cmd = UI::Command.new('Floor') { change_type_to('FLOOR') }
       floor_type_cmd.set_validation_proc { validate_type('FLOOR') }
-      
+
       wall_type_cmd = UI::Command.new('Wall') { change_type_to('WALL') }
       wall_type_cmd.set_validation_proc { validate_type('WALL') }
-      
+
       ceiling_type_cmd = UI::Command.new('Ceiling') { change_type_to('CEILING') }
       ceiling_type_cmd.set_validation_proc { validate_type('CEILING') }
-      
+
       roof_type_cmd = UI::Command.new('Roof') { change_type_to('ROOF') }
       roof_type_cmd.set_validation_proc { validate_type('ROOF') }
 
       window_type_cmd = UI::Command.new('Window') { change_type_to('WINDOW') }
       window_type_cmd.set_validation_proc { validate_type('WINDOW') }
-      
+
       door_type_cmd = UI::Command.new('Door') { change_type_to('DOOR') }
       door_type_cmd.set_validation_proc { validate_type('DOOR') }
-      
+
       glassdoor_type_cmd = UI::Command.new('GlassDoor') { change_type_to('GLASSDOOR') }
       glassdoor_type_cmd.set_validation_proc { validate_type('GLASSDOOR') }
-      
+
       tdd_dome_type_cmd = UI::Command.new('TubularDaylightDome') { change_type_to('TubularDaylightDome') }
       tdd_dome_type_cmd.set_validation_proc { validate_type('TubularDaylightDome') }
-      
+
       tdd_diffuser_type_cmd = UI::Command.new('TubularDaylightDiffuser') { change_type_to('TDD:DIFFUSER') }
       tdd_diffuser_type_cmd.set_validation_proc { validate_type('TDD:DIFFUSER') }
 
@@ -664,16 +664,16 @@ module LegacyOpenStudio
 
       surface_class_cmd = UI::Command.new('BUILDINGSURFACE:DETAILED') { change_class_to('BUILDINGSURFACE:DETAILED') }
       surface_class_cmd.set_validation_proc { validate_class('BUILDINGSURFACE:DETAILED') }
-      
+
       sub_surface_class_cmd = UI::Command.new('FENESTRATIONSURFACE:DETAILED') { change_class_to('FENESTRATIONSURFACE:DETAILED') }
       sub_surface_class_cmd.set_validation_proc { validate_class('FENESTRATIONSURFACE:DETAILED') }
 
       attached_shading_class_cmd = UI::Command.new('SHADING:ZONE:DETAILED') { change_class_to('SHADING:ZONE:DETAILED') }
       attached_shading_class_cmd.set_validation_proc { validate_class('SHADING:ZONE:DETAILED') }
-      
+
       detached_building_class_cmd = UI::Command.new('SHADING:BUILDING:DETAILED') { change_class_to('SHADING:BUILDING:DETAILED') }
       detached_building_class_cmd.set_validation_proc { validate_class('SHADING:BUILDING:DETAILED') }
-      
+
       detached_fixed_class_cmd = UI::Command.new('SHADING:SITE:DETAILED') { change_class_to('SHADING:SITE:DETAILED') }
       detached_fixed_class_cmd.set_validation_proc { validate_class('SHADING:SITE:DETAILED') }
 
@@ -773,19 +773,19 @@ module LegacyOpenStudio
     # This is not implemented yet.
     def change_class_to(new_class)
       drawing_interface = Plugin.model_manager.selected_drawing_interface
-      
+
       case (new_class)
       when 'SURFACE:HEATTRANSFER'
 
       when 'SURFACE:HEATTRANSFER:SUB'
-      
+
       when 'SURFACE:SHADING:ATTACHED'
         # Problem here is that there is no base surface, unless its a window and that's an unlikely surface to be changing into shading
-        
+
       when 'SURFACE:SHADING:DETACHED:BUILDING'
         # Problem here is that detached surfaces need to move outside the zone group, if its a regular HT
         # OK to convert between different types of shading.
-      
+
       end
 
     end
@@ -832,5 +832,5 @@ module LegacyOpenStudio
 
 
   end
-  
+
 end

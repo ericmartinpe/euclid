@@ -19,16 +19,16 @@ module LegacyOpenStudio
 
     def onLButtonUp(flags, x, y, view)
       super
-      
+
       model = Sketchup.active_model
       active_path = model.active_path
-      
+
       if not active_path.nil?
         UI.messagebox("Zone should be added at the top level of a SketchUp model")
         Sketchup.send_action("selectSelectionTool:")
         return false
       end
-      
+
       model.start_operation("Shading Group")
 
       shading_group = DetachedShadingGroup.new
@@ -43,7 +43,7 @@ module LegacyOpenStudio
 
       Sketchup.active_model.commit_operation
     end
-    
+
   end
 
 end

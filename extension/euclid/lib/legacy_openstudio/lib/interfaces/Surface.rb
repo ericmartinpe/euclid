@@ -86,7 +86,7 @@ module LegacyOpenStudio
         # OTHER CHECKS TO ADD:
         # Check for more or less vertices than 'number of vertices' flag
         # Check that no crossing lines are formed (wrong order of vertices)
-        
+
         polygon = Geom::Polygon.new(new_points)
         polygon.reduce!  # Remove duplicate and colinear vertices
 
@@ -126,7 +126,7 @@ module LegacyOpenStudio
       else
         points = surface_polygon.points
       end
-      
+
       @entity = group_entity.entities.add_face(points)
 
       # Swapping of face entities can occur with the 'add_face' method.
@@ -200,7 +200,7 @@ module LegacyOpenStudio
         #erase_entity
         #create_entity
         #puts "wants to redraw polygon"
-        
+
         #draw_entity(false)  # Don't do this:  This is circular!
       end
     end
@@ -274,7 +274,7 @@ module LegacyOpenStudio
         # Always keep at least 4 places for now, until I figure out how to keep the actual saved in the idf from being reduced upon loading
         # There's nothing in the API that prevents from drawing at finer precision than the option settings.
         # Just have to figure out how to keep this routine from messing it up...
-        
+
         # UPDATE:  Looks like more than 4 is necesssary to get the solar shading right in EnergyPlus, otherwise surfaces can be positioned
         # incorrectly, e.g., one wall could overlap another because of the less accurate coordinates.
       #end

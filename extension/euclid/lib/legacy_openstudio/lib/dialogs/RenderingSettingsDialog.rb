@@ -20,14 +20,14 @@ module LegacyOpenStudio
       @container.set_file(Plugin.dir + "/lib/dialogs/html/RenderingSettings.html")
 
       @output_file = Plugin.model_manager.results_manager.output_file
-      
+
    # check if file was modified
-   
+
       @run_period_index = 0
 
       @surface_variables = []
       @zone_variables = []
-      
+
       @outside_units = ""
       @outside_min = ""
       @outside_max = ""
@@ -52,7 +52,7 @@ module LegacyOpenStudio
 
     def on_load
       super
-      on_change_output_file 
+      on_change_output_file
       on_click_variable_type
       on_click_match_range
       on_change_appearance
@@ -66,14 +66,14 @@ module LegacyOpenStudio
     def on_browse
       if (@hash['OUTPUT_FILE_PATH'].empty?)
         dir = Plugin.model_manager.input_file_dir
-        file_name = "*.eso"      
+        file_name = "*.eso"
       else
         dir = File.dirname(@hash['OUTPUT_FILE_PATH'])
         file_name = File.basename(@hash['OUTPUT_FILE_PATH'])
       end
 
       if (output_file_path = UI.open_panel("Locate Output File", dir, file_name))
-      
+
         # if user selects .cache file help them out
         output_file_path.gsub!('.eso.cache', '.eso')
 
@@ -105,7 +105,7 @@ module LegacyOpenStudio
           run_period_indices = ['']
         end
         set_select_options("RUN_PERIOD", run_period_indices, run_period_names)
-        
+
         on_change_run_period
         on_click_variable_type
       end
@@ -127,7 +127,7 @@ module LegacyOpenStudio
     end
 
     def on_click_variable_type
-    
+
       if (@hash['VARIABLE_TYPE'] == "SURFACE")
         set_element_value("NORMALIZE_VARIABLE_BY", "net surface area")
         variable_defs = get_surface_variables.to_a
@@ -149,7 +149,7 @@ module LegacyOpenStudio
 
         set_select_options("OUTSIDE_VARIABLE", variable_names)
         set_select_options("INSIDE_VARIABLE", variable_names)
-        
+
         if (variable_names.index(@hash['OUTSIDE_VARIABLE']))
           set_element_value("OUTSIDE_VARIABLE", @hash['OUTSIDE_VARIABLE'])
         else
@@ -166,10 +166,10 @@ module LegacyOpenStudio
         end
         on_change_inside_variable
 
-      end 
-      
+      end
+
     end
-    
+
     def on_click_normalize
 
       if @hash['NORMALIZE']
@@ -179,14 +179,14 @@ module LegacyOpenStudio
         disable_element('MATCH_RANGE')
         enable_element('RANGE_MINIMUM')
         enable_element('RANGE_MAXIMUM')
-        
+
         normalize_suffix = ""
         if (Plugin.model_manager.units_system == "SI")
           normalize_suffix = "/m2"
         else
           normalize_suffix = "/ft2"
         end
-        
+
         set_element_value("OUTSIDE_UNITS", @outside_units + normalize_suffix)
         set_element_value("INSIDE_UNITS", @inside_units + normalize_suffix)
       else
@@ -194,10 +194,10 @@ module LegacyOpenStudio
         @hash['MATCH_RANGE'] = true
         set_element_value('MATCH_RANGE', @hash['MATCH_RANGE'])
         enable_element('MATCH_RANGE')
-       
+
         set_element_value("OUTSIDE_UNITS", @outside_units)
         set_element_value("INSIDE_UNITS", @inside_units)
-        
+
         on_click_match_range
       end
     end
@@ -215,8 +215,8 @@ module LegacyOpenStudio
       end
 
       set_element_value("OUTSIDE_MINIMUM", @outside_min)
-      set_element_value("OUTSIDE_MAXIMUM", @outside_max)  
-      
+      set_element_value("OUTSIDE_MAXIMUM", @outside_max)
+
       if (@hash['VARIABLE_TYPE'] != "SURFACE")
         @hash['INSIDE_VARIABLE'] = @hash['OUTSIDE_VARIABLE']
         on_change_inside_variable
@@ -224,7 +224,7 @@ module LegacyOpenStudio
         on_click_match_range
         on_click_normalize
       end
-      
+
     end
 
     def on_change_inside_variable
@@ -241,7 +241,7 @@ module LegacyOpenStudio
 
       set_element_value("INSIDE_MINIMUM", @inside_min)
       set_element_value("INSIDE_MAXIMUM", @inside_max)
-      
+
       on_click_match_range
       on_click_normalize
     end
@@ -287,7 +287,7 @@ module LegacyOpenStudio
       else
         @hash['RANGE_MAXIMUM'] = ([@outside_max.to_f, @inside_max.to_f].max).to_s
       end
-      
+
       set_element_value("RANGE_MAXIMUM", @hash['RANGE_MAXIMUM'])
     end
 
@@ -300,7 +300,7 @@ module LegacyOpenStudio
 
         for variable_def in @output_file.variable_defs.values
           if (surface_names.index(variable_def.object_name))
-          
+
             # Check if the same variable name is already in the array
             found = false
             for surface_variable in surface_variables
@@ -327,7 +327,7 @@ module LegacyOpenStudio
         zone_names = Plugin.model_manager.input_file.find_objects_by_class_name("ZONE").to_a.collect { |zone| zone.name.upcase }
 
         for variable_def in @output_file.variable_defs.values
-          
+
           if (zone_names.index(variable_def.object_name))
 
             # Check if the same variable name is already in the array
@@ -364,9 +364,9 @@ module LegacyOpenStudio
         return(nil)
       end
     end
-    
-   
+
+
   end
 
-  
+
 end

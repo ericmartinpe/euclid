@@ -41,7 +41,7 @@ module LegacyOpenStudio
 
               # Solution is to "touch" the new Group to force SketchUp to create a new
               # ComponentDefinition and a new Entities object.
-              cpoint = entity.entities.add_cpoint(Geom::Point3d.new(0,0,0)) 
+              cpoint = entity.entities.add_cpoint(Geom::Point3d.new(0,0,0))
               cpoint.erase!
 
               original_group = entity.drawing_interface

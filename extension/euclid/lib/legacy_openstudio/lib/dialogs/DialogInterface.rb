@@ -16,7 +16,7 @@ module LegacyOpenStudio
     def initialize(container = nil)
       @hash = Hash.new
       populate_hash
-      
+
       # This is where subclasses will create the Dialog object.
       # @dialog = Dialog.new(self, @hash)
     end
@@ -55,7 +55,7 @@ module LegacyOpenStudio
       # Note:  Hash keys, e.g., 'name', are case sensitive!
       # value1 = @hash['key1']
       # value2 = @hash['key2']
-      
+
       # Return value validates the user input and allows the dialog to close.
       # A false value can force the user to fix their input before closing is allowed.
       return(true)

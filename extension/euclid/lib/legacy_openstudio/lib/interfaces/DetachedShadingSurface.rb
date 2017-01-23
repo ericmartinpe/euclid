@@ -60,9 +60,9 @@ module LegacyOpenStudio
 
 
     def parent_from_input_object
-    
+
       update_parent_from_entity  # This is really the wrong place...
-      
+
       return(nil)
     end
 
@@ -78,7 +78,7 @@ module LegacyOpenStudio
       if (input_object_polygon.points != face_polygon.points)
         #erase_entity
         #create_entity
-        
+
         #draw_entity(false)  # Don't do this:  This is circular!
       end
     end
@@ -117,7 +117,7 @@ module LegacyOpenStudio
         return(input_object_polygon.transform(coordinate_transformation))  # same as 'super'
       end
     end
-    
+
     def in_selection?(selection)
       return (selection.contains?(@entity) or selection.contains?(@parent.entity))
     end

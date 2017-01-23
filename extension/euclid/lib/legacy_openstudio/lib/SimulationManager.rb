@@ -13,7 +13,7 @@ end
 module LegacyOpenStudio
 
   class SimulationManager
-  
+
     def initialize
       @output_dir = nil
       @active_thread = nil
@@ -22,7 +22,7 @@ module LegacyOpenStudio
     def run_simulation
 
       run_weather_file = false
-      
+
       # check that new file has been saved
       if not Plugin.model_manager.input_file.path
         UI.messagebox("Please save your input file before simulating in EnergyPlus.")
@@ -87,34 +87,34 @@ module LegacyOpenStudio
 
       # Copy the input file so that permanent changes are not made to the original input file.
       new_input_file = Plugin.model_manager.input_file.copy
-      
+
       # do first so we don't remove requests added later
       if (not Plugin.model_manager.get_attribute("Report User Variables"))
         # Probably shouldn't be able to access .objects directly!
         new_input_file.objects.remove_if { |object| object.is_class_name?("Output:Variable") or object.is_class_name?("Output:Meter") }
       end
-      
+
       if (Plugin.model_manager.get_attribute("Report ABUPS"))
         new_input_file.objects.remove_if { |object| object.is_class_name?("Output:Table:SummaryReports") or object.is_class_name?("OutputControl:Table:Style") }
 
         format = Plugin.model_manager.get_attribute("ABUPS Format")
         units = Plugin.model_manager.get_attribute("ABUPS Units")
-        
+
         if units == "IP"
           new_input_file.add_object(InputObject.new("OutputControl:Table:Style", ["OutputControl:Table:Style", format, "InchPound"]))
         else
           new_input_file.add_object(InputObject.new("OutputControl:Table:Style", ["OutputControl:Table:Style", format]))
         end
-        
+
         new_input_file.add_object(InputObject.new("Output:Table:SummaryReports", ["Output:Table:SummaryReports", "AnnualBuildingUtilityPerformanceSummary"]))
       end
-      
+
       if (Plugin.model_manager.get_attribute("Report Sql"))
         # Probably shouldn't be able to access .objects directly!
         new_input_file.objects.remove_if { |object| object.is_class_name?("Output:SQLite")}
         new_input_file.add_object(InputObject.new("Output:SQLite", ["Output:SQLite", "SimpleAndTabular"]))
       end
-      
+
       if (Plugin.model_manager.get_attribute("Report DXF"))
         # Probably shouldn't be able to access .objects directly!
         new_input_file.objects.remove_if { |object| object.is_class_name?("Output:Surfaces:Drawing")}
@@ -143,16 +143,16 @@ module LegacyOpenStudio
         new_input_file.add_object(InputObject.new("Output:Variable", ["Output:Variable", "*", "Zone Ideal Loads Supply Air Sensible Cooling Rate", "Hourly"]))
         new_input_file.add_object(InputObject.new("Output:Variable", ["Output:Variable", "*", "Zone Ideal Loads Supply Air Total Cooling Rate", "Hourly"]))
       end
-      
+
       # make a temp directory to run in
       run_dir = Dir.tmpdir + "/OpenStudio/run"
-      if not File.directory?(run_dir) 
+      if not File.directory?(run_dir)
         FileUtils.mkdir_p(run_dir)
       end
-      
+
       # name of current file
       input_file_name = Plugin.model_manager.input_file_name
-      
+
       # Clean the output directory
       FileUtils.cd(output_dir)
       base_name = File.basename(input_file_name, '.*')
@@ -178,46 +178,46 @@ module LegacyOpenStudio
 
       # Write idf file to run directory
       new_input_file.write(run_dir + "/in.idf")
-      if (Plugin.model_manager.get_attribute("Report User Variables") or 
-          Plugin.model_manager.get_attribute("Report Zone Temps") or 
-          Plugin.model_manager.get_attribute("Report Surface Temps") or 
-          Plugin.model_manager.get_attribute("Report Zone Loads") or 
+      if (Plugin.model_manager.get_attribute("Report User Variables") or
+          Plugin.model_manager.get_attribute("Report Zone Temps") or
+          Plugin.model_manager.get_attribute("Report Surface Temps") or
+          Plugin.model_manager.get_attribute("Report Zone Loads") or
           Plugin.model_manager.get_attribute("Report Daylighting"))
         @readvars_flag = true
       else
         @readvars_flag = false
       end
-      
+
       # Copy idd file to run directory
-      FileUtils.cp(idd_path, run_dir + '/Energy+.idd') 
-      
+      FileUtils.cp(idd_path, run_dir + '/Energy+.idd')
+
       # Copy weather file to run directory
       if (run_weather_file)
         FileUtils.cp(weather_file_path, run_dir + '/in.epw') if (File.exist?(weather_file_path))
       end
-      
-      # define where expand objects is 
+
+      # define where expand objects is
       expandobjects_path = ''
       if (Plugin.platform == Platform_Windows)
         expandobjects_path = energyplus_dir + '/ExpandObjects.exe'
       else
         expandobjects_path = energyplus_dir + '/expandobjects'
       end
-      
+
       # run expand objects
       if File.exists?(expandobjects_path)
         # call command and wait for process to complete
         system("#{expandobjects_path}")
-        
+
         if File.exists?(run_dir + "/expanded.idf")
           # copy the expanded.idf to in.expidf
           FileUtils.cp(run_dir + "/expanded.idf", run_dir + "/in.expidf")
-        
+
           # overwrite in.idf with the expanded file
           if File.exists?(run_dir + "/in.idf")
-            File.rename(run_dir + "/in.idf", run_dir + "/in.idf.original") 
+            File.rename(run_dir + "/in.idf", run_dir + "/in.idf.original")
           end
-          
+
           File.rename(run_dir + "/expanded.idf", run_dir + "/in.idf")
         end
       end
@@ -250,13 +250,13 @@ module LegacyOpenStudio
 
 
     def on_completion
-      base_name = File.basename(Plugin.model_manager.input_file_name, ".*")      
+      base_name = File.basename(Plugin.model_manager.input_file_name, ".*")
       run_dir = Dir.tmpdir + "/OpenStudio/run/"
       output_dir = @output_dir
       editor_path = Plugin.read_pref("Text Editor Path")
-      
+
       begin
-      
+
         FileUtils.cd(run_dir)
         FileUtils.cp('in.expidf', output_dir + '/' + base_name + '.expidf') if (File.exist?('in.expidf'))
         FileUtils.cp('eplusout.err', output_dir + '/' + base_name + '.err') if (File.exist?('eplusout.err'))
@@ -283,7 +283,7 @@ module LegacyOpenStudio
             readvars_path = Plugin.energyplus_dir + "/readvars"
           end
 
-          if (File.exist?(readvars_path))      
+          if (File.exist?(readvars_path))
             if (Plugin.platform == Platform_Windows)
               UI.shell_command('call "' + readvars_path + '"', false)  # Called synchronously, might want to do this differently
 
@@ -374,7 +374,7 @@ module LegacyOpenStudio
             puts "Could not find the CSV file."
           end
         end
-      
+
       rescue Exception => e
         UI.messagebox("Error when performing post processing: '#{e}'\nSimulation results in #{run_dir}", MB_OK)
       end
@@ -395,7 +395,7 @@ module LegacyOpenStudio
         on_completion
       else
         view.show_frame(0.5)  # Must be called to ensure that nextFrame is called repeatedly
-      end   
+      end
     end
 
   end

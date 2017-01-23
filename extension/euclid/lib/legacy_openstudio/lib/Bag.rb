@@ -36,8 +36,8 @@ module LegacyOpenStudio
     def empty?
       return(@objects.empty?)
     end
-    
-    
+
+
     def length
       return(@objects.length)
     end
@@ -80,20 +80,20 @@ module LegacyOpenStudio
       end
       return(self)
     end
-    
+
 
     def each
       @objects.each { |object| yield(object) }
       return(self)
     end
-    
-    
+
+
     def each_index
       @objects.each_index { |object| yield(object) }
       return(self)
     end
-    
-    
+
+
     def [](i)
       return @objects[i]
     end
@@ -110,7 +110,7 @@ module LegacyOpenStudio
     end
 
 
-    def find 
+    def find
       return(@objects.find { |object| yield(object) })
     end
 

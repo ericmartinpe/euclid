@@ -18,7 +18,7 @@ module LegacyOpenStudio
         @hash['NAME'] = @input_object.fields[1]
         @hash['NUMXPOINTS'] = @input_object.fields[6].to_i
         @hash['NUMYPOINTS'] = @input_object.fields[9].to_i
-        
+
         # Need better method here
         if (Plugin.model_manager.units_system == "SI")
           i = 0
@@ -56,7 +56,7 @@ module LegacyOpenStudio
       @input_object.fields[1] = @hash['NAME']
       @input_object.fields[6] = [@hash['NUMXPOINTS'].to_i, 1].max
       @input_object.fields[9] = [@hash['NUMYPOINTS'].to_i, 1].max
-      
+
       # Need better method here
       if (Plugin.model_manager.units_system == "SI")
         i = 0

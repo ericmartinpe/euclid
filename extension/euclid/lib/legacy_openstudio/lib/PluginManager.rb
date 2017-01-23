@@ -27,12 +27,12 @@ module LegacyOpenStudio
   class PluginManager
 
     attr_reader :name, :version, :dir, :progress_dialog, :asynch_delay
-    
+
     attr_accessor :data_dictionary, :model_manager, :command_manager, :menu_manager, :dialog_manager, :animation_manager, :simulation_manager, :preferences
     attr_accessor :energyplus_path, :update_manager, :load_components
 
     def initialize
-      @name = OPENSTUDIO_PLUGIN_NAME   
+      @name = OPENSTUDIO_PLUGIN_NAME
       @version = OPENSTUDIO_PLUGIN_VERSION
 
       # need safety check here if can't find path!!
@@ -75,9 +75,9 @@ module LegacyOpenStudio
 
     def do_bug
       # For testing ErrorHandler
-      
+
       $test = false
-      
+
       a = nil
       b = a + 3
     end
@@ -162,7 +162,7 @@ module LegacyOpenStudio
       hash['Server Timeout'] = "120"
       hash['Last Input File Dir'] = Plugin.dir
       hash['Open Dialogs'] = ""
-      
+
       if (platform == Platform_Windows)
         hash['Text Editor Path'] = "C:/WINDOWS/system32/notepad.exe"
         hash['EnergyPlus Path'] = "C:/EnergyPlusV8-1-0/EnergyPlus.exe"  # Default installation path
@@ -178,7 +178,7 @@ module LegacyOpenStudio
 
     # Create and set default preferences for any that might not be in the Registry already.
     # For example, the first time the plugin is run, or the first time a new version (with new preferences) is run.
-    # Stores values in the Registry at:  HKEY_CURRENT_USER/Software/Google/SketchUp6/OpenStudio   
+    # Stores values in the Registry at:  HKEY_CURRENT_USER/Software/Google/SketchUp6/OpenStudio
     def load_default_preferences
       default_hash = default_preferences
       for key in default_hash.keys

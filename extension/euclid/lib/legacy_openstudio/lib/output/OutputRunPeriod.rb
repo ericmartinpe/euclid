@@ -25,7 +25,7 @@ module LegacyOpenStudio
     attr_accessor :type  # DesignDay or WeatherFile, this cannot be determined from the ESO yet, but it is set by ResultsManager later.
     attr_accessor :start_month, :start_date, :end_month, :end_date, :length, :interval
     attr_accessor :variable_defs, :data_series, :data_sets
-    
+
     def initialize
       @name = nil
       @latitude = nil
@@ -61,8 +61,8 @@ module LegacyOpenStudio
         return(name + " (" + start_month.to_s + "/" + start_date.to_s + "-" + end_month.to_s + "/" + end_date.to_s + ")")
       end
     end
-    
-    
+
+
     def add_value(key, value)
       if (@data_series[key].nil?)
         @data_series[key] = DataSeries.new(@variable_defs[key])
@@ -78,7 +78,7 @@ module LegacyOpenStudio
 
       @end_month = end_time.month
       @end_date = end_time.day
-      
+
       @data_series.each_value { |series|
         series.interval = @interval
         series.finalize
@@ -99,12 +99,12 @@ module LegacyOpenStudio
         @data_sets[series.variable_def.set_name].add_data_series(series)
       }
     end
-    
-    
+
+
     #def write(path)
       # Dump the data set "All Variables" to a CSV file.
     #end
 
   end
-  
+
 end

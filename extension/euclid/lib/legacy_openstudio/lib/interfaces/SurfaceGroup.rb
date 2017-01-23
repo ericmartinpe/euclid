@@ -82,8 +82,8 @@ module LegacyOpenStudio
       # Defaults to "@show_origin = false" when opening an input file.
       # Set to true when drawing a new zone with the new zone tool.
       if (@show_origin)
-      
-# There was warning here that construction point cannot be drawn at 0, 0, 0 but 
+
+# There was warning here that construction point cannot be drawn at 0, 0, 0 but
 # I have not experienced problems with that in either SU 7 or 8
 #        if (self.origin == Geom::Point3d.new(0,0,0))
 #          # SketchUp apparently doesn't like it if you put a ConstructionPoint at the real origin.
@@ -141,9 +141,9 @@ module LegacyOpenStudio
     # Error checks, finalization, or cleanup needed after the entity is drawn.
     def confirm_entity
       if (super)
-      
-      
-      
+
+
+
         return(true)
       else
         return(false)
@@ -163,7 +163,7 @@ module LegacyOpenStudio
         if (this_entity.class == Sketchup::Edge)
           if (this_entity.faces.empty?)
             # Be careful: looks like calling edge.find_faces will make edge.faces become non-empty
-            orphan_edges << this_entity 
+            orphan_edges << this_entity
             puts "orphan edge!"
           end
         end

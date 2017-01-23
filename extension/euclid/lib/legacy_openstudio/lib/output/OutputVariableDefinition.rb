@@ -19,7 +19,7 @@ module LegacyOpenStudio
     attr_accessor :key, :name, :object_name, :units, :frequency
     #attr_accessor :type  # Sum or Average; not implemented yet because this is not available in the ESO (but it is in the RDD).
     # also Report Variable or Meter
-    
+
     def inspect
       return(self)
     end
@@ -30,7 +30,7 @@ module LegacyOpenStudio
     # ...maybe... outside_variable_set_name...but set is really more general
     # name, long_name, full_name
 
-    
+
     def frequency_label  # frequency_name
       case(@frequency)
       when VARIABLE_FREQUENCY_RUN_PERIOD

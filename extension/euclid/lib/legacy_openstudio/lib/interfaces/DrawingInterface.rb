@@ -70,7 +70,7 @@ module LegacyOpenStudio
     # hit to constantly add and remove observers on child and parent.
     # There was also some evidence that too much shuffling of observers was
     # causing BugSplats.
-    def draw_entity(use_observers = true)    
+    def draw_entity(use_observers = true)
       if (check_input_object)
         update_parent_from_input_object  # Needs to happen earlier since @parent is needed in 'check_input_object'
 
@@ -89,7 +89,7 @@ module LegacyOpenStudio
 
           paint_entity
           add_observers if (use_observers)
-          
+
           update_input_object
         end
       end
@@ -168,7 +168,7 @@ module LegacyOpenStudio
       @parent.remove_child(self) if (@parent)
       @parent = parent_from_input_object
       @parent.add_child(self) if (@parent)
-      
+
     end
 
 
@@ -210,8 +210,8 @@ module LegacyOpenStudio
 
     def create_from_entity(entity)
       @entity = entity
-      @entity.drawing_interface = self    
-    
+      @entity.drawing_interface = self
+
       if (check_entity)  # class.check_entity(entity)   # should check before the interface accepts the entity
         #attach_entity(entity)
 
@@ -227,7 +227,7 @@ module LegacyOpenStudio
       else
         puts "DrawingInterface.create_from_entity:  check_entity failed"
       end
-      
+
       return(self)
     end
 

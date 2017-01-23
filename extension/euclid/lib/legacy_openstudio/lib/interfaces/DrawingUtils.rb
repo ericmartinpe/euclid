@@ -65,7 +65,7 @@ module DrawingUtils
         break
       end
     }
-    
+
     return(base_surface)
   end
 
@@ -91,7 +91,7 @@ module DrawingUtils
   # 'entity1' already has an interface.
   def DrawingUtils.swap_interfaces(entity1, entity2)
 
-  
+
     #drawing_interface.attach_entity(entity)
         #    detach_entity(@entity)  # fix old entity
         #
@@ -103,7 +103,7 @@ module DrawingUtils
         #      ? maybe call on_changed_entity
         #    ##add_observers  (optional)  or do externally
 
-  
+
     #  .attach_input_object(input_object)
     #      @input_object = input_object
     #      @entity.input_object_key = @input_object.key
@@ -131,7 +131,7 @@ module DrawingUtils
     if entity.drawing_interface.entity.deleted?
       return(false)  # no swap
     end
-    
+
     new_face_points = entity.polygon.reduce.points
     original_face_points = entity.drawing_interface.entity.polygon.reduce.points
 

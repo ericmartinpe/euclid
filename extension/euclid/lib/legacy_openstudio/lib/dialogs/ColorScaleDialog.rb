@@ -38,5 +38,5 @@ module LegacyOpenStudio
     end
 
   end
-  
+
 end

@@ -45,10 +45,10 @@ module LegacyOpenStudio
         #end
       #end
       if (Plugin.model_manager.input_file_dir == ".")
-      
+
       end
 
- 
+
       if (path = UI.open_panel("Open EnergyPlus Input File", Plugin.model_manager.input_file_dir, "*.idf; *.imf"))  # have not figured out how to set File Types popup yet
 
         Plugin.write_pref("Last Input File Dir", File.dirname(path))  # Save the dir so we can start here next time
@@ -69,7 +69,7 @@ module LegacyOpenStudio
           Plugin.model_manager.detach_input_file
           success = Plugin.model_manager.open_input_file(path)
         end
-        
+
       end
 
       #Sketchup.active_model.commit_operation
@@ -96,7 +96,7 @@ module LegacyOpenStudio
         save_input_file_as
       elsif (not File.exist?(path))
         # pop error msg first?  the path was there. but now has disappeared
-        save_input_file_as     
+        save_input_file_as
       else
         # check if writable?
         Plugin.model_manager.save_input_file(path)
@@ -136,7 +136,7 @@ module LegacyOpenStudio
           end
         end
 
-        Plugin.model_manager.close_input_file      
+        Plugin.model_manager.close_input_file
         Plugin.model_manager.detach_input_file(erase)
         Plugin.model_manager.new_input_file
       end

@@ -52,13 +52,13 @@ module LegacyOpenStudio
       Plugin.model_manager.results_manager.range_minimum = @hash['RANGE_MINIMUM']
       Plugin.model_manager.results_manager.range_maximum = @hash['RANGE_MAXIMUM']
       Plugin.model_manager.results_manager.interpolate = @hash['INTERPOLATE']
- 
+
       Plugin.model_manager.results_manager.update
 
       Plugin.dialog_manager.update(ColorScaleInterface)
 
       Plugin.model_manager.paint
- 
+
       return(true)
     end
 

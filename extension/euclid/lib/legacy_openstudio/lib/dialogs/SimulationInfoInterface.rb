@@ -24,13 +24,13 @@ module LegacyOpenStudio
       else
         @hash['COORDINATE_SYSTEM'] = "ABSOLUTE"
       end
-      
+
       if (input_object.fields[4] and input_object.fields[4].upcase == "ABSOLUTE")
         @hash['DAYLIGHTING_COORDINATE_SYSTEM'] = "ABSOLUTE"
       else
         @hash['DAYLIGHTING_COORDINATE_SYSTEM'] = "RELATIVE"
       end
-      
+
       if (input_object.fields[5] and input_object.fields[5].upcase == "ABSOLUTE")
         @hash['RECTANGULAR_COORDINATE_SYSTEM'] = "ABSOLUTE"
       else
@@ -63,7 +63,7 @@ module LegacyOpenStudio
       else
         puts "This file has no location."
       end
-      
+
     end
 
 
@@ -79,19 +79,19 @@ module LegacyOpenStudio
       else
         input_object.fields[3] = "Absolute"
       end
-      
+
       if (@hash['DAYLIGHTING_COORDINATE_SYSTEM'] == "RELATIVE")
         input_object.fields[4] = "Relative"
       else
         input_object.fields[4] = "Absolute"
       end
-      
+
       if (@hash['RECTANGULAR_COORDINATE_SYSTEM'] == "RELATIVE")
         input_object.fields[5] = "Relative"
       else
         input_object.fields[5] = "Absolute"
       end
-      
+
       if (@hash['VERTEX_ORDER'] == "CLOCKWISE")
         input_object.fields[2] = "Clockwise"
       else
@@ -108,7 +108,7 @@ module LegacyOpenStudio
 
       when "UPPER_RIGHT_CORNER"
         input_object.fields[1] = "UpperRightCorner"
-        
+
       when "LOWER_RIGHT_CORNER"
         input_object.fields[1] = "LowerRightCorner"
       end

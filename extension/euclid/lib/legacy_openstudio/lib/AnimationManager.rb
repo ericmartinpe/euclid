@@ -29,7 +29,7 @@ module LegacyOpenStudio
 
       @match_time_step = false
       @day_only = false
-      
+
       @time_step = 600.0
       @multiplier = 6
       @delay = 0.1
@@ -48,7 +48,7 @@ module LegacyOpenStudio
         else
           @between_markers = false
         end
-        
+
         Plugin.menu_manager.rwd_anim_cmd.tooltip = "Fast Reverse"
         Plugin.menu_manager.play_anim_cmd.tooltip = "Stop"
         Plugin.menu_manager.fwd_anim_cmd.tooltip = "Fast Forward"
@@ -63,17 +63,17 @@ module LegacyOpenStudio
       this_time = Time.now
       if ((this_time -  @previous_time) > @delay)
         @previous_time = this_time
-        
+
         if (@fast_reverse)
           reverse_time
         else
           forward_time
         end
       end
-      
+
       view.show_frame
     end
-    
+
 
     def forward_time
       if (@fast_forward)
@@ -207,12 +207,12 @@ module LegacyOpenStudio
 
     def update  # update_interface   update_dialogs
       Sketchup.set_status_text(Sketchup.active_model.shadow_info.time.strftime("%I:%M %p, %B %d"))
-      
+
       # Also sets stuff in the control panel dialog, if open.
     end
 
 
-    def stop_animation    
+    def stop_animation
       # Can be called by SketchUp
       Sketchup.active_model.active_view.animation = nil
 
@@ -221,7 +221,7 @@ module LegacyOpenStudio
       @fast_reverse = false
 
       Sketchup.set_status_text(Sketchup.active_model.shadow_info.time.strftime("%I:%M %p, %B %d"))
-      
+
       Plugin.menu_manager.rwd_anim_cmd.tooltip = "Reverse Frame"
       Plugin.menu_manager.play_anim_cmd.tooltip = "Play"
       Plugin.menu_manager.fwd_anim_cmd.tooltip = "Forward Frame"

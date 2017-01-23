@@ -47,7 +47,7 @@ module LegacyOpenStudio
 
     def open(path)
       @path = path
-      
+
       if (File.exist?(path))
         merge(path)
         @modified = false
@@ -70,11 +70,11 @@ module LegacyOpenStudio
 
     def merge(path)
       if (File.exist?(path))
-        read_file(path)  
-        
-        
+        read_file(path)
+
+
         # if this was canceled, or there was an error, 'read_file' should return an error code.
-        
+
         update_object_references
         @modified = true
       else
@@ -211,7 +211,7 @@ module LegacyOpenStudio
       if (not fields.empty?)
         object.fields = fields
         object.class_definition = @data_dictionary.get_class_def(fields[0])  # this is way more work than I should be doing here...
-        
+
         # add to file 'context' based on ordering/formatting rules
       end
 
@@ -277,7 +277,7 @@ module LegacyOpenStudio
       file_size = File.size(path)
 
       while (line = file.gets)
-      
+
         file_length += line.length + 1  # For update_progress
 
         if (i = line.index('!'))
@@ -356,16 +356,16 @@ module LegacyOpenStudio
         else
           object_key = "BAD OBJECT"
         end
-        
+
         if (not @update_progress.nil?)
           @update_progress.call(100, "Reading Input Objects")
-        end       
+        end
       else
         @context += buffer
       end
 
       file.close
-      
+
       if Sketchup.version_number > 14000000
         if !@context.valid_encoding?
           @context = @context.encode("UTF-16be", :invalid=>:replace, :replace=>"?").encode('UTF-8')
@@ -397,7 +397,7 @@ module LegacyOpenStudio
 
 
     def update_object_references  #update_references   # find_references   find_dependents
-     
+
       # Build object list hash, add all objects that have \reference
       # this could be done during reading/parsing of the file
 
@@ -405,7 +405,7 @@ module LegacyOpenStudio
       count = 0
 
       for object in @objects
-      
+
         count += 1
         if (not @update_progress.nil?)
           continue = @update_progress.call((100 * count / total_objects), "Updating Object References, First Pass")
@@ -413,11 +413,11 @@ module LegacyOpenStudio
             break
           end
         end
-        
+
         if object.class_definition.name.upcase == "VERSION"
           version_string = DataDictionary::version(@data_dictionary.path)
           version_pattern = Regexp.new("^#{Regexp.escape(version_string)}")
-          
+
           # pad idf_version_string with 0's if neccesary
           idf_version_string = object.fields[1].to_s
           if not idf_version_string.match(/\d+\.\d+\.\d+/)
@@ -435,7 +435,7 @@ module LegacyOpenStudio
         end
 
         if (not object.class_definition)
-        
+
           # Kludge to skip the error message for certain vestigial input objects that are still in the IDD but do nothing.
           # DesignBuilder stills adds these.
           next if (object.is_class_name?("LEAD INPUT"))
@@ -471,7 +471,7 @@ module LegacyOpenStudio
       count = 0
       # this must only be done after all objects are parsed
       for object in @objects
-      
+
         count += 1
         if (not @update_progress.nil?)
           continue = @update_progress.call((100 * count / total_objects), "Updating Object References, Second Pass")
@@ -501,7 +501,7 @@ module LegacyOpenStudio
                   if (other_object.name.upcase == object.fields[i].upcase)
                     # Replace object name with the object reference
                     object.fields[i] = other_object
-                    other_object.dependents << object 
+                    other_object.dependents << object
                     break
                     # what if there is more than 1 with this name in here?  dupe names should be flagged elsewhere
                   end
@@ -537,7 +537,7 @@ module LegacyOpenStudio
       #puts "total objects= " + total_objects.to_s
 
       lines = nil
-      if Sketchup.version_number > 14000000     
+      if Sketchup.version_number > 14000000
         lines = @context.split(/\n/)
       else
         lines = @context.split(/\n/)
@@ -552,8 +552,8 @@ module LegacyOpenStudio
 
           if (object)
             file.puts(object.to_idf)
-            
-            count += 1            
+
+            count += 1
             if (not update_progress.nil?)
               #puts count
               continue = update_progress.call((100 * count / total_objects), "Writing Objects")

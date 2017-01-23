@@ -44,7 +44,7 @@ module LegacyOpenStudio
               base_surface = DrawingUtils.detect_attached_shading(entity)
               if (base_surface)
                 puts "new attached shading surface"
-                AttachedShadingSurface.new_from_entity(entity)            
+                AttachedShadingSurface.new_from_entity(entity)
               else
                 puts "new base surface"
                 BaseSurface.new_from_entity(entity)
@@ -60,15 +60,15 @@ module LegacyOpenStudio
             # This is a cut/paste or undo of a previous delete of this surface.
             puts "cut-paste/delete-undo surface"
             entity.drawing_interface.on_undelete_entity(entity)
-            
-            
+
+
             # May have to handle swapping in here too.
             if (swapped = DrawingUtils.swapped_face_on_divide?(entity))
               puts "swapped!!!!!"
             else
               puts "no swaps asdfasdf"
             end
-            
+
 
           else
             # This is a divide of an existing surface.
@@ -111,7 +111,7 @@ module LegacyOpenStudio
               end
 
 
-            else  
+            else
               # This is a new sub surface located on a base surface.
 
               # NEED SEPARATE TOOL HANDLER HERE
@@ -144,30 +144,30 @@ module LegacyOpenStudio
                 original_surface = entity.drawing_interface
 
                 SubSurface.new_from_entity(entity)
-                
+
                 # Must trigger the base surface to recalculate vertices to account for the new sub surface.
                 original_surface.on_change_entity
-                
+
               end
             end
           end
-        
+
         else
- 
+
           if (not entity.deleted?)
             if (drawing_interface = entity.drawing_interface)
-            
+
               need_to_remove = false
               already_exists = false
               error_message = ""
-            
+
               if (drawing_interface.class == DaylightingControls)
                 puts "new daylighting controls"
-                
+
                 if (@drawing_interface.class == Zone)
-                
+
                   # see if we already have this object
-                  Plugin.model_manager.daylighting_controls.each do |daylighting_controls| 
+                  Plugin.model_manager.daylighting_controls.each do |daylighting_controls|
                     if daylighting_controls.entity == entity
                       already_exists = true
                     elsif daylighting_controls.zone == @drawing_interface.input_object
@@ -176,24 +176,24 @@ module LegacyOpenStudio
                       break
                     end
                   end
-                  
-                  if not already_exists and not need_to_remove 
+
+                  if not already_exists and not need_to_remove
                     new_entity = DaylightingControls.new_from_entity(entity)
                   end
-               
-                else 
+
+                else
                   # not added to a zone
                   need_to_remove = true
                   error_message = "Can only add DaylightingControls to a Zone"
                 end
-                
+
               elsif(drawing_interface.class == OutputIlluminanceMap)
                 puts "new output illuminance map"
-                
+
                 if (@drawing_interface.class == Zone)
-                
+
                   # see if we already have this object
-                  Plugin.model_manager.output_illuminance_maps.each do |output_illuminance_map| 
+                  Plugin.model_manager.output_illuminance_maps.each do |output_illuminance_map|
                     if output_illuminance_map.entity == entity
                       already_exists = true
                     elsif output_illuminance_map.zone == @drawing_interface.input_object
@@ -202,17 +202,17 @@ module LegacyOpenStudio
                       break
                     end
                   end
-                  
-                  if not already_exists and not need_to_remove 
+
+                  if not already_exists and not need_to_remove
                     new_entity = OutputIlluminanceMap.new_from_entity(entity)
                   end
-               
-                else 
+
+                else
                   # not added to a zone
                   need_to_remove = true
                   error_message = "Can only add Output:IlluminanceMap to a Zone"
                 end
-                             
+
               end
 
               if need_to_remove
@@ -221,19 +221,19 @@ module LegacyOpenStudio
                 Sketchup.send_action("selectSelectionTool:")
                 UI.messagebox(error_message)
               end
-              
+
             else
               puts "unknown object added"
             end
-            
+
           end
-          
+
         end
-        
+
         # This is also getting called in DrawingInterface in a couple places.
         # Should probably standardize...call in observers?  or call in an 'on_event' method in DrawingInterface?
         Plugin.dialog_manager.update(ObjectInfoInterface)
-        
+
       }  # AsynchProc
     end
 

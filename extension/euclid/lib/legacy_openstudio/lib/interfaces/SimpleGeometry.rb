@@ -156,7 +156,7 @@ module LegacyOpenStudio
 
         when "Window"
           puts "converting:  " + input_object.key
-          
+
           old_fields = input_object.fields.dup
           vertices = SimpleGeometry.calc_vertices(input_object, coord_change, building_rotation)
           input_object.class_definition = Plugin.data_dictionary.get_class_def("FenestrationSurface:Detailed")
@@ -513,7 +513,7 @@ module LegacyOpenStudio
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
-          
+
         end
       end
 
@@ -533,7 +533,7 @@ module LegacyOpenStudio
         hash['z1'] = input_object.fields[8].to_f
         hash['length'] = input_object.fields[9].to_f
         hash['height'] = input_object.fields[10].to_f
-        
+
       when "Wall:Interzone", "Ceiling:Interzone", "Floor:Interzone"
         hash['azimuth'] = -input_object.fields[5].to_f.degrees
         hash['tilt'] = -input_object.fields[6].to_f.degrees
@@ -542,14 +542,14 @@ module LegacyOpenStudio
         hash['z1'] = input_object.fields[9].to_f
         hash['length'] = input_object.fields[10].to_f
         hash['height'] = input_object.fields[11].to_f
-        
+
       when "FenestrationSurface:Detailed"
         base_surface = input_object.fields[4]
         surface_transform = SimpleGeometry.base_surface_transform(base_surface)
 
         vertices = input_object.fields[11..-1]
         number_of_vertices = (vertices.size / 3)
-        
+
         points = []
         for i in 0..number_of_vertices-1
           x = vertices[i*3].to_f
@@ -562,7 +562,7 @@ module LegacyOpenStudio
         puts "before #{polygon.points}"
         polygon.transform!(surface_transform.inverse)
         puts "after #{polygon.points}"
-        
+
         xmin = nil
         xmax = nil
         ymin = nil
@@ -580,7 +580,7 @@ module LegacyOpenStudio
             ymax = [ymax, -point.y].max
           end
         end
-        
+
         xoff = surface_transform.to_a[12]
         yoff = surface_transform.to_a[13]
         zoff = surface_transform.to_a[14]
@@ -590,7 +590,7 @@ module LegacyOpenStudio
         hash['length'] = xmax-xmin
         hash['height'] = ymax-ymin
         hash['base_surface'] = base_surface
-        
+
       when "Window", "GlazedDoor"
         hash['x1'] = input_object.fields[7].to_f
         hash['z1'] = input_object.fields[8].to_f
@@ -666,7 +666,7 @@ module LegacyOpenStudio
         zone_transform = building_rotation
 
 
-      when "Wall:Exterior", "Wall:Adiabatic", "Wall:Underground", "Roof", "Ceiling:Adiabatic", "Floor:GroundContact", 
+      when "Wall:Exterior", "Wall:Adiabatic", "Wall:Underground", "Roof", "Ceiling:Adiabatic", "Floor:GroundContact",
         "Floor:Adiabatic", "Wall:Interzone", "Ceiling:Interzone", "Floor:Interzone"
         length1 = hash['length']
         height1 = hash['height']
@@ -679,7 +679,7 @@ module LegacyOpenStudio
       when "Window", "Door", "GlazedDoor", "Window:Interzone", "Door:Interzone", "GlazedDoor:Interzone"
         length1 = hash['length']
         height1 = hash['height']
-        
+
         offset_translation = Geom::Transformation.translation(Geom::Vector3d.new(-hash['x1'], -hash['z1'], 0))
         local_transform = offset_translation
 
@@ -766,7 +766,7 @@ module LegacyOpenStudio
       p3 = Geom::Point3d.new(-length1, -height1, 0.0)
       p4 = Geom::Point3d.new(0.0, -height1, 0.0)
       polygon = Geom::Polygon.new([p1, p2, p3, p4])
-      
+
       polygon.transform!(local_transform)
       polygon.transform!(surface_transform)
 
@@ -787,7 +787,7 @@ module LegacyOpenStudio
     # Return the transformation for a base surface according to azimuth, tilt, and starting corner.
     def SimpleGeometry.base_surface_transform(input_object)
       if (input_object.class == InputObject)
-        
+
         case input_object.class_name.upcase
           when "BUILDINGSURFACE:DETAILED","WALL:DETAILED", "ROOFCEILING:DETAILED", "FLOOR:DETAILED"
             if input_object.class_name.upcase == "BUILDINGSURFACE:DETAILED"
@@ -797,11 +797,11 @@ module LegacyOpenStudio
               number_of_vertices = input_object.fields[9].to_i
               vertices = input_object.fields[10..-1]
             end
-            
+
             if number_of_vertices == 0 # autocalculate
               number_of_vertices = (vertices.size / 3)
             end
-            
+
             points = []
             for i in 0..number_of_vertices-1
               x = vertices[i*3].to_f
@@ -809,7 +809,7 @@ module LegacyOpenStudio
               z = vertices[i*3 + 2].to_f
               points[i] = Geom::Point3d.new(x, y, z)
             end
-            
+
             polygon = Geom::Polygon.new(points)
 
             # face axes
@@ -835,7 +835,7 @@ module LegacyOpenStudio
             else
               new_x = x_axis.clone
             end
-            
+
             # subtract out component along new_z
             if y_axis.dot(new_z) != 0
               tmp = new_z.clone
@@ -844,7 +844,7 @@ module LegacyOpenStudio
             else
               new_y = y_axis.clone
             end
-            
+
             if new_x.length > new_y.length
               new_x.normalize!
               new_y = new_z.cross(new_x)
@@ -852,16 +852,16 @@ module LegacyOpenStudio
               new_y.normalize!
               new_x = new_y.cross(new_z)
             end
-            
+
             # find the origin, biggest x and then biggest y
             origin = points[0]
             points.each do |point|
               origin_vec = Geom::Vector3d.new(origin.x, origin.y, origin.z)
               point_vec = Geom::Vector3d.new(point.x, point.y, point.z)
-              
+
               projected_origin_x = origin_vec.dot(new_x)
               projected_point_x = point_vec.dot(new_x)
-              
+
               if projected_point_x > projected_origin_x
                 origin = point
               elsif projected_point_x == projected_origin_x
@@ -876,7 +876,7 @@ module LegacyOpenStudio
             surface_transform = Geom::Transformation.new(new_x, new_y, new_z, origin)
 
           else
-        
+
             hash = SimpleGeometry.get_geometry_parameters(input_object)
             origin = Geom::Point3d.new(0, 0, 0)
             x_axis = Geom::Vector3d.new(1, 0, 0)
@@ -905,7 +905,7 @@ module LegacyOpenStudio
           else
             zone = input_object.fields[3]
           end
-          
+
           if zone.class == InputObject
             origin = Geom::Point3d.new(0, 0, 0)
             z_axis = Geom::Vector3d.new(0, 0, 1)

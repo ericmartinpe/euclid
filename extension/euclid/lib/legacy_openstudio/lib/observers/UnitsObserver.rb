@@ -10,7 +10,7 @@ module LegacyOpenStudio
     # This observer seems to be called twice when it should only be called once?  could be API bug
 
     def onOptionsProviderChanged(options_provider, options_key)
-    
+
       if (options_key == "LengthUnit")
 
         case (options_provider['LengthUnit'])
@@ -29,7 +29,7 @@ module LegacyOpenStudio
       if (options_key == "LengthPrecision")
         # 'LengthPrecision' ranges from 0 to 6--the number indicates the places past the decimal point
         new_precision = options_provider['LengthPrecision']
- 
+
         if (new_precision != Plugin.model_manager.length_precision)
           Plugin.model_manager.length_precision = new_precision
           # Plugin.dialog_manager.update_units   # update any open dialogs
@@ -40,7 +40,7 @@ module LegacyOpenStudio
       if (options_key == "AnglePrecision")
         # 'AnglePrecision' ranges from 0 to 3--the number indicates the places past the decimal point
         new_precision = options_provider['AnglePrecision']
-        
+
         if (new_precision != Plugin.model_manager.angle_precision)
           Plugin.model_manager.angle_precision = new_precision
           # Plugin.dialog_manager.update_units   # update any open dialogs

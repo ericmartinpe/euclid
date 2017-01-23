@@ -38,7 +38,7 @@ module LegacyOpenStudio
         @input_object.fields[7] = "SunExposed"
         @input_object.fields[8] = "WindExposed"
       end
-      
+
       @input_object.fields[3] = default_construction # do after setting boundary conditions
 
       @input_object.fields[9] = ""
@@ -305,7 +305,7 @@ module LegacyOpenStudio
       end
       return(surface_type)
     end
-    
+
     def exterior?
       return (@input_object.fields[5] == "Ground" or @input_object.fields[5] == "Outdoors")
     end
@@ -323,22 +323,22 @@ module LegacyOpenStudio
           construction_name = Plugin.model_manager.construction_manager.default_wall_ext
         else
           construction_name = Plugin.model_manager.construction_manager.default_wall_int
-        end      
+        end
       when "ROOF", "CEILING"
          if exterior?
           construction_name = Plugin.model_manager.construction_manager.default_roof_ext
         else
           construction_name = Plugin.model_manager.construction_manager.default_roof_int
-        end     
+        end
       end
-      
+
       return(construction_name)
     end
-    
+
     def in_selection?(selection)
       return (selection.contains?(@entity) or selection.contains?(@parent.entity))
     end
-    
+
     def name
       @input_object.fields[1]
     end
@@ -347,7 +347,7 @@ module LegacyOpenStudio
     def net_area
       return(self.area)
     end
-    
+
 
     def gross_area
       area_sum = self.area
@@ -361,7 +361,7 @@ module LegacyOpenStudio
 
 
     def glazing_area
-      area = 0.0 
+      area = 0.0
       for child in @children
         if (child.class == SubSurface and (child.surface_type.upcase == "WINDOW" or child.surface_type.upcase == "GLASSDOOR"))
           area += child.area
@@ -385,8 +385,8 @@ module LegacyOpenStudio
       @children.each { |child| count += 1 if (child.class == SubSurface) }
       return(count)
     end
-    
-    
+
+
     # match this base surface to another base surface
     def set_other_side_surface(other)
       if (@input_object.fields[2].upcase == "ROOF")
@@ -404,16 +404,16 @@ module LegacyOpenStudio
               @entity.back_material = Plugin.model_manager.construction_manager.surface_int
           else
           end
-      
+
     end
-    
+
     # set this base surface to reference no other base surface
     def unset_other_side_surface
-    
+
       if (@input_object.fields[2].upcase == "CEILING")
         @input_object.fields[2] = "Roof"
       end
-      
+
       if (@input_object.fields[2] == "Floor")
         @input_object.fields[5] = "Ground"
         @input_object.fields[6] = ""
@@ -438,11 +438,11 @@ module LegacyOpenStudio
               @entity.back_material = Plugin.model_manager.construction_manager.outdoorssunwind_int
           else
           end
-      end   
+      end
 
       @input_object.fields[3] = default_construction # do after making exterior
 
-    end    
+    end
 
   end
 

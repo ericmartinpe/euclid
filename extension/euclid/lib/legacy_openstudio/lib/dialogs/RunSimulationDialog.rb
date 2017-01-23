@@ -40,7 +40,7 @@ module LegacyOpenStudio
       @container.execute_function("setDateOptions()")
 
       @container.execute_function("setElementValue('RUN_DIR', '" + @hash['RUN_DIR'].to_s + "')" )
-      
+
       # Manually set the date values
       @container.execute_function("setElementValue('START_DATE', '" + @hash['START_DATE'].to_s + "')")
       @container.execute_function("setElementValue('END_DATE', '" + @hash['END_DATE'].to_s + "')")
@@ -48,18 +48,18 @@ module LegacyOpenStudio
       #if (@hash['START_DATE'] == "1" and @hash['START_MONTH'] == "1" and @hash['END_DATE'] == "12" and @hash['END_MONTH'] == "31")
       #  @hash['ANNUAL_SIMULATION'] = true
       #  set_element_value("ANNUAL_SIMULATION", @hash['ANNUAL_SIMULATION'])
-      #  
+      #
       #end
       @container.execute_function("onClickAnnualSimulation()")
       @container.execute_function("onClickRunWeatherFile()")
       @container.execute_function("onClickReportABUPS()")
       @container.execute_function("onClickReportVariable()")
-      
+
       epw_path = @hash['EPW_PATH']
       if (File.exists?(epw_path))
         show_weather_file_info(epw_path)
       end
-      
+
       if (Plugin.platform == Platform_Mac)
         # Automatic close shell feature doesn't work on Mac yet.
         @container.execute_function("disableElement('CLOSE_SHELL')")
@@ -72,7 +72,7 @@ module LegacyOpenStudio
 
       if (@hash['EPW_PATH'].empty?)
         dir = Plugin.model_manager.input_file_dir
-        file_name = "*.epw"      
+        file_name = "*.epw"
       else
         dir = File.dirname(@hash['EPW_PATH'])
         file_name = File.basename(@hash['EPW_PATH'])
@@ -99,7 +99,7 @@ module LegacyOpenStudio
       set_element_value("LONGITUDE", weather_file.longitude.to_s)
       set_element_value("TIME_ZONE", weather_file.time_zone.to_s)
       set_element_value("ELEVATION", weather_file.elevation.to_s + " m")
-      
+
       set_element_value("EPW_START", weather_file.start)
       set_element_value("EPW_END", weather_file.end)
       set_element_value("EPW_START_DAY", weather_file.start_day)
@@ -118,7 +118,7 @@ module LegacyOpenStudio
       @container.execute_function("setElementValue('START_MONTH', '1')")
       @container.execute_function("setStartMonthOptions()")
       @container.execute_function("setElementValue('START_DATE', '1')")
-      
+
       @container.execute_function("setElementValue('END_MONTH', '12')")
       @container.execute_function("setEndMonthOptions()")
       @container.execute_function("setElementValue('END_DATE', '31')")
@@ -140,9 +140,9 @@ module LegacyOpenStudio
 
 
     def on_click_close_shell
-      # Give a warning to the user because there is no way to distinguish between a shell command window that is 
+      # Give a warning to the user because there is no way to distinguish between a shell command window that is
       # running and one that is paused.
-      
+
       if (@hash['CLOSE_SHELL'])
         UI.messagebox("Unchecking this option means that you must manually close the shell command window\n" +
           "before any of the selected results files (ERR, ABUPS, CSV) will be shown.")
@@ -155,5 +155,5 @@ module LegacyOpenStudio
     end
 
   end
-  
+
 end

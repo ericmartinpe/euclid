@@ -7,11 +7,11 @@ module LegacyOpenStudio
   class AsynchProc
 
     def initialize(delay = 50)
-    
+
       seconds = (delay/1000).to_i
       UI.start_timer(seconds, false) {
         begin
-          
+
           # do the proc
           yield
 
@@ -37,7 +37,7 @@ module LegacyOpenStudio
         #ensure
         end
       }
-      
+
     end
 
   end

@@ -17,7 +17,7 @@ module LegacyOpenStudio
     def name
       return @input_object.fields[1]
     end
-    
+
 ##### Begin override methods for the input object #####
 
 
@@ -130,7 +130,7 @@ module LegacyOpenStudio
       super
       if (valid_entity?)
         set_entity_name
-        
+
         # update children
         @entity.entities.each do |entity|
           if (drawing_interface = entity.drawing_interface)
@@ -233,7 +233,7 @@ module LegacyOpenStudio
 
             if (found)
               # Fix the faces
-              # The 'intended_face' has the wrong geometry (not connected to base face properly) but the correct drawing interface.                  
+              # The 'intended_face' has the wrong geometry (not connected to base face properly) but the correct drawing interface.
               # The 'inferred_face' has the correct geometry, but the wrong drawing interface.
 
               #puts "intended" + intended_face.to_s + " " + intended_face.vertices.length.to_s
@@ -302,7 +302,7 @@ module LegacyOpenStudio
       # Using the edges returned by intersect_with is not going to work.
       # In the case where one zone is smaller (and therefore does not get any new cuts), none of its edges/faces are returned.
       # Would be impossible to match.
-      
+
       # Plan B.
       # Loop through all faces.
       # Quick Tests:
@@ -313,9 +313,9 @@ module LegacyOpenStudio
       #            4.  elsif normal is in opposite direction, setup interzone BCs.   Or delete both (air wall).
       #
       #  Now, just how to get rid of penetrating parts of the pushed zone?
-      
+
       # what happens if a window gets cut by the intersect_with?
-      
+
       # special cases:
       #    A BaseSurface pushed into the middle of another zone Base.  Must cut hole and slice to outside!
       #    Option to delete wall and just do Airwall.
@@ -372,14 +372,14 @@ module LegacyOpenStudio
       if (@input_object.fields[3].nil?)
         puts "Zone.origin:  missing x coordinate"
       end
-      
+
       if (@input_object.fields[4].nil?)
         puts "Zone.origin:  missing y coordinate"
       end
 
       if (@input_object.fields[5].nil?)
         puts "Zone.origin:  missing z coordinate"
-      end      
+      end
 
       x = @input_object.fields[3].to_f.m
       y = @input_object.fields[4].to_f.m
@@ -417,7 +417,7 @@ module LegacyOpenStudio
         # a bad value for field (like putting "asdf" instead of "330") does not throw an error
         # when using to_f
         # might want to do my own conversion
-        
+
         # EnergyPlus measures angles with positive values in the clockwise direction.
         # SketchUp measures with positive values in the counter-clockwise direction.
 

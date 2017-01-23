@@ -21,7 +21,7 @@ require("legacy_openstudio/lib/observers/UnitsObserver")
 module LegacyOpenStudio
 
   class ModelManager
-   
+
     attr_accessor :guid, :units_system, :units_hash, :length_precision, :angle_precision, :construction_manager, :schedule_manager, :results_manager, :zone_loads_manager
     attr_accessor :input_file, :components, :weather_file, :model_interface, :rendering_mode, :unviewed_errors, :model_observer, :selection_observer
 
@@ -45,10 +45,10 @@ module LegacyOpenStudio
       @construction_manager = ConstructionManager.new
       @schedule_manager = ScheduleManager.new
       @results_manager = ResultsManager.new  # Requires model_manager in 'initialize'
-      
+
       @model_observer = ModelObserver.new
       Sketchup.active_model.add_observer(@model_observer)
-      
+
       @selection_observer = SelectionObserver.new
       Sketchup.active_model.selection.add_observer(@selection_observer)
 
@@ -180,18 +180,18 @@ module LegacyOpenStudio
           if (@input_file)
             @model_interface = ModelInterface.new(@input_file)
             @model_interface.draw_model(Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
-            
+
             if path != Plugin.dir + "/NewFileTemplate.idf"
               Sketchup.active_model.active_view.zoom_extents
             end
           end
-          
+
           @construction_manager.reset_defaults
           @construction_manager.check_defaults
         ensure
           progress_dialog.destroy
         end
-        
+
         success = true
       end
 
@@ -248,7 +248,7 @@ module LegacyOpenStudio
     def close_input_file
       @error_log = ""
       @unviewed_errors = false
-      
+
       # Unlock or otherwise release the input file so that other programs can use it
       # - might be a combination of flock and/or chmod:
       #file = File.open(@path, 'r')
@@ -297,7 +297,7 @@ module LegacyOpenStudio
       # Expand as necessary...
 
       @length_precision = units_options_provider['LengthPrecision']
-      
+
       @angle_precision = units_options_provider['AnglePrecision']
     end
 
@@ -314,7 +314,7 @@ module LegacyOpenStudio
 
     def default_attributes
       hash = Hash.new
-      
+
       # Run Simulation attributes
       hash['Weather File Path'] = ""
       hash['Report ABUPS'] = true
@@ -346,9 +346,9 @@ module LegacyOpenStudio
       # Others:
       # current view mode
       # windows open?
-      
+
       # Animation settings
-      
+
       return(hash)
     end
 
@@ -473,7 +473,7 @@ module LegacyOpenStudio
     def all_surfaces
       return(@model_interface.recurse_children.find_all { |child| child.class == BaseSurface or child.class == SubSurface or child.class == AttachedShadingSurface or child.class == DetachedShadingSurface })
     end
-    
+
     def output_illuminance_maps
       return(@model_interface.recurse_children.find_all { |child| child.class == OutputIlluminanceMap })
     end
@@ -481,7 +481,7 @@ module LegacyOpenStudio
     def daylighting_controls
       return(@model_interface.recurse_children.find_all { |child| child.class == DaylightingControls })
     end
-   
+
     def relative_coordinates?
       if (drawing_interface = surface_geometry)
         return(drawing_interface.input_object.fields[3] == "Relative")
@@ -490,7 +490,7 @@ module LegacyOpenStudio
         return(false)
       end
     end
-    
+
     def relative_daylighting_coordinates?
       if (drawing_interface = surface_geometry)
         if (drawing_interface.input_object.fields[4])
@@ -515,7 +515,7 @@ module LegacyOpenStudio
 
         range_min = @results_manager.range_minimum.to_f
         range_max = @results_manager.range_maximum.to_f
-        
+
         rendering_appearance = @results_manager.rendering_appearance
         interpolate = @results_manager.interpolate
         normalize = @results_manager.normalize
@@ -526,7 +526,7 @@ module LegacyOpenStudio
       # until all the recursive threads are finished.
       for child in @model_interface.recurse_children
         next if (not child.respond_to?(:outside_variable_key))
-        
+
         had_observers = child.remove_observers
 
         # added the or statement for render by boundary, layer, normal
@@ -547,7 +547,7 @@ module LegacyOpenStudio
           if (child.outside_variable_key)
             outside_value = run_period.data_series[child.outside_variable_key].value_at(time, interpolate)
             outside_variable_def = run_period.data_series[child.outside_variable_key].variable_def
-            
+
             if (not outside_value.nil?) and normalize
               # Need better method here
               if (Plugin.model_manager.units_system == "SI")
@@ -605,7 +605,7 @@ module LegacyOpenStudio
           if (child.inside_variable_key)
             inside_value = run_period.data_series[child.inside_variable_key].value_at(time, interpolate)
             inside_variable_def = run_period.data_series[child.inside_variable_key].variable_def
-            
+
             if (not inside_value.nil?) and normalize
               # Need better method here
               if (Plugin.model_manager.units_system == "SI")
@@ -623,7 +623,7 @@ module LegacyOpenStudio
           if (inside_value.nil?)
             color = Sketchup::Color.new(255, 255, 255, 1.0)  # No data--paint white
             texture = nil
-            
+
           elsif (range_max == range_min)
             color = Sketchup::Color.new(255, 255, 255, 1.0)  # No data--paint white
             texture = nil
@@ -662,11 +662,11 @@ module LegacyOpenStudio
 
           child.paint_data
         end
-        
+
         child.add_observers if had_observers
-        
+
       end
-    
+
     end
 
 
@@ -674,7 +674,7 @@ module LegacyOpenStudio
       # variable keys should be assigned as soon as Rendering Settings are applied
 
       outside_data_set = @results_manager.outside_data_set
-      inside_data_set = @results_manager.inside_data_set      
+      inside_data_set = @results_manager.inside_data_set
 
       if (outside_data_set and inside_data_set)
 
@@ -694,7 +694,7 @@ module LegacyOpenStudio
               inside_variable_key = @results_manager.output_file.get_variable_key(inside_variable_name, surface.input_object.name.upcase)
               surface.inside_variable_key = inside_variable_key
               surface.inside_normalization = surface.area
-              
+
             end
           end
 
@@ -707,15 +707,15 @@ module LegacyOpenStudio
             for base_surface in zone.children
               if (base_surface.respond_to?(:outside_variable_key))
                 base_surface.outside_variable_key = outside_variable_key
-                base_surface.inside_variable_key = inside_variable_key 
-              
+                base_surface.inside_variable_key = inside_variable_key
+
                 base_surface.outside_normalization = zone.unit_floor_area
                 base_surface.inside_normalization = zone.unit_floor_area
 
                 for sub_surface in base_surface.children
                   sub_surface.outside_variable_key = outside_variable_key
-                  sub_surface.inside_variable_key = inside_variable_key 
-                
+                  sub_surface.inside_variable_key = inside_variable_key
+
                   sub_surface.outside_normalization = zone.unit_floor_area
                   sub_surface.inside_normalization = zone.unit_floor_area
                 end
@@ -743,7 +743,7 @@ module LegacyOpenStudio
        if (@rendering_mode == 4)
        else
           #change RenderMode to 2 (so you can see material)
-          render_mode_value = renderingoptions["RenderMode"] = 2  
+          render_mode_value = renderingoptions["RenderMode"] = 2
        end
        # add if statement (don't chagne if in color by layer)
        if (@rendering_mode == 3)
@@ -766,5 +766,5 @@ module LegacyOpenStudio
 
 
   end
-  
+
 end

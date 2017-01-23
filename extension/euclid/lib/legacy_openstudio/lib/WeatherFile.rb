@@ -12,7 +12,7 @@ module LegacyOpenStudio
 
 
     def initialize(path)
-    
+
       if (File.exists?(path))
         @path = path
         parse_header
@@ -20,14 +20,14 @@ module LegacyOpenStudio
       else
         puts "WeatherFile.initialize:  bad path"
       end
-      
+
     end
 
 
     def parse_header
-      
+
       file = File.open(path, 'r')
-      
+
       # All geographic location information is in line 1
       line = file.gets
       array = line.split(',')
@@ -47,34 +47,34 @@ module LegacyOpenStudio
       line = file.gets
       line = file.gets
       line = file.gets
-      
+
       # All data period information is in line 8
       line = file.gets
       array = line.split(',')
       @time_step = (60.0 / array[2].to_f).to_i  # minutes
-      
+
       @start_day = array[4].strip
-      
+
       data_start = array[5].split('/')
       @start_month = data_start[0].to_i
       @start_date = data_start[1].to_i
       @start = @start_month.to_s + '/' + @start_date.to_s
-      
+
       data_end = array[6].split('/')
       @end_month = data_end[0].to_i
       @end_date = data_end[1].to_i
       @end = @end_month.to_s + '/' + @end_date.to_s
-      
+
       file.close
     end
-    
-    
+
+
     def analyze
       # calculate statistics, HDD, CDD, max, min
-    
+
     end
-    
-    
+
+
   end
-  
+
 end

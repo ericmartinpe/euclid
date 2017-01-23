@@ -81,15 +81,15 @@ module LegacyOpenStudio
       if (base_face = DrawingUtils.detect_base_face(@entity))
         return(base_face.drawing_interface)
       else
-      
+
         zone_interface = super
-      
+
         # try parent_from_input_object
         input_object_parent = parent_from_input_object
         if input_object_parent and zone_interface == input_object_parent.parent_from_entity
           return(input_object_parent)
         end
-        
+
         # just grab the first base surface in the zone.
         for child in zone_interface.children
           if (child.class == BaseSurface)
@@ -108,7 +108,7 @@ module LegacyOpenStudio
     def in_selection?(selection)
       return (selection.contains?(@entity) or selection.contains?(@parent.entity) or (not @parent.parent.nil? and selection.contains?(@parent.parent.entity)))
     end
-    
+
     def paint_surface_type
       if (valid_entity?)
         @entity.material = Plugin.model_manager.construction_manager.attached_shading

@@ -19,7 +19,7 @@ module LegacyOpenStudio
 
     def on_load
       #super
-            
+
       # Populate construction list
       object_names = Plugin.model_manager.construction_manager.constructions.collect { |object| object.name }
       if (not object_names.contains?(@hash['CONSTRUCTION']))
@@ -42,7 +42,7 @@ module LegacyOpenStudio
         object_names.add(@hash['FRAME_DIVIDER'])
       end
       set_select_options("FRAME_DIVIDER", object_names.sort)
-      
+
       # Populate shading device list
       object_names = Plugin.model_manager.input_file.find_objects_by_class_name("WINDOWPROPERTY:SHADINGCONTROL").collect { |object| object.name }
       if (not object_names.contains?(@hash['SHADING_DEVICE']))
@@ -55,7 +55,7 @@ module LegacyOpenStudio
       on_change_base_surface
 
       #super
-      
+
       # Don't set the background color because it causes the dialog to flash.
       #@container.execute_function("setBackgroundColor('" + default_dialog_color + "')")
       update_units
@@ -70,7 +70,7 @@ module LegacyOpenStudio
 
 
     def on_change_type
-            
+
       case (@hash['TYPE'].upcase)
 
       when "WINDOW", "GLASSDOOR"
@@ -118,7 +118,7 @@ module LegacyOpenStudio
 
         when "GROUND", "GROUNDFCFACTORMETHOD", "GROUNDSLABPREPROCESSORAVERAGE",
               "GROUNDSLABPREPROCESSORCORE", "GROUNDSLABPREPROCESSORPERIMETER",
-              "GROUNDBASEMENTPREPROCESSORAVERAGEWALL", "GROUNDBASEMENTPREPROCESSORAVERAGEFLOOR", 
+              "GROUNDBASEMENTPREPROCESSORAVERAGEWALL", "GROUNDBASEMENTPREPROCESSORAVERAGEFLOOR",
               "GROUNDBASEMENTPREPROCESSORUPPERWALL", "GROUNDBASEMENTPREPROCESSORLOWERWALL",
               "ZONE", "OTHERSIDECONDITIONSMODEL"  # Not sure what to do with the last two here!
           disable_element("VIEW_FACTOR_TO_GROUND")

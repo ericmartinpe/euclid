@@ -9,7 +9,7 @@ require("legacy_openstudio/lib/dialogs/ProgressDialog")
 module LegacyOpenStudio
 
   class ResultsManager
-  
+
     attr_accessor :output_file_path, :output_file, :run_period
     attr_accessor :run_period_index, :variable_type, :rendering_appearance
     attr_accessor :match_range, :range_minimum, :range_maximum, :interpolate, :normalize
@@ -54,11 +54,11 @@ module LegacyOpenStudio
       if (@output_file)
         @outside_data_set = @output_file.run_periods[@run_period_index].data_sets[@outside_variable_set_name]
         @inside_data_set = @output_file.run_periods[@run_period_index].data_sets[@inside_variable_set_name]
-        
+
         puts "@outside_data_set = #{@outside_data_set}"
         puts "@inside_data_set = #{@inside_data_set}"
       end
-      
+
       # Call DrawingManager to update variable keys on all surfaces
       Plugin.model_manager.update_surface_variable_keys
     end
@@ -74,7 +74,7 @@ module LegacyOpenStudio
       ensure
         progress_dialog.destroy
       end
-      
+
       # Kludge to fix the run periods because DataRunPeriod cannot always get the accurate start and end dates for the run period,
       # the info must be cross-referenced to the RUNPERIOD objects and DESIGNDAY objects.
       run_periods = output_file.run_periods.clone
@@ -86,7 +86,7 @@ module LegacyOpenStudio
           if (not run_period.nil? and run_period.name == design_day.fields[1].upcase)
 
             run_period.type = RUN_PERIOD_TYPE_DESIGN_DAY
-            
+
             run_period.start_month = design_day.fields[2].to_i
             run_period.start_date = design_day.fields[3].to_i
             run_period.end_month = run_period.start_month
@@ -123,10 +123,10 @@ module LegacyOpenStudio
           run_period.interval = TimeInterval.new(start_time, end_time)
         end
       end
-      
+
       # Kludge to re-finalize everything now that better start and end dates are specified.
       output_file.run_periods.each { |run_period| run_period.finalize }
-      
+
       return(output_file)
     end
 
@@ -143,23 +143,23 @@ module LegacyOpenStudio
 
 
     def parse_abups_html
-    
+
       path = File.dirname(Plugin.energyplus_path) + "/eplustbl.htm"
-      
+
       if (not File.exists?(path))
         return
       end
-      
+
       file = File.open(path, 'r')
-      
+
       results = []
 
       while (line = file.gets)
-      
+
         line.strip!
-        
+
         case (line)
-        
+
         when ('<td align="right">Heating</td>')
           energy = 0
           for i in 0..4
@@ -175,7 +175,7 @@ module LegacyOpenStudio
             energy += line[22..33].strip.to_f
           end
           results[1] = energy
-          
+
         when ('<td align="right">Interior Lighting</td>')
           energy = 0
           for i in 0..4
@@ -183,7 +183,7 @@ module LegacyOpenStudio
             energy += line[22..33].strip.to_f
           end
           results[2] = energy
-          
+
         when ('<td align="right">Exterior Lighting</td>')
           energy = 0
           for i in 0..4
@@ -191,7 +191,7 @@ module LegacyOpenStudio
             energy += line[22..33].strip.to_f
           end
           results[3] = energy
-          
+
         when ('<td align="right">Interior Equipment</td>')
           energy = 0
           for i in 0..4
@@ -199,7 +199,7 @@ module LegacyOpenStudio
             energy += line[22..33].strip.to_f
           end
           results[4] = energy
-          
+
         when ('<td align="right">Exterior Equipment</td>')
           energy = 0
           for i in 0..4
@@ -207,7 +207,7 @@ module LegacyOpenStudio
             energy += line[22..33].strip.to_f
           end
           results[5] = energy
-          
+
         when ('<td align="right">Fans</td>')
           energy = 0
           for i in 0..4
@@ -215,7 +215,7 @@ module LegacyOpenStudio
             energy += line[22..33].strip.to_f
           end
           results[6] = energy
-          
+
         when ('<td align="right">Pumps</td>')
           energy = 0
           for i in 0..4
@@ -231,7 +231,7 @@ module LegacyOpenStudio
             energy += line[22..33].strip.to_f
           end
           results[8] = energy
-          
+
         when ('<td align="right">Humidification</td>')
           energy = 0
           for i in 0..4
@@ -239,7 +239,7 @@ module LegacyOpenStudio
             energy += line[22..33].strip.to_f
           end
           results[9] = energy
-          
+
         when ('<td align="right">Heat Recovery</td>')
           energy = 0
           for i in 0..4
@@ -247,7 +247,7 @@ module LegacyOpenStudio
             energy += line[22..33].strip.to_f
           end
           results[10] = energy
-          
+
         when ('<td align="right">Water Systems</td>')
           energy = 0
           for i in 0..4
@@ -255,7 +255,7 @@ module LegacyOpenStudio
             energy += line[22..33].strip.to_f
           end
           results[11] = energy
-          
+
         when ('<td align="right">Refrigeration</td>')
           energy = 0
           for i in 0..4
@@ -263,7 +263,7 @@ module LegacyOpenStudio
             energy += line[22..33].strip.to_f
           end
           results[12] = energy
-          
+
         when ('<td align="right">Generators</td>')
           energy = 0
           for i in 0..4
@@ -271,30 +271,30 @@ module LegacyOpenStudio
             energy += line[22..33].strip.to_f
           end
           results[13] = energy
-          
+
           break  # Break out of the while loop
-          
+
         else
           # do nothing
-        
+
         end
-      
-      
+
+
       end
-      
+
       for i in 0...results.length
         if (results[i] == 0.0)
           results[i] = 0.001
         end
       end
-      
-      
+
+
       file.close
 
-      return(results)    
+      return(results)
     end
-  
-  
+
+
   end
-  
+
 end

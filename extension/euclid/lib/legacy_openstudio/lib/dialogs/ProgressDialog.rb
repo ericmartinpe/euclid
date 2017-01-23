@@ -5,7 +5,7 @@
 
 module LegacyOpenStudio
 
-  class ProgressDialog 
+  class ProgressDialog
 
     def initialize()
     end

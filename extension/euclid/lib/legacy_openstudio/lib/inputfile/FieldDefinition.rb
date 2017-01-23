@@ -20,8 +20,8 @@ module LegacyOpenStudio
       @object_list_keys = []  # \reference, array of keys that can be referenced by \object-list
       @choice_keys = []  # \choice, array of fixed choice keys
     end
-    
-    
+
+
     def get_choice_key(key_name)
       actual_key = nil
       for key in @choice_keys
@@ -39,5 +39,5 @@ module LegacyOpenStudio
     end
 
   end
-  
+
 end

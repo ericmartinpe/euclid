@@ -34,7 +34,7 @@ module LegacyOpenStudio
     # Drawing interfaces that don't correspond directly to a SketchUp entity (SurfaceGeometry, Building)
     # should return false here.
     def check_entity
-      return(false) 
+      return(false)
     end
 
 
@@ -120,7 +120,7 @@ module LegacyOpenStudio
         return(true)
       else
         return(false)
-      end      
+      end
     end
 
 

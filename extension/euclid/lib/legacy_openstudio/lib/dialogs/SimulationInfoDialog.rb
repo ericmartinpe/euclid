@@ -8,7 +8,7 @@ require("legacy_openstudio/lib/dialogs/DialogContainers")
 
 module LegacyOpenStudio
 
-  
+
   class SimulationInfoDialog < PropertiesDialog
 
     def initialize(container, interface, hash)
@@ -20,7 +20,7 @@ module LegacyOpenStudio
 
       add_callbacks
     end
-    
+
     def on_load
       super
       #disable_element("COORDINATE_SYSTEM")
@@ -28,8 +28,8 @@ module LegacyOpenStudio
       #disable_element("RECTANGULAR_COORDINATE_SYSTEM")
       #disable_element("VERTEX_ORDER")
       #disable_element("STARTING_VERTEX")
-    end 
+    end
 
   end
-  
+
 end

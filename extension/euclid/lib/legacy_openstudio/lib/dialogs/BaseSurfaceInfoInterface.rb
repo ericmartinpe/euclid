@@ -27,8 +27,8 @@ module LegacyOpenStudio
         @hash['WIND'] = (@input_object.fields[8].upcase == "WINDEXPOSED")
 
         @hash['VIEW_FACTOR_TO_GROUND'] = @input_object.fields[9]
-        
-        
+
+
         # Need better method here
         if (Plugin.model_manager.units_system == "SI")
           i = 0
@@ -81,21 +81,21 @@ module LegacyOpenStudio
         # Set some things to blank
 
       when "GROUND"
-      
+
       when "GROUNDFCFACTORMETHOD"
-      
+
       when "GROUNDSLABPREPROCESSORAVERAGE"
-      
+
       when "GROUNDSLABPREPROCESSORCORE"
-      
+
       when "GROUNDSLABPREPROCESSORPERIMETER"
-      
+
       when "GROUNDBASEMENTPREPROCESSORAVERAGEWALL"
-      
+
       when "GROUNDBASEMENTPREPROCESSORAVERAGEFLOOR"
 
       when "GROUNDBASEMENTPREPROCESSORUPPERWALL"
-      
+
       when "GROUNDBASEMENTPREPROCESSORLOWERWALL"
 
       when "SURFACE"
@@ -117,8 +117,8 @@ module LegacyOpenStudio
       else
         @input_object.fields[6] = outside_boundary_object
       end
-      
-      
+
+
       if (@hash['SUN'])
         @input_object.fields[7] = "SunExposed"
       else
@@ -147,7 +147,7 @@ module LegacyOpenStudio
 
       return(true)
     end
-    
+
   end
 
 end

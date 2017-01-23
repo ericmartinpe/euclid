@@ -28,16 +28,16 @@ module LegacyOpenStudio
 
     def view_idf
       # Not used right now
-      
+
       editor_path = Plugin.read_pref("Text Editor Path")
       file_path = Plugin.model_manager.input_file.path
-      
+
       if (not editor_path.nil? and not file_path.nil?)
         command_string = '"' + editor_path + '" "' + file_path + '"'
 
-        # Need different command for Mac OSX        
+        # Need different command for Mac OSX
         UI.shell_command(command_string)
-        
+
         #UI.openURL('file://"' + editor_path + '" "' + file_path + '"')
       else
         puts "missing editor path or file path"
@@ -45,5 +45,5 @@ module LegacyOpenStudio
     end
 
   end
-  
+
 end
