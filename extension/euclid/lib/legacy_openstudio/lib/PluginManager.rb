@@ -2,19 +2,19 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
-require("legacy_openstudio/lib/AnimationManager")
-require("legacy_openstudio/lib/AsynchProc")
-require("legacy_openstudio/lib/CommandManager")
-require("legacy_openstudio/lib/DialogManager")
-require("legacy_openstudio/lib/MenuManager")
-require("legacy_openstudio/lib/ModelManager")
-require("legacy_openstudio/lib/SimulationManager")
-require("legacy_openstudio/lib/UpdateManager")
-require("legacy_openstudio/lib/inputfile/DataDictionary")
+require("euclid/lib/legacy_openstudio/lib/AnimationManager")
+require("euclid/lib/legacy_openstudio/lib/AsynchProc")
+require("euclid/lib/legacy_openstudio/lib/CommandManager")
+require("euclid/lib/legacy_openstudio/lib/DialogManager")
+require("euclid/lib/legacy_openstudio/lib/MenuManager")
+require("euclid/lib/legacy_openstudio/lib/ModelManager")
+require("euclid/lib/legacy_openstudio/lib/SimulationManager")
+require("euclid/lib/legacy_openstudio/lib/UpdateManager")
+require("euclid/lib/legacy_openstudio/lib/inputfile/DataDictionary")
 
-require("legacy_openstudio/sketchup/UI")
-require("legacy_openstudio/sketchup/Sketchup")
-require("legacy_openstudio/sketchup/Geom")
+require("euclid/lib/legacy_openstudio/sketchup/UI")
+require("euclid/lib/legacy_openstudio/sketchup/Sketchup")
+require("euclid/lib/legacy_openstudio/sketchup/Geom")
 
 #UI.messagebox "Starting Plugin!"
 
@@ -32,8 +32,8 @@ module LegacyOpenStudio
     attr_accessor :energyplus_path, :update_manager, :load_components
 
     def initialize
-      @name = OPENSTUDIO_PLUGIN_NAME
-      @version = OPENSTUDIO_PLUGIN_VERSION
+      @name = EUCLID_EXTENSION_NAME
+      @version = EUCLID_EXTENSION_VERSION
 
       # need safety check here if can't find path!!
       @dir = File.dirname(__FILE__) + "/.."
@@ -96,7 +96,7 @@ module LegacyOpenStudio
         @data_dictionary = DataDictionary.open(idd_path)
         success = true
       else
-        UI.messagebox("Cannot locate the Data Dictionary file Energy+.idd.\nOpenStudio will not be loaded.")
+        UI.messagebox("Cannot locate the Data Dictionary file Energy+.idd.\n#{EUCLID_EXTENSION_NAME} will not be loaded.")
         puts "Bad IDD path=" + idd_path
       end
 

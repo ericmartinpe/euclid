@@ -2,10 +2,10 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
-require("legacy_openstudio/lib/dialogs/Dialogs")
-require("legacy_openstudio/lib/interfaces/BaseSurface")
-require("legacy_openstudio/lib/interfaces/SubSurface")
-require("legacy_openstudio/lib/dialogs/LastReportInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/Dialogs")
+require("euclid/lib/legacy_openstudio/lib/interfaces/BaseSurface")
+require("euclid/lib/legacy_openstudio/lib/interfaces/SubSurface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/LastReportInterface")
 
 module LegacyOpenStudio
 
@@ -92,7 +92,7 @@ Do you want to continue?", MB_OKCANCEL)
       begin
 
         if @profile
-          require 'legacy_openstudio/stdruby/profiler'
+          require("euclid/lib/legacy_openstudio/stdruby/profiler")
           Profiler__::start_profile
         end
 

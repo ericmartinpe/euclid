@@ -24,8 +24,8 @@ installed_version = Sketchup.version
 installed_version_key = ''; installed_version.split('.').each { |e| installed_version_key += e.rjust(4, '0') }
 
 if (installed_version_key < minimum_version_key)
-  UI.messagebox("OpenStudio is only compatible with SketchUp version " + minimum_version +
-    " or higher.\nThe installed version is " + installed_version + ".  The plugin was not loaded.", MB_OK)
+  UI.messagebox("#{EUCLID_EXTENSION_NAME} is only compatible with SketchUp version " + minimum_version +
+    " or higher.\nThe installed version is " + installed_version + ". The plugin was not loaded.", MB_OK)
 else
   # start legacy plugin after everything and check for OpenStudio already loaded
   UI.start_timer(1, false) {
@@ -38,13 +38,11 @@ else
       if Sketchup.version_number > 14000000
         SKETCHUP_CONSOLE.show
       end
-      puts "OpenStudio is already loaded, disable OpenStudio using 'Window->Preferences->Extensions' to use the Legacy OpenStudio Plug-in."
+      puts "OpenStudio is already loaded, disable OpenStudio using 'Window->Preferences->Extensions' to use the #{EUCLID_EXTENSION_NAME} extension."
 
     rescue
-
       # only load this if OpenStudio is not installed
-      load("legacy_openstudio/lib/PluginManager.rb")
-
+      load("euclid/lib/legacy_openstudio/lib/PluginManager.rb")
     end
   }
 end

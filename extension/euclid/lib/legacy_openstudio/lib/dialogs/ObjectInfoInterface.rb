@@ -2,20 +2,20 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
-require("legacy_openstudio/lib/dialogs/DialogInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/DialogInterface")
 
-require("legacy_openstudio/lib/dialogs/BuildingInfoInterface")
-require("legacy_openstudio/lib/dialogs/ZoneInfoInterface")
-require("legacy_openstudio/lib/dialogs/BaseSurfaceInfoInterface")
-require("legacy_openstudio/lib/dialogs/SubSurfaceInfoInterface")
-require("legacy_openstudio/lib/dialogs/AttachedShadingSurfaceInfoInterface")
-require("legacy_openstudio/lib/dialogs/DetachedShadingGroupInfoInterface")
-require("legacy_openstudio/lib/dialogs/DetachedShadingSurfaceInfoInterface")
-require("legacy_openstudio/lib/dialogs/OutputIlluminanceMapInfoInterface")
-require("legacy_openstudio/lib/dialogs/DaylightingControlsInfoInterface")
-require("legacy_openstudio/lib/dialogs/NoSelectionInfoInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/BuildingInfoInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/ZoneInfoInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/BaseSurfaceInfoInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/SubSurfaceInfoInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/AttachedShadingSurfaceInfoInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/DetachedShadingGroupInfoInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/DetachedShadingSurfaceInfoInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/OutputIlluminanceMapInfoInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/DaylightingControlsInfoInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/NoSelectionInfoInterface")
 
-require("legacy_openstudio/lib/dialogs/ObjectInfoDialog")
+require("euclid/lib/legacy_openstudio/lib/dialogs/ObjectInfoDialog")
 
 
 module LegacyOpenStudio

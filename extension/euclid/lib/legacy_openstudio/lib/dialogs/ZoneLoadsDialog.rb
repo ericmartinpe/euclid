@@ -2,9 +2,9 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
-require("legacy_openstudio/lib/dialogs/Dialogs")
-require("legacy_openstudio/lib/dialogs/ThermostatInterface")
-require("legacy_openstudio/lib/dialogs/LastReportInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/Dialogs")
+require("euclid/lib/legacy_openstudio/lib/dialogs/ThermostatInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/LastReportInterface")
 
 module LegacyOpenStudio
 

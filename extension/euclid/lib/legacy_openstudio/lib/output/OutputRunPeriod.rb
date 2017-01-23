@@ -2,9 +2,9 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
-require("legacy_openstudio/lib/output/TimeInterval")
-require("legacy_openstudio/lib/output/DataSeries")
-require("legacy_openstudio/lib/output/DataSet")
+require("euclid/lib/legacy_openstudio/lib/output/TimeInterval")
+require("euclid/lib/legacy_openstudio/lib/output/DataSeries")
+require("euclid/lib/legacy_openstudio/lib/output/DataSet")
 
 
 module LegacyOpenStudio

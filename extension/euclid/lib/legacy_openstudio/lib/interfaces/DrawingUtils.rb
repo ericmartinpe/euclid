@@ -2,8 +2,8 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
-require("legacy_openstudio/sketchup/Sketchup")
-require("legacy_openstudio/sketchup/Geom")
+require("euclid/lib/legacy_openstudio/sketchup/Sketchup")
+require("euclid/lib/legacy_openstudio/sketchup/Geom")
 
 
 # Everything in this module should be strictly based on entities and not drawing interfaces.

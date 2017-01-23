@@ -2,23 +2,23 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
-require("legacy_openstudio/lib/Collection")
+require("euclid/lib/legacy_openstudio/lib/Collection")
 
-require("legacy_openstudio/lib/interfaces/SurfaceGeometry")
-require("legacy_openstudio/lib/interfaces/Location")
-require("legacy_openstudio/lib/interfaces/Building")
-require("legacy_openstudio/lib/interfaces/Zone")
-require("legacy_openstudio/lib/interfaces/BaseSurface")
-require("legacy_openstudio/lib/interfaces/SubSurface")
-require("legacy_openstudio/lib/interfaces/AttachedShadingSurface")
-require("legacy_openstudio/lib/interfaces/DetachedShadingSurface")
-require("legacy_openstudio/lib/interfaces/OtherInterfaces")
-require("legacy_openstudio/lib/interfaces/SimpleGeometry")
-require("legacy_openstudio/lib/interfaces/DaylightingControls")
-require("legacy_openstudio/lib/interfaces/OutputIlluminanceMap")
+require("euclid/lib/legacy_openstudio/lib/interfaces/SurfaceGeometry")
+require("euclid/lib/legacy_openstudio/lib/interfaces/Location")
+require("euclid/lib/legacy_openstudio/lib/interfaces/Building")
+require("euclid/lib/legacy_openstudio/lib/interfaces/Zone")
+require("euclid/lib/legacy_openstudio/lib/interfaces/BaseSurface")
+require("euclid/lib/legacy_openstudio/lib/interfaces/SubSurface")
+require("euclid/lib/legacy_openstudio/lib/interfaces/AttachedShadingSurface")
+require("euclid/lib/legacy_openstudio/lib/interfaces/DetachedShadingSurface")
+require("euclid/lib/legacy_openstudio/lib/interfaces/OtherInterfaces")
+require("euclid/lib/legacy_openstudio/lib/interfaces/SimpleGeometry")
+require("euclid/lib/legacy_openstudio/lib/interfaces/DaylightingControls")
+require("euclid/lib/legacy_openstudio/lib/interfaces/OutputIlluminanceMap")
 
-require("legacy_openstudio/lib/observers/ModelObserver.rb")
-require("legacy_openstudio/lib/observers/ModelEntitiesObserver.rb")
+require("euclid/lib/legacy_openstudio/lib/observers/ModelObserver.rb")
+require("euclid/lib/legacy_openstudio/lib/observers/ModelEntitiesObserver.rb")
 
 
 module LegacyOpenStudio

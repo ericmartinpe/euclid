@@ -6,8 +6,8 @@ begin
   require("fileutils")
   require("tmpdir")
 rescue LoadError
-  require("legacy_openstudio/stdruby/fileutils")
-  require("legacy_openstudio/stdruby/tmpdir")
+  require("euclid/lib/legacy_openstudio/stdruby/fileutils")
+  require("euclid/lib/legacy_openstudio/stdruby/tmpdir")
 end
 
 module LegacyOpenStudio

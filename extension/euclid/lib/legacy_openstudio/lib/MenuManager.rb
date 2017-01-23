@@ -2,27 +2,27 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
-require("legacy_openstudio/lib/dialogs/FileInfoInterface")
-require("legacy_openstudio/lib/dialogs/SimulationInfoInterface")
-require("legacy_openstudio/lib/dialogs/ObjectInfoInterface")
-require("legacy_openstudio/lib/dialogs/RunSimulationInterface")
-require("legacy_openstudio/lib/dialogs/RenderingSettingsInterface")
-require("legacy_openstudio/lib/dialogs/ColorScaleInterface")
-require("legacy_openstudio/lib/dialogs/AnimationSettingsInterface")
-require("legacy_openstudio/lib/dialogs/PreferencesInterface")
-require("legacy_openstudio/lib/dialogs/AboutInterface")
-require("legacy_openstudio/lib/dialogs/SurfaceSearchInterface")
-require("legacy_openstudio/lib/dialogs/SurfaceMatchingInterface")
-require("legacy_openstudio/lib/dialogs/DefaultConstructionsInterface")
-require("legacy_openstudio/lib/dialogs/ZoneLoadsInterface")
-require("legacy_openstudio/lib/dialogs/ThermostatInterface")
-require("legacy_openstudio/lib/tools/DataTool")
-require("legacy_openstudio/lib/tools/InfoTool")
-require("legacy_openstudio/lib/tools/NewShadingTool")
-require("legacy_openstudio/lib/tools/NewDaylightingControlsTool")
-require("legacy_openstudio/lib/tools/NewOutputIlluminanceMapTool")
-require("legacy_openstudio/lib/tools/NewZoneTool")
-require("legacy_openstudio/lib//observers/ErrorObserver")  # This is hopefully only a temporary location
+require("euclid/lib/legacy_openstudio/lib/dialogs/FileInfoInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/SimulationInfoInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/ObjectInfoInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/RunSimulationInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/RenderingSettingsInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/ColorScaleInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/AnimationSettingsInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/PreferencesInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/AboutInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/SurfaceSearchInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/SurfaceMatchingInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/DefaultConstructionsInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/ZoneLoadsInterface")
+require("euclid/lib/legacy_openstudio/lib/dialogs/ThermostatInterface")
+require("euclid/lib/legacy_openstudio/lib/tools/DataTool")
+require("euclid/lib/legacy_openstudio/lib/tools/InfoTool")
+require("euclid/lib/legacy_openstudio/lib/tools/NewShadingTool")
+require("euclid/lib/legacy_openstudio/lib/tools/NewDaylightingControlsTool")
+require("euclid/lib/legacy_openstudio/lib/tools/NewOutputIlluminanceMapTool")
+require("euclid/lib/legacy_openstudio/lib/tools/NewZoneTool")
+require("euclid/lib/legacy_openstudio/lib//observers/ErrorObserver")  # This is hopefully only a temporary location
 
 
 module LegacyOpenStudio

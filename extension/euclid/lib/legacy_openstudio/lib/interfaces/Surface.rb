@@ -2,9 +2,9 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
-require("legacy_openstudio/lib/interfaces/DrawingInterface")
-require("legacy_openstudio/lib/inputfile/InputObject")
-require("legacy_openstudio/lib/observers/FaceObserver")
+require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingInterface")
+require("euclid/lib/legacy_openstudio/lib/inputfile/InputObject")
+require("euclid/lib/legacy_openstudio/lib/observers/FaceObserver")
 
 
 module LegacyOpenStudio

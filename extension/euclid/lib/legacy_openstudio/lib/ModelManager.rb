@@ -2,20 +2,20 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
-require("legacy_openstudio/lib/ConstructionManager")
-require("legacy_openstudio/lib/ScheduleManager")
-require("legacy_openstudio/lib/ResultsManager")
+require("euclid/lib/legacy_openstudio/lib/ConstructionManager")
+require("euclid/lib/legacy_openstudio/lib/ScheduleManager")
+require("euclid/lib/legacy_openstudio/lib/ResultsManager")
 
-require("legacy_openstudio/lib/dialogs/ProgressDialog")
+require("euclid/lib/legacy_openstudio/lib/dialogs/ProgressDialog")
 
-require("legacy_openstudio/lib/inputfile/InputFile")
+require("euclid/lib/legacy_openstudio/lib/inputfile/InputFile")
 
-require("legacy_openstudio/lib/interfaces/ModelInterface")
+require("euclid/lib/legacy_openstudio/lib/interfaces/ModelInterface")
 
-require("legacy_openstudio/lib/observers/AppObserver")
-require("legacy_openstudio/lib/observers/ModelObserver")
-require("legacy_openstudio/lib/observers/SelectionObserver")
-require("legacy_openstudio/lib/observers/UnitsObserver")
+require("euclid/lib/legacy_openstudio/lib/observers/AppObserver")
+require("euclid/lib/legacy_openstudio/lib/observers/ModelObserver")
+require("euclid/lib/legacy_openstudio/lib/observers/SelectionObserver")
+require("euclid/lib/legacy_openstudio/lib/observers/UnitsObserver")
 
 
 module LegacyOpenStudio

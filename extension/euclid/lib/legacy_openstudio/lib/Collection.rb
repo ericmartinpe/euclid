@@ -7,7 +7,7 @@
 # capabilities and the advantage that it can be used outside of SketchUp.
 # Also Collection never contains nil in its collection.
 
-require("legacy_openstudio/lib/Bag")
+require("euclid/lib/legacy_openstudio/lib/Bag")
 
 
 module LegacyOpenStudio
