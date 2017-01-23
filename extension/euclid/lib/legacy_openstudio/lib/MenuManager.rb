@@ -455,7 +455,7 @@ module LegacyOpenStudio
       @help_cmd.set_validation_proc { MF_ENABLED }
 
       @update_cmd = UI::Command.new("Check For Update") { Plugin.update_manager.check_for_update }
-      @update_cmd.set_validation_proc { MF_ENABLED }
+      @update_cmd.set_validation_proc { MF_GRAYED }  # Temporarily disable update checking until new update server is set up
 
       @about_cmd = UI::Command.new("About Euclid...") { Plugin.dialog_manager.show(AboutInterface) }
       @about_cmd.set_validation_proc { MF_ENABLED }

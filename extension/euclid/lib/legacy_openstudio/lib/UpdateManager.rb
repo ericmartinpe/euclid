@@ -14,6 +14,7 @@ module LegacyOpenStudio
     end
 
     def check_for_update(verbose = true)
+      return(nil)  # Temporarily disable update checking until new update server is set up
 
       puts "Checking for update..."
 
