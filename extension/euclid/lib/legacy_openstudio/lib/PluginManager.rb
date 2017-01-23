@@ -138,12 +138,12 @@ module LegacyOpenStudio
 
 
     def read_pref(name)
-      return(Sketchup.read_default("OpenStudio", name))
+      return(Sketchup.read_default("Euclid", name))
     end
 
 
     def write_pref(name, value)
-      Sketchup.write_default("OpenStudio", name, value)
+      Sketchup.write_default("Euclid", name, value)
     end
 
 

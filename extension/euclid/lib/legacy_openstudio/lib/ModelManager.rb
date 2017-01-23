@@ -303,12 +303,12 @@ module LegacyOpenStudio
 
 
     def get_attribute(name)
-      return(Sketchup.active_model.get_attribute("OpenStudio", name))
+      return(Sketchup.active_model.get_attribute("Euclid", name))
     end
 
 
     def set_attribute(name, value)
-      Sketchup.active_model.set_attribute("OpenStudio", name, value)
+      Sketchup.active_model.set_attribute("Euclid", name, value)
     end
 
 

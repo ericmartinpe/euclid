@@ -59,7 +59,7 @@ module LegacyOpenStudio
         if @entity["NorthAngle"] != 0
           if not @first_time_message
             @first_time_message = true
-            UI.messagebox("OpenStudio renders geometry with Y-Axis along true North, changing this will cause shadows to render differently than in EnergyPlus.")
+            UI.messagebox("Euclid renders geometry with Y-Axis along true North, changing this will cause shadows to render differently than in EnergyPlus.")
           end
           # locking NorthAngle was too obnoxious, just warn
           #@entity["NorthAngle"] = 0

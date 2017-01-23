@@ -447,17 +447,17 @@ module LegacyOpenStudio
 
   # Help / About
 
-      @help_cmd = UI::Command.new("OpenStudio User Guide") { UI.open_external_file(Plugin.dir + "/doc/help/index.html") }
+      @help_cmd = UI::Command.new("Legacy OpenStudio User Guide") { UI.open_external_file(Plugin.dir + "/doc/help/index.html") }
       @help_cmd.small_icon = Plugin.dir + "/lib/resources/icons/Help-16.png"
       @help_cmd.large_icon = Plugin.dir + "/lib/resources/icons/Help-24.png"
       @help_cmd.tooltip = "Help"
-      @help_cmd.status_bar_text = "View the OpenStudio User Guide help documentation"
+      @help_cmd.status_bar_text = "View the Legacy OpenStudio User Guide help documentation"
       @help_cmd.set_validation_proc { MF_ENABLED }
 
       @update_cmd = UI::Command.new("Check For Update") { Plugin.update_manager.check_for_update }
       @update_cmd.set_validation_proc { MF_ENABLED }
 
-      @about_cmd = UI::Command.new("About OpenStudio...") { Plugin.dialog_manager.show(AboutInterface) }
+      @about_cmd = UI::Command.new("About Euclid...") { Plugin.dialog_manager.show(AboutInterface) }
       @about_cmd.set_validation_proc { MF_ENABLED }
 
       # validation_procs to add:
