@@ -27,21 +27,13 @@ if (installed_version_key < minimum_version_key)
   UI.messagebox("#{EUCLID_EXTENSION_NAME} is only compatible with SketchUp version " + minimum_version +
     " or higher.\nThe installed version is " + installed_version + ". The plugin was not loaded.", MB_OK)
 else
-  # start legacy plugin after everything and check for OpenStudio already loaded
-  UI.start_timer(1, false) {
-    begin
-      # Test if OpenStudio is loaded, Kernel.const_defined?(OpenStudio) did not work in SU 8
-      OpenStudio
-      OpenStudio::Plugin
-
-      # UI.MessageBox was being called repeatedly, maybe because it was blocking?
-      if Sketchup.version_number > 14000000
-        SKETCHUP_CONSOLE.show
-      end
-      puts "OpenStudio is already loaded, disable OpenStudio using 'Window->Preferences->Extensions' to use the #{EUCLID_EXTENSION_NAME} extension."
-
-    rescue
-      # only load this if OpenStudio is not installed
+  # start legacy plugin after everything and check for OpenStudio or Legacy OpenStudio already loaded
+  UI.start_timer(2, false) {
+    if (Kernel.const_defined?(:OpenStudio))
+      UI.messagebox("Unable to load the #{EUCLID_EXTENSION_NAME} extension.\n\nThe OpenStudio extension is already loaded. Disable OpenStudio using Extension Manager before using the #{EUCLID_EXTENSION_NAME} extension.", MB_OK)
+    elsif (Kernel.const_defined?(:LegacyOpenStudio))
+      UI.messagebox("Unable to load the #{EUCLID_EXTENSION_NAME} extension.\n\nThe Legacy OpenStudio extension is already loaded. Disable Legacy OpenStudio using Extension Manager before using the #{EUCLID_EXTENSION_NAME} extension.", MB_OK)
+    else
       load("euclid/lib/legacy_openstudio/lib/PluginManager.rb")
     end
   }
