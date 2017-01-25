@@ -1,0 +1,9 @@
+This extension is free, open-source software composed of multiple open-source
+libraries, modules, and files. The individual libraries, modules, and files are
+copyrighted by their respective owners. You are permitted to inspect the source
+code, make changes, and redistribute the software according to the license
+terms and conditions of the individual libraries, modules, and files contained
+within.
+
+See the license files contained in the extension directory structure for
+specific terms and conditions.
