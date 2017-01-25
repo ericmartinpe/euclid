@@ -13,7 +13,7 @@ end
 
 
 EUCLID_EXTENSION_NAME = "Euclid"
-EUCLID_EXTENSION_VERSION = "1.0.0"
+EUCLID_EXTENSION_VERSION = "0.9.0"
 
 extension = SketchupExtension.new(EUCLID_EXTENSION_NAME, "euclid/lib/legacy_openstudio/lib/Startup")
 extension.name = EUCLID_EXTENSION_NAME
