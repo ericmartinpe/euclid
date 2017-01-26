@@ -2,5 +2,5 @@
 # See the file "license.txt" for additional terms and conditions.
 
 module EuclidExtension
-  VERSION = "0.9.0"
+  VERSION = "0.9.1"
 end
