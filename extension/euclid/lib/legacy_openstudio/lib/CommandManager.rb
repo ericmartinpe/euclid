@@ -157,16 +157,6 @@ module LegacyOpenStudio
       return(true)
     end
 
-
-    def open_eefg
-      web_dialog = UI::WebDialog.new("EnergyPlus Example File Generator", true, "EEFG", width = 600, height = 500, left = 100, top = 100, true)
-      web_dialog.set_url("http://apps1.eere.energy.gov/buildings/energyplus/cfm/inputs/")
-      web_dialog.show
-
-      $eefg = web_dialog  # Need this to keep the dialog from getting garbage collected.
-    end
-
-
   end
 
 end

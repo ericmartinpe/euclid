@@ -228,13 +228,6 @@ module LegacyOpenStudio
       @run_cmd.status_bar_text = "Run an EnergyPlus simulation"
       @run_cmd.set_validation_proc { Plugin.dialog_manager.validate(RunSimulationInterface) if (Plugin.dialog_manager) }
 
-      @eefg_cmd = UI::Command.new("Example File Generator...") { Plugin.command_manager.open_eefg }
-      @eefg_cmd.small_icon = Plugin.dir + "/lib/resources/icons/EEFG-16.png"
-      @eefg_cmd.large_icon = Plugin.dir + "/lib/resources/icons/EEFG-24.png"
-      @eefg_cmd.tooltip = "Connect to the EnergyPlus Example File Generator"
-      @eefg_cmd.status_bar_text = "Connect to the EnergyPlus Example File Generator on the web"
-      #@eefg_cmd.set_validation_proc { }  # Check if on-line
-
   # Tools
 
       @info_tool_cmd = UI::Command.new("Info Tool") { Sketchup.active_model.tools.push_tool(@info_tool) }
@@ -491,7 +484,6 @@ module LegacyOpenStudio
       @plugin_menu.add_item(@object_info_cmd)
       @plugin_menu.add_separator
       @plugin_menu.add_item(@run_cmd)
-      @plugin_menu.add_item(@eefg_cmd)
       @plugin_menu.add_separator
       @plugin_menu.add_item(@new_zone_cmd)
       @plugin_menu.add_item(@new_shading_cmd)
@@ -585,7 +577,6 @@ module LegacyOpenStudio
       @command_toolbar.add_item(@set_default_constructions_cmd)
       @command_toolbar.add_separator
       @command_toolbar.add_item(@run_cmd)
-      @command_toolbar.add_item(@eefg_cmd)
       @command_toolbar.add_separator
       @command_toolbar.add_item(@help_cmd)
       @command_toolbar.restore
