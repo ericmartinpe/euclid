@@ -278,6 +278,12 @@ module LegacyOpenStudio
 
       while (line = file.gets)
 
+        if (RUBY_VERSION.to_f > 1.8)  # String encoding methods are only available starting in Ruby 1.9
+          if (not line.valid_encoding?)
+            line = line.encode('UTF-16be', :invalid => :replace, :replace => '?').encode('UTF-8')
+          end
+        end
+
         file_length += line.length + 1  # For update_progress
 
         if (i = line.index('!'))
@@ -365,12 +371,6 @@ module LegacyOpenStudio
       end
 
       file.close
-
-      if Sketchup.version_number > 14000000
-        if !@context.valid_encoding?
-          @context = @context.encode("UTF-16be", :invalid=>:replace, :replace=>"?").encode('UTF-8')
-        end
-      end
 
       if (false) #$debug)
         file = File.open(Plugin.dir + "/z_file_string_dump.idf", 'w')
