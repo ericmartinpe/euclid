@@ -27,7 +27,7 @@ module LegacyOpenStudio
               entity.drawing_interface.on_undelete_entity(entity)
             }
 
-          else
+          elsif (entity.definition.count_instances > 1)
             # This is a copy-paste event.
 
             AsynchProc.new {
@@ -49,12 +49,13 @@ module LegacyOpenStudio
               new_group = group_class.new_from_entity_copy(entity)
               new_group.update_entity
             }
-          end
 
-        else
-          # A new Group entity was added.
-          # New zones and shading groups are added with a tool instead of an Observer event.
-          # There is nothing to handle here.
+          else
+            # A new Group entity was added.
+            # New zones and shading groups are added with a tool instead of an Observer event.
+            # There is nothing to handle here.
+
+          end
 
         end
       else
