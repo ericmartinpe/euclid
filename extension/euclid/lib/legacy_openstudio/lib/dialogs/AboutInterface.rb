@@ -15,6 +15,11 @@ module LegacyOpenStudio
       @dialog = AboutDialog.new(nil, self, @hash)
     end
 
+
+    def populate_hash
+      @hash['VERSION'] = "Version #{EuclidExtension::VERSION}"
+    end
+
   end
 
 end

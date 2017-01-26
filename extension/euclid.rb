@@ -12,13 +12,14 @@ rescue LoadError
 end
 
 
+require("euclid/lib/version")
+
 EUCLID_EXTENSION_NAME = "Euclid"
-EUCLID_EXTENSION_VERSION = "0.9.0"
 
 extension = SketchupExtension.new(EUCLID_EXTENSION_NAME, "euclid/lib/legacy_openstudio/lib/Startup")
 extension.name = EUCLID_EXTENSION_NAME
 extension.description = "Adds building energy modeling capabilities by coupling SketchUp to various simulation engines."
-extension.version = EUCLID_EXTENSION_VERSION
+extension.version = EuclidExtension::VERSION
 extension.creator = "Big Ladder Software"
 extension.copyright = "2017 Big Ladder Software LLC; 2008-2015 Alliance for Sustainable Energy"
 

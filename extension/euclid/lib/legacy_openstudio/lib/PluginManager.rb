@@ -33,7 +33,7 @@ module LegacyOpenStudio
 
     def initialize
       @name = EUCLID_EXTENSION_NAME
-      @version = EUCLID_EXTENSION_VERSION
+      @version = EuclidExtension::VERSION
 
       # need safety check here if can't find path!!
       @dir = File.dirname(__FILE__) + "/.."
