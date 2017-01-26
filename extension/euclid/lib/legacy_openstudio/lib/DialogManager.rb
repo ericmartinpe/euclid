@@ -20,7 +20,7 @@ module LegacyOpenStudio
 
 
     def save_state
-      interface_names = @dialog_interfaces.collect { |interface| interface.class.to_s[12..-1] }  # Clip the "LegacyOpenStudio::" part
+      interface_names = @dialog_interfaces.collect { |interface| interface.class.to_s[18..-1] }  # Clip the "LegacyOpenStudio::" part
       Plugin.write_pref('Open Dialogs', interface_names.to_a.join(','))
     end
 
