@@ -49,7 +49,7 @@ module LegacyOpenStudio
       end
 
 
-      if (path = UI.open_panel("Open EnergyPlus Input File", Plugin.model_manager.input_file_dir, "*.idf; *.imf"))  # have not figured out how to set File Types popup yet
+      if (path = UI.open_panel("Open EnergyPlus Input File", Plugin.model_manager.input_file_dir, "EnergyPlus|*.idf|All Files|*.*||"))
 
         Plugin.write_pref("Last Input File Dir", File.dirname(path))  # Save the dir so we can start here next time
 
@@ -82,7 +82,7 @@ module LegacyOpenStudio
 
 
     def merge_input_file
-      if (path = UI.open_panel("Merge EnergyPlus Input File", Plugin.model_manager.input_file_dir, "*.idf; *.imf"))
+      if (path = UI.open_panel("Merge EnergyPlus Input File", Plugin.model_manager.input_file_dir, "EnergyPlus|*.idf|All Files|*.*||"))
         #model.start_operation("Merge EnergyPlus Input File")
         success = Plugin.model_manager.merge_input_file(path)
       end

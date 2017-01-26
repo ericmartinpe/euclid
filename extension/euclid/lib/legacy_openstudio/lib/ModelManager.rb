@@ -90,7 +90,7 @@ module LegacyOpenStudio
       button = UI.messagebox(message, MB_YESNO)
 
       if (button == 6)  # YES
-        if (path = UI.open_panel("Open EnergyPlus Input File", File.dirname(@model_interface.model_path), "*.idf; *.imf"))
+        if (path = UI.open_panel("Open EnergyPlus Input File", File.dirname(@model_interface.model_path), "EnergyPlus|*.idf|All Files|*.*||"))
           open_input_file(path)
           return
         end

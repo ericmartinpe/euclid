@@ -72,7 +72,7 @@ module LegacyOpenStudio
 
       if (@hash['EPW_PATH'].empty?)
         dir = Plugin.model_manager.input_file_dir
-        file_name = "*.epw"
+        file_name = "EnergyPlus|*.epw|All Files|*.*||"
       else
         dir = File.dirname(@hash['EPW_PATH'])
         file_name = File.basename(@hash['EPW_PATH'])

@@ -66,7 +66,7 @@ module LegacyOpenStudio
     def on_browse
       if (@hash['OUTPUT_FILE_PATH'].empty?)
         dir = Plugin.model_manager.input_file_dir
-        file_name = "*.eso"
+        file_name = "EnergyPlus|*.eso;*.eso.cache|All Files|*.*||"
       else
         dir = File.dirname(@hash['OUTPUT_FILE_PATH'])
         file_name = File.basename(@hash['OUTPUT_FILE_PATH'])
