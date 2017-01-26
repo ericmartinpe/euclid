@@ -19,7 +19,8 @@ module LegacyOpenStudio
         Plugin.new_model  # This is required for the Mac
 
       elsif (Sketchup.active_model.guid != Plugin.model_manager.guid)
-        # Could probably store @guid here on the observer.
+
+        # Could probably store @guid here on the observer.
 
         #puts "=> new model"
 
