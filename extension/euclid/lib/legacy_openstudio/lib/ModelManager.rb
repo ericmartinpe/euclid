@@ -282,18 +282,18 @@ module LegacyOpenStudio
 
       @units_hash = Hash.new
       @units_hash['m'] = ["(m)", "(ft)", 1.0]
-      @units_hash['m2'] = ["(m" + 178.chr + ")", "(ft" + 178.chr + ")", 1.0]
-      @units_hash['m3'] = ["(m" + 179.chr + ")", "(ft" + 179.chr + ")", 1.0]
-      @units_hash['People/100m2'] = ["(Number of People/100 m" + 178.chr + ")", "(Number of People/1000 ft" + 178.chr + ")", 1.0]
-      @units_hash['W/m2'] = ["(W/m" + 178.chr + ")", "(W/ft" + 178.chr + ")", 1.0]
+      @units_hash['m2'] = ["(m\u00b2)", "(ft\u00b2)", 1.0]
+      @units_hash['m3'] = ["(m\u00b3)", "(ft\u00b3)", 1.0]
+      @units_hash['People/100m2'] = ["(Number of People/100 m\u00b2)", "(Number of People/1000 ft\u00b2)", 1.0]
+      @units_hash['W/m2'] = ["(W/m\u00b2)", "(W/ft\u00b2)", 1.0]
       @units_hash['W/linear m'] = ["(W/linear m)", "(W/linear ft)", 1.0]
-      @units_hash['m2/TDD'] = ["(m" + 178.chr + "/TDD)", "(f" + 178.chr + "/TDD)", 1.0]
+      @units_hash['m2/TDD'] = ["(m\u00b2/TDD)", "(f\u00b2/TDD)", 1.0]
       @units_hash['lux'] = ["(lux)", "(footcandles)", 1.0]
       @units_hash['L'] = ["(Liters)", "(Gallons)", 1.0]
-      @units_hash['C'] = ["(" + 176.chr + "C)", "(" + 176.chr + "F)", 1.0]
+      @units_hash['C'] = ["(\u00b0C)", "(\u00b0F)", 1.0]
       @units_hash['L/sec'] = ["(L/sec)", "(cfm)", 1.0]
-      @units_hash['L/sec/person'] = ["(L/sec/person" + 178.chr + ")", "(cfm/person)", 1.0]
-      @units_hash['L/sec/m2'] = ["(L/sec/m" + 178.chr + ")", "(cfm/ft" + 178.chr + ")", 1.0]
+      @units_hash['L/sec/person'] = ["(L/sec/person)", "(cfm/person)", 1.0]
+      @units_hash['L/sec/m2'] = ["(L/sec/m\u00b2)", "(cfm/ft\u00b2)", 1.0]
       # Expand as necessary...
 
       @length_precision = units_options_provider['LengthPrecision']
