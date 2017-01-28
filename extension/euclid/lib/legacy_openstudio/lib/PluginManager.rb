@@ -9,7 +9,6 @@ require("euclid/lib/legacy_openstudio/lib/DialogManager")
 require("euclid/lib/legacy_openstudio/lib/MenuManager")
 require("euclid/lib/legacy_openstudio/lib/ModelManager")
 require("euclid/lib/legacy_openstudio/lib/SimulationManager")
-require("euclid/lib/legacy_openstudio/lib/UpdateManager")
 require("euclid/lib/legacy_openstudio/lib/inputfile/DataDictionary")
 
 require("euclid/lib/legacy_openstudio/sketchup/UI")
@@ -69,11 +68,13 @@ module LegacyOpenStudio
         @dialog_manager = DialogManager.new
       end
 
-      @update_manager = UpdateManager.new
 
-      if (Plugin.read_pref("Check For Update") and platform == Platform_Windows)
+      if (Plugin.read_pref("Check For Update"))
         # Kludge:  Give a delay to allow SketchUp to finish starting up, otherwise can BugSplat.
-        AsynchProc.new(2000) { @update_manager.check_for_update(false) }
+        asynch_proc = AsynchProc.new(5000) { EuclidExtension.check_for_update(false) }
+        # NOTE: There is a SketchUp bug that if you open a modal window in a non-repeating timer the timer will repeat until the window is closed.
+        # Force the timer to stop after a safe time period--but before the timer repeats a second time.
+        AsynchProc.new(9000) { UI.stop_timer(asynch_proc.timer_id) }
       end
     end
 

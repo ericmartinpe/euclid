@@ -9,12 +9,6 @@
 function onLoad() {
   window.location='skp:on_load';
   document.getElementById('ok').focus();
-  if (true) {  // Temporarily disable update checking until new update server is set up
-  //if (is_mac()) {
-    // Automatic check for updates is not supported on the Mac yet.
-    document.getElementById('CHECK_FOR_UPDATE').checked = false;
-    disableElement('CHECK_FOR_UPDATE');
-  }
 }
 function onOK() { window.location='skp:on_ok'; }
 function onCancel() { window.location='skp:on_cancel'; }

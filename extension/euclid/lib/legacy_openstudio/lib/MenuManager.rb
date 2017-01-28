@@ -442,8 +442,8 @@ module LegacyOpenStudio
       @help_cmd.status_bar_text = "View the Legacy OpenStudio User Guide help documentation"
       @help_cmd.set_validation_proc { MF_ENABLED }
 
-      @update_cmd = UI::Command.new("Check For Update") { Plugin.update_manager.check_for_update }
-      @update_cmd.set_validation_proc { MF_GRAYED }  # Temporarily disable update checking until new update server is set up
+      @update_cmd = UI::Command.new("Check For Update") { EuclidExtension.check_for_update }
+      @update_cmd.set_validation_proc { MF_ENABLED }
 
       @about_cmd = UI::Command.new("About Euclid...") { Plugin.dialog_manager.show(AboutInterface) }
       @about_cmd.set_validation_proc { MF_ENABLED }
@@ -500,11 +500,7 @@ module LegacyOpenStudio
       @plugin_menu.add_item(@prefs_cmd)
       @plugin_menu.add_separator
       @plugin_menu.add_item(@help_cmd)
-
-      if (Plugin.platform == Platform_Windows)
-        @plugin_menu.add_item(@update_cmd)  # Update is broken on the Mac
-      end
-
+      @plugin_menu.add_item(@update_cmd)
       @plugin_menu.add_item(@about_cmd)
 
       #@plugin_menu.add_item(@test_cmd)
