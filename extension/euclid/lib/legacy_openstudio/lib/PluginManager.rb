@@ -16,6 +16,9 @@ require("euclid/lib/legacy_openstudio/sketchup/UI")
 require("euclid/lib/legacy_openstudio/sketchup/Sketchup")
 require("euclid/lib/legacy_openstudio/sketchup/Geom")
 
+require("euclid/lib/euclidextension")
+
+
 #UI.messagebox "Starting Plugin!"
 
 module LegacyOpenStudio
@@ -42,6 +45,8 @@ module LegacyOpenStudio
 
     def start
       # 'start' must be separate from 'initialize' because some of the objects below are dependent on the Plugin module constant.
+
+      EuclidExtension.trace_exceptions
 
       load_default_preferences
 

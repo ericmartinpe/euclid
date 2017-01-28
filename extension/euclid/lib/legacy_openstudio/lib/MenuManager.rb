@@ -22,7 +22,6 @@ require("euclid/lib/legacy_openstudio/lib/tools/NewShadingTool")
 require("euclid/lib/legacy_openstudio/lib/tools/NewDaylightingControlsTool")
 require("euclid/lib/legacy_openstudio/lib/tools/NewOutputIlluminanceMapTool")
 require("euclid/lib/legacy_openstudio/lib/tools/NewZoneTool")
-require("euclid/lib/legacy_openstudio/lib//observers/ErrorObserver")  # This is hopefully only a temporary location
 
 
 module LegacyOpenStudio
@@ -72,11 +71,7 @@ module LegacyOpenStudio
       @new_cmd.large_icon = Plugin.dir + "/lib/resources/icons/NewFile-24.png"
       @new_cmd.tooltip = "New EnergyPlus Input File"
       @new_cmd.status_bar_text = "New EnergyPlus Input File"
-      @new_cmd.set_validation_proc {
-        # kludge to run error checking for ruby script errors in the plugin
-        detect_errors
-        MF_ENABLED }
-
+      @new_cmd.set_validation_proc { MF_ENABLED }
 
       @open_cmd = UI::Command.new("Open...") { Plugin.command_manager.open_input_file }
       @open_cmd.small_icon = Plugin.dir + "/lib/resources/icons/OpenFile-16.png"
