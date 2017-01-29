@@ -216,10 +216,11 @@ module LegacyOpenStudio
       end
 
       if not_found.size > 0
-        result = UI.messagebox("File does not contain default construction names.\nDo you want to set these before drawing new geometry?", MB_YESNO)
-        if result == 6 # Yes
-          Plugin.dialog_manager.show(DefaultConstructionsInterface)
-        end
+        # Disable default constructions dialog prompt because it's annoying.
+        #result = UI.messagebox("File does not contain default construction names.\nDo you want to set these before drawing new geometry?", MB_YESNO)
+        #if result == 6 # Yes
+        #  Plugin.dialog_manager.show(DefaultConstructionsInterface)
+        #end
       end
     end
 
