@@ -22,7 +22,11 @@ function setElementValue(elementName, value) {
         case 'INPUT':
           switch(element.type.toUpperCase()) {
             case 'TEXT':
-              element.value = value;
+              // Only set the value if the new value is different (except for whitespace).
+              // This prevents the element from refreshing and losing the cursor position while editing.
+              if (element.value.replace(/^\s+|\s+$/g, '') != value) {
+                element.value = value;
+              }
               break;
 
             case 'BUTTON':

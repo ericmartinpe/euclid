@@ -50,7 +50,7 @@ module LegacyOpenStudio
     def report
       input_object_copy = @input_object.copy
 
-      @input_object.fields[1] = @hash['NAME']
+      @input_object.fields[1] = @hash['NAME'].strip
       @input_object.fields[2] = @input_object.class_definition.field_definitions[2].get_choice_key(@hash['TYPE'])
 
       # Lookup Construction object
@@ -103,7 +103,7 @@ module LegacyOpenStudio
         @input_object.fields[5] = outside_boundary_object
       end
 
-      @input_object.fields[6] = @hash['VIEW_FACTOR_TO_GROUND']
+      @input_object.fields[6] = @hash['VIEW_FACTOR_TO_GROUND'].strip
 
       if (shading_device = Plugin.model_manager.input_file.find_object_by_class_and_name("WINDOWPROPERTY:SHADINGCONTROL", @hash['SHADING_DEVICE']))
         @input_object.fields[7] = shading_device
@@ -117,7 +117,7 @@ module LegacyOpenStudio
         @input_object.fields[8] = @hash['FRAME_DIVIDER']
       end
 
-      @input_object.fields[9] = @hash['MULTIPLIER']
+      @input_object.fields[9] = @hash['MULTIPLIER'].strip
       # Possibly warn if > 1 and using Full Interior solar distribution
 
       # Update object text with changes

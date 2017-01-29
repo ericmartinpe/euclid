@@ -39,7 +39,7 @@ module LegacyOpenStudio
     def report
       input_object_copy = @input_object.copy
 
-      @input_object.fields[1] = @hash['NAME']
+      @input_object.fields[1] = @hash['NAME'].strip
 
       # Lookup base surface object
       objects = Plugin.model_manager.input_file.find_objects_by_class_name("BUILDINGSURFACE:DETAILED")
@@ -59,6 +59,8 @@ module LegacyOpenStudio
 
       # Update object text with changes
       @hash['OBJECT_TEXT'] = @input_object.to_idf
+
+      populate_hash
 
       # Update drawing interface
       @drawing_interface.on_change_input_object

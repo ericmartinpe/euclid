@@ -68,13 +68,13 @@ module LegacyOpenStudio
     def report
       input_object_copy = @input_object.copy
 
-      @input_object.fields[1] = @hash['NAME']
-      @input_object.fields[2] = @hash['ROTATION']
+      @input_object.fields[1] = @hash['NAME'].strip
+      @input_object.fields[2] = @hash['ROTATION'].strip
       @input_object.fields[3] = @input_object.class_definition.field_definitions[3].get_choice_key(@hash['TERRAIN'])
-      @input_object.fields[4] = @hash['LOADS_TOLERANCE']
-      @input_object.fields[5] = @hash['TEMPERATURE_TOLERANCE']
+      @input_object.fields[4] = @hash['LOADS_TOLERANCE'].strip
+      @input_object.fields[5] = @hash['TEMPERATURE_TOLERANCE'].strip
       @input_object.fields[6] = @input_object.class_definition.field_definitions[6].get_choice_key(@hash['SOLAR_DISTRIBUTION'])
-      @input_object.fields[7] = @hash['MAX_WARMUP_DAYS']
+      @input_object.fields[7] = @hash['MAX_WARMUP_DAYS'].strip
 
       # Update object text with changes
       @hash['OBJECT_TEXT'] = @input_object.to_idf
@@ -85,6 +85,8 @@ module LegacyOpenStudio
       if (@input_object != input_object_copy)
         Plugin.model_manager.input_file.modified = true
       end
+
+      populate_hash
 
       # Update drawing interface
       Plugin.model_manager.building.on_change_input_object

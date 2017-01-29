@@ -54,7 +54,7 @@ module LegacyOpenStudio
     def report
       input_object_copy = @input_object.copy
 
-      @input_object.fields[1] = @hash['NAME']
+      @input_object.fields[1] = @hash['NAME'].strip
       @input_object.fields[2] = @input_object.class_definition.field_definitions[2].get_choice_key(@hash['TYPE'])
 
       # Lookup Construction object
@@ -132,11 +132,13 @@ module LegacyOpenStudio
       end
 
 
-      @input_object.fields[9] = @hash['VIEW_FACTOR_TO_GROUND']
+      @input_object.fields[9] = @hash['VIEW_FACTOR_TO_GROUND'].strip
 
 
       # Update object text with changes
       @hash['OBJECT_TEXT'] = @input_object.to_idf
+
+      populate_hash
 
       # Update drawing interface
       @drawing_interface.on_change_input_object
