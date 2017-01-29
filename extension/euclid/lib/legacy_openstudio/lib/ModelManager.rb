@@ -420,11 +420,9 @@ module LegacyOpenStudio
     def selection_changed
       #puts "selection_changed"
 
-      # Note: This gets called twice for every click, e.g., changed from item A to item B selected.
+      # Note: This gets called twice (used to?--but not anymore?) for every click, e.g., changed from item A to item B selected.
       # Reason is that selection cleared is also calling this, but drawing interface is nil.
-      if (Plugin.dialog_manager.active_interface(ObjectInfoInterface) and Sketchup.active_model.tools.active_tool_id == 21022)
-      #if (Plugin.dialog_manager.active_interface(ObjectInfoInterface) and Sketchup.active_model.tools.active_tool_name == "SelectionTool")
-        # Mac bug:  active_tool_name returns as "ctionTool" on the Mac.  Only active_tool_id is cross-platform.
+      if (Plugin.dialog_manager.active_interface(ObjectInfoInterface))
         Plugin.dialog_manager.update(ObjectInfoInterface)
       end
     end
