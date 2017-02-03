@@ -38,7 +38,7 @@ module LegacyOpenStudio
       @version = EuclidExtension::VERSION
 
       # need safety check here if can't find path!!
-      @dir = File.dirname(__FILE__) + "/.."
+      @dir = File.expand_path(File.dirname(__FILE__) + "/..")
     end
 
 
