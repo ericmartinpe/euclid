@@ -43,7 +43,7 @@ module EuclidExtension
     puts "Checking for update..."
 
     begin
-      latest_version = Net::HTTP.get("bigladdersoftware.com", "/projects/euclid/latest-version")
+      latest_version = Net::HTTP.get("bigladdersoftware.com", "/updates/euclid-latest-version")
     rescue  # Something failed, e.g., no internet connection or website down
       latest_version = nil
     end
