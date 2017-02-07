@@ -28,13 +28,20 @@ if (installed_version_key < minimum_version_key)
     " or higher.\nThe installed version is " + installed_version + ". The plugin was not loaded.", MB_OK)
 else
   # start legacy plugin after everything and check for OpenStudio or Legacy OpenStudio already loaded
-  UI.start_timer(2, false) {
-    if (Kernel.const_defined?(:OpenStudio))
+  timer_id = UI.start_timer(2, false) {
+    # This seems to be the only reliable way to check if OpenStudio is loaded.
+    # Sketchup.extensions["OpenStudio"].loaded? doesn't register as true until the extension is completely loaded, and OpenStudio takes so long to load.
+    if (Kernel.const_defined?(:OpenStudio) and OpenStudio.const_defined?(:PluginManager))
       UI.messagebox("Unable to load the #{EUCLID_EXTENSION_NAME} extension.\n\nThe OpenStudio extension is already loaded. Disable OpenStudio using Extension Manager before using the #{EUCLID_EXTENSION_NAME} extension.", MB_OK)
-    elsif (Kernel.const_defined?(:LegacyOpenStudio))
+    elsif (Kernel.const_defined?(:LegacyOpenStudio) and LegacyOpenStudio.const_defined?(:PluginManager))
       UI.messagebox("Unable to load the #{EUCLID_EXTENSION_NAME} extension.\n\nThe Legacy OpenStudio extension is already loaded. Disable Legacy OpenStudio using Extension Manager before using the #{EUCLID_EXTENSION_NAME} extension.", MB_OK)
     else
       load("euclid/lib/legacy_openstudio/lib/PluginManager.rb")
     end
   }
+
+  # NOTE: There is a SketchUp bug that if you open a modal window in a non-repeating timer the timer will repeat until the window is closed.
+  # Force the timer to stop after a safe time period--but before the timer repeats a second time.
+  UI.start_timer(3, false) { UI.stop_timer(timer_id) }
 end
+
