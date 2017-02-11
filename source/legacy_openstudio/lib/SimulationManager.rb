@@ -2,13 +2,9 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
-begin
-  require("fileutils")
-  require("tmpdir")
-rescue LoadError
-  require("euclid/lib/legacy_openstudio/stdruby/fileutils")
-  require("euclid/lib/legacy_openstudio/stdruby/tmpdir")
-end
+require("fileutils")
+require("tmpdir")
+
 
 module LegacyOpenStudio
 

@@ -4,12 +4,8 @@
 
 require("euclid/lib/legacy_openstudio/lib/dialogs/DialogInterface")
 require("euclid/lib/legacy_openstudio/lib/dialogs/RunSimulationDialog")
+require("tmpdir")
 
-begin
-  require("tmpdir")
-rescue LoadError
-  require("euclid/lib/legacy_openstudio/stdruby/tmpdir")
-end
 
 module LegacyOpenStudio
 

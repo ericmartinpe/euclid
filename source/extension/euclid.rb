@@ -2,17 +2,8 @@
 # See the file "license.txt" for additional terms and conditions.
 
 require("extensions")
-
-begin
-  require("fileutils")
-  require("tmpdir")
-rescue LoadError
-  require("euclid/lib/legacy_openstudio/stdruby/fileutils")
-  require("euclid/lib/legacy_openstudio/stdruby/tmpdir")
-end
-
-
 require("euclid/lib/version")
+
 
 EUCLID_EXTENSION_NAME = "Euclid"
 
