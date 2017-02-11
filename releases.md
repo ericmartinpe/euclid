@@ -1,5 +1,9 @@
 # Releases
 
+## 0.9.2
+
+- Fix bug where OpenStudio extension was being detected as already loaded even when disabled.
+
 ## 0.9.1
 
 - Disable (temporarily) the Daylighting:Controls tool and rendering until the new 8.6 changes are handled in the UI.
