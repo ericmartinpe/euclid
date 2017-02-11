@@ -8,6 +8,7 @@ You can download the [latest version of *Euclid* here](http://downloads.bigladde
 
 ### Releases
 
+- [*Euclid 0.9.2*](http://downloads.bigladdersoftware.com/?ref=euclid-0.9.2.rbz) (.rbz file; compatible with *EnergyPlus 8.6* and *SketchUp 2016* or higher, *SketchUp 2015* may also work)
 - [*Euclid 0.9.1*](http://downloads.bigladdersoftware.com/?ref=euclid-0.9.1.rbz) (.rbz file; compatible with *EnergyPlus 8.6* and *SketchUp 2016* or higher, *SketchUp 2015* may also work)
 - [*Euclid 0.9.0*](http://downloads.bigladdersoftware.com/?ref=euclid-0.9.0.rbz) (.rbz file; compatible with *EnergyPlus 8.4* and *SketchUp 2016* or higher, *SketchUp 2015* may also work)
 
