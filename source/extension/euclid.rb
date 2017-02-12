@@ -5,7 +5,7 @@ require("extensions")
 require("euclid/lib/version")
 
 
-extension = SketchupExtension.new("Euclid", "euclid/lib/legacy_openstudio/lib/Startup")
+extension = SketchupExtension.new("Euclid", "euclid/startup")
 extension.name = "Euclid"
 extension.description = "Adds building energy modeling capabilities by coupling SketchUp to various simulation engines."
 extension.version = Euclid::VERSION
