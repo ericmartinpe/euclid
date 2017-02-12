@@ -534,11 +534,6 @@ module LegacyOpenStudio
       @animation_menu.add_separator
       @animation_menu.add_item(@anim_settings_cmd)
 
-      # Add the help menu
-      @help_menu = UI.menu("Help")#.add_submenu(Plugin.name)
-
-      @help_menu.add_item(@help_cmd)
-
     end
 
 
