@@ -31,7 +31,7 @@ module EuclidExtension
         msg += "SketchUp #{Sketchup.version} #{Sketchup.is_64bit? ? '64-bit' : '32-bit'}#{Sketchup.is_pro? ? ' Pro' : ''}\n"
         msg += "Ruby #{RUBY_VERSION} #{RUBY_PLATFORM}\n"
 
-        UI.messagebox(msg, MB_MULTILINE, EUCLID_EXTENSION_NAME + " - Error Notification")
+        UI.messagebox(msg, MB_MULTILINE, "Euclid - Error Notification")
       else
         # Not a Euclid bug!
       end

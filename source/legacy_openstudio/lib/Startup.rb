@@ -24,7 +24,7 @@ installed_version = Sketchup.version
 installed_version_key = ''; installed_version.split('.').each { |e| installed_version_key += e.rjust(4, '0') }
 
 if (installed_version_key < minimum_version_key)
-  UI.messagebox("#{EUCLID_EXTENSION_NAME} is only compatible with SketchUp version " + minimum_version +
+  UI.messagebox("Euclid is only compatible with SketchUp version " + minimum_version +
     " or higher.\nThe installed version is " + installed_version + ". The plugin was not loaded.", MB_OK)
 else
   # start legacy plugin after everything and check for OpenStudio or Legacy OpenStudio already loaded
@@ -32,9 +32,9 @@ else
     # This seems to be the only reliable way to check if OpenStudio is loaded.
     # Sketchup.extensions["OpenStudio"].loaded? doesn't register as true until the extension is completely loaded, and OpenStudio takes so long to load.
     if (Kernel.const_defined?(:OpenStudio) and OpenStudio.const_defined?(:PluginManager))
-      UI.messagebox("Unable to load the #{EUCLID_EXTENSION_NAME} extension.\n\nThe OpenStudio extension is already loaded. Disable OpenStudio using Extension Manager before using the #{EUCLID_EXTENSION_NAME} extension.", MB_OK)
+      UI.messagebox("Unable to load the Euclid extension.\n\nThe OpenStudio extension is already loaded. Disable OpenStudio using Extension Manager before using the Euclid extension.", MB_OK)
     elsif (Kernel.const_defined?(:LegacyOpenStudio) and LegacyOpenStudio.const_defined?(:PluginManager))
-      UI.messagebox("Unable to load the #{EUCLID_EXTENSION_NAME} extension.\n\nThe Legacy OpenStudio extension is already loaded. Disable Legacy OpenStudio using Extension Manager before using the #{EUCLID_EXTENSION_NAME} extension.", MB_OK)
+      UI.messagebox("Unable to load the Euclid extension.\n\nThe Legacy OpenStudio extension is already loaded. Disable Legacy OpenStudio using Extension Manager before using the Euclid extension.", MB_OK)
     else
       load("euclid/lib/legacy_openstudio/lib/PluginManager.rb")
     end

@@ -34,7 +34,7 @@ module LegacyOpenStudio
     attr_accessor :energyplus_path, :update_manager, :load_components
 
     def initialize
-      @name = EUCLID_EXTENSION_NAME
+      @name = "Euclid"
       @version = EuclidExtension::VERSION
 
       # need safety check here if can't find path!!
@@ -102,7 +102,7 @@ module LegacyOpenStudio
         @data_dictionary = DataDictionary.open(idd_path)
         success = true
       else
-        UI.messagebox("Cannot locate the Data Dictionary file Energy+.idd.\n#{EUCLID_EXTENSION_NAME} will not be loaded.")
+        UI.messagebox("Cannot locate the Data Dictionary file Energy+.idd.\nEuclid will not be loaded.")
         puts "Bad IDD path=" + idd_path
       end
 
