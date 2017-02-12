@@ -4,7 +4,7 @@
 require("net/http")
 
 
-module EuclidExtension
+module Euclid
 
   def self.trace_exceptions
     TracePoint.trace(:raise) do |trace|
@@ -27,7 +27,7 @@ module EuclidExtension
         exception.backtrace.each { |stack_call| msg += stack_call + "\n" }
 
         msg += "\nCONFIGURATION:\n"
-        msg += "Euclid #{EuclidExtension::VERSION}\n"
+        msg += "Euclid #{Euclid::VERSION}\n"
         msg += "SketchUp #{Sketchup.version} #{Sketchup.is_64bit? ? '64-bit' : '32-bit'}#{Sketchup.is_pro? ? ' Pro' : ''}\n"
         msg += "Ruby #{RUBY_VERSION} #{RUBY_PLATFORM}\n"
 
@@ -48,12 +48,12 @@ module EuclidExtension
       latest_version = nil
     end
 
-    puts "installed_version=#{EuclidExtension::VERSION}"
+    puts "installed_version=#{Euclid::VERSION}"
     puts "latest_version=#{latest_version}"
 
     if (latest_version)
       # Version numbering scheme is (major).(minor).(maintenance).(build), e.g. 0.9.4.1
-      installed_version_key = ''; EuclidExtension::VERSION.split('.').each { |e| installed_version_key += e.rjust(4, '0') }
+      installed_version_key = ''; Euclid::VERSION.split('.').each { |e| installed_version_key += e.rjust(4, '0') }
       latest_version_key = ''; latest_version.split('.').each { |e| latest_version_key += e.rjust(4, '0') }
       skip_version_key = LegacyOpenStudio::Plugin.read_pref('Skip Update')
 

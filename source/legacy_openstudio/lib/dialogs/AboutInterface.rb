@@ -17,7 +17,7 @@ module LegacyOpenStudio
 
 
     def populate_hash
-      @hash['VERSION'] = "Version #{EuclidExtension::VERSION}"
+      @hash['VERSION'] = "Version #{Euclid::VERSION}"
     end
 
   end

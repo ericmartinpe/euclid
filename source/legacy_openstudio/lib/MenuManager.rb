@@ -443,7 +443,7 @@ module LegacyOpenStudio
       @help_cmd.status_bar_text = "View the Legacy OpenStudio User Guide help documentation"
       @help_cmd.set_validation_proc { MF_ENABLED }
 
-      @update_cmd = UI::Command.new("Check For Update") { EuclidExtension.check_for_update }
+      @update_cmd = UI::Command.new("Check For Update") { Euclid.check_for_update }
       @update_cmd.set_validation_proc { MF_ENABLED }
 
       @about_cmd = UI::Command.new("About Euclid...") { Plugin.dialog_manager.show(AboutInterface) }

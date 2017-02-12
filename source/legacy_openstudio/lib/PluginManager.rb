@@ -15,7 +15,7 @@ require("euclid/lib/legacy_openstudio/sketchup/UI")
 require("euclid/lib/legacy_openstudio/sketchup/Sketchup")
 require("euclid/lib/legacy_openstudio/sketchup/Geom")
 
-require("euclid/lib/euclidextension")
+require("euclid/lib/euclid")
 
 
 #UI.messagebox "Starting Plugin!"
@@ -35,7 +35,7 @@ module LegacyOpenStudio
 
     def initialize
       @name = "Euclid"
-      @version = EuclidExtension::VERSION
+      @version = Euclid::VERSION
 
       # need safety check here if can't find path!!
       @dir = File.expand_path(File.dirname(__FILE__) + "/..")
@@ -45,7 +45,7 @@ module LegacyOpenStudio
     def start
       # 'start' must be separate from 'initialize' because some of the objects below are dependent on the Plugin module constant.
 
-      EuclidExtension.trace_exceptions
+      Euclid.trace_exceptions
 
       load_default_preferences
 
@@ -71,7 +71,7 @@ module LegacyOpenStudio
 
       if (Plugin.read_pref("Check For Update"))
         # Kludge:  Give a delay to allow SketchUp to finish starting up, otherwise can BugSplat.
-        asynch_proc = AsynchProc.new(5000) { EuclidExtension.check_for_update(false) }
+        asynch_proc = AsynchProc.new(5000) { Euclid.check_for_update(false) }
         # NOTE: There is a SketchUp bug that if you open a modal window in a non-repeating timer the timer will repeat until the window is closed.
         # Force the timer to stop after a safe time period--but before the timer repeats a second time.
         AsynchProc.new(9000) { UI.stop_timer(asynch_proc.timer_id) }

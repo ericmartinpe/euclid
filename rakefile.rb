@@ -130,7 +130,7 @@ task :package, [:architecture] => [:compile] do |t, args|
   end
 
   FileUtils.mkdir_p("#{build_dir}/package")
-  package_path = "#{build_dir}/package/euclid-#{EuclidExtension::VERSION}-#{platform}-#{commit}.rbz"
+  package_path = "#{build_dir}/package/euclid-#{Euclid::VERSION}-#{platform}-#{commit}.rbz"
 
   if (File.exist?(package_path))
     FileUtils.rm(package_path)
