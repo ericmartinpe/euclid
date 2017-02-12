@@ -52,14 +52,11 @@ module Euclid
     puts "latest_version=#{latest_version}"
 
     if (latest_version)
-      # Version numbering scheme is (major).(minor).(maintenance).(build), e.g. 0.9.4.1
-      installed_version_key = ''; Euclid::VERSION.split('.').each { |e| installed_version_key += e.rjust(4, '0') }
-      latest_version_key = ''; latest_version.split('.').each { |e| latest_version_key += e.rjust(4, '0') }
-      skip_version_key = LegacyOpenStudio::Plugin.read_pref('Skip Update')
+      skip_version = LegacyOpenStudio::Plugin.read_pref('Skip Update')
 
-      if (installed_version_key < latest_version_key)
-        if (latest_version_key != skip_version_key or verbose)
-          button = UI.messagebox("A newer version (" + latest_version + ") of Euclid is ready for download.\n" +
+      if (Gem::Version.new(latest_version) > Gem::Version.new(Euclid::VERSION))
+        if (latest_version != skip_version or verbose)
+          button = UI.messagebox("A newer version (#{latest_version}) of Euclid is ready for download.\n" +
             "Do you want to update to the newer version?\n\n" +
             "Click YES to visit the Euclid website to get the download.\n" +
             "Click NO to skip this version and not ask you again.\n" +
@@ -67,7 +64,7 @@ module Euclid
           if (button == 6)  # YES
             UI.openURL("http://bigladdersoftware.com/projects/euclid")
           elsif (button == 7)  # NO
-            LegacyOpenStudio::Plugin.write_pref('Skip Update', newest_version_key)
+            LegacyOpenStudio::Plugin.write_pref('Skip Update', latest_version)
           end
         end
 
