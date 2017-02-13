@@ -14,6 +14,21 @@ require("#{root_dir}/source/extension/euclid/lib/version")
 task :default => :compile
 
 
+desc "Update dependencies in Git sub-repositories"
+# Repository dependencies are specified in a .dependencies file in the project root directory.
+# Each line of the file defines one dependency in the format:
+#
+#   <local-directory>,<remote-url>,<commit-reference>  # comment
+#
+# Blank lines are allowed. End-of-line comments can be included using the # character.
+# Directory paths should use / forward slashes. Relative paths are allowed. Spaces in the path are allowed.
+# Commit references are either a SHA1 hash or any Git reference/symbol, e.g., "origin/HEAD~2".
+# Use "origin/HEAD" as the reference to track the remote head and always pull the latest commit.
+task :dependencies do
+  update_dependencies(root_dir)
+end
+
+
 desc "Clean the build directory"
 task :clean do
   puts "Cleaning..."
@@ -45,7 +60,7 @@ end
 
 
 desc "Compile files for local platform from source"  # "Compile" in the sense of assembling something from other sources
-task :compile, [:architecture] do |t, args|
+task :compile, [:architecture] => [:dependencies] do |t, args|
   args.with_defaults(:architecture => "win64")
 
   puts "Compiling..."
@@ -73,12 +88,24 @@ task :compile, [:architecture] do |t, args|
 
   set_read_write(build_dir)  # Set writable to allow overwrite
 
+  # Rewrite gem specifications environment for local libraries. (Should this be a separate build step?)
+  # This rewrites the source gemspec file into the standard format needed by RubyGems.
+  # NOTE: Should be a separate build step because it recreates these files as modified every time.
+  puts "Rewriting gem specifications..."
+  gemspecs_dir = "#{build_dir}/temp/gemspecs"
+  FileUtils.mkdir_p(gemspecs_dir)
+
+  spec = Gem::Specification.load("#{root_dir}/source/libraries/bemkit/bemkit.gemspec")
+  File.write("#{gemspecs_dir}/bemkit-#{BEMkit::VERSION}.gemspec", spec.to_ruby)
+
   # A Rake file or file list task dependency would only detect added or changed files, not deleted files.
   # This 'sync_tree' approach ensures that the source and target directory trees are synchronised while
   # only copying the minimum number of files.
 
   dir_mappings = [ ["source/extension/", "build/output/extension/"],
                    ["source/legacy_openstudio/", "build/output/extension/euclid/lib/legacy_openstudio/"],
+                   ["source/libraries/bemkit/", "build/output/extension/euclid/lib/rubygems/gems/bemkit-#{BEMkit::VERSION}/"],
+                   ["build/temp/gemspecs/", "build/output/extension/euclid/lib/rubygems/specifications/"],
                    ["source/vendor/common/", "build/output/extension/euclid/vendor/"],
                    [vendor_platform_dir, "build/output/extension/euclid/vendor/"] ]
 
