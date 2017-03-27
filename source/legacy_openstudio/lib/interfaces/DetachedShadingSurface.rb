@@ -110,14 +110,6 @@ module LegacyOpenStudio
     end
 
 
-    def surface_relative_polygon
-      if (@surface_type == 0)
-        return(input_object_polygon)
-      else
-        return(input_object_polygon.transform(coordinate_transformation))  # same as 'super'
-      end
-    end
-
     def in_selection?(selection)
       return (selection.contains?(@entity) or selection.contains?(@parent.entity))
     end

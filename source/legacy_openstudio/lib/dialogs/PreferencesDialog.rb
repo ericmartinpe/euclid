@@ -74,6 +74,12 @@ module LegacyOpenStudio
       end
     end
 
+
+    def on_change_element(d, p)
+      super
+      report
+    end
+
   end
 
 end

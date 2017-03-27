@@ -453,3 +453,11 @@ function TEXT_FRAMEenableElement(elementName) { top.TEXT_FRAME.enableElement(ele
 
 function FILLER_FRAMEfocus() { top.FILLER_FRAME.focus(); }
 function FILLER_FRAMEsetBackgroundColor(color) { top.FILLER_FRAME.setBackgroundColor(color); }
+
+function GBXML_DETACHED_SHADING_GROUP_FRAMEsetElementValue(elementName, value) { top.GBXML_DETACHED_SHADING_GROUP_FRAME.setElementValue(elementName, value); }
+function GBXML_DETACHED_SHADING_GROUP_FRAMEsetSelectOptions(elementName, values, text) { top.GBXML_DETACHED_SHADING_GROUP_FRAME.setSelectOptions(elementName, values, text); }
+function GBXML_DETACHED_SHADING_GROUP_FRAMEsetBackgroundColor(color) { top.GBXML_DETACHED_SHADING_GROUP_FRAME.setBackgroundColor(color); }
+
+function GBXML_DETACHED_SHADING_SURFACE_FRAMEsetElementValue(elementName, value) { top.GBXML_DETACHED_SHADING_SURFACE_FRAME.setElementValue(elementName, value); }
+function GBXML_DETACHED_SHADING_SURFACE_FRAMEsetSelectOptions(elementName, values, text) { top.GBXML_DETACHED_SHADING_SURFACE_FRAME.setSelectOptions(elementName, values, text); }
+function GBXML_DETACHED_SHADING_SURFACE_FRAMEsetBackgroundColor(color) { top.GBXML_DETACHED_SHADING_SURFACE_FRAME.setBackgroundColor(color); }

@@ -63,7 +63,6 @@ module LegacyOpenStudio
       else
         puts "This file has no location."
       end
-
     end
 
 

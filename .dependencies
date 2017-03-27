@@ -1,1 +1,3 @@
-source/libraries/bemkit/,http://bitbucket.org/bigladdersoftware/bemkit.git,1552b63
+source/libraries/bemkit/,http://bitbucket.org/bigladdersoftware/bemkit.git,c0e9f3c
+source/libraries/bemkit-energyplus/,http://bitbucket.org/bigladdersoftware/bemkit-energyplus.git,1ca29d9
+source/libraries/bemkit-gbxml/,http://bitbucket.org/bigladdersoftware/bemkit-gbxml.git,ec454df

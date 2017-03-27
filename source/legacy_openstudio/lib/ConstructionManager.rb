@@ -16,6 +16,7 @@ module LegacyOpenStudio
     attr_accessor :default_window_ext, :default_window_int, :default_door_ext, :default_door_int, :default_save_path
     attr_reader :attached_shading, :detached_building_shading, :detached_fixed_shading
     attr_reader :attached_shading_back, :detached_building_shading_back, :detached_fixed_shading_back
+    attr_reader :detached_photovoltaic_shading
       #added for boundary render mode
     attr_reader :surface_ext, :adiabatic_ext, :zone_ext, :ground_ext, :groundfcfactormethod_ext, :groundslabpreprocessoraverage_ext
     attr_reader :groundslabpreprocessorcore_ext, :groundslabpreprocessorperimeter_ext, :groundbasementpreprocessoraveragewall_ext
@@ -54,10 +55,12 @@ module LegacyOpenStudio
 
       # The detached colors may be breaking from the new DXF color scheme
       @detached_building_shading = get_material("EnergyPlus_Detached_Building_Shading", Sketchup::Color.new(113, 76, 153, 1.0))  # old DXF: "Light Gray"
-      @detached_building_shading_back = get_material("EnergyPlus_Detached_Building_Shading_back", Sketchup::Color.new(216, 203, 229, 1.0))
+      @detached_building_shading_back = get_material("EnergyPlus_Detached_Building_Shading_back", Sketchup::Color.new(178, 153, 208, 1.0))
 
-      @detached_fixed_shading = get_material("EnergyPlus_Detached_Fixed_Shading", Sketchup::Color.new(191, 191, 191, 1.0))  # old DXF: "Blue"
-      @detached_fixed_shading_back = get_material("EnergyPlus_Detached_Fixed_Shading_back", Sketchup::Color.new(240, 240, 240, 1.0))  # old DXF: "Blue"
+      @detached_fixed_shading = get_material("EnergyPlus_Detached_Fixed_Shading", Sketchup::Color.new(153, 153, 153, 1.0))  # old DXF: "Blue"
+      @detached_fixed_shading_back = get_material("EnergyPlus_Detached_Fixed_Shading_back", Sketchup::Color.new(208, 208, 208, 1.0))  # old DXF: "Blue"
+
+      @detached_photovoltaic_shading = get_material("EnergyPlus_Detached_Photovoltaic_Shading", Sketchup::Color.new(0, 0, 153, 1.0))
 
       # start textures for boundary conditions
       @surface_ext = get_material("EnergyPlus_Surface_Ext", Sketchup::Color.new(0, 153, 0, 1.0))

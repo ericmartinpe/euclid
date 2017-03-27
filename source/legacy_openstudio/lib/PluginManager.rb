@@ -39,6 +39,8 @@ module LegacyOpenStudio
 
       # need safety check here if can't find path!!
       @dir = File.expand_path(File.dirname(__FILE__) + "/..")
+
+      @document = nil  # read_pref(DEFAULT_DOCUMENT)
     end
 
 
@@ -68,13 +70,13 @@ module LegacyOpenStudio
         @dialog_manager = DialogManager.new
       end
 
-
       if (Plugin.read_pref("Check For Update"))
+# Disable check for update until it's clear if Euclid-CSE is a separate branch or just a capability built into Euclid.
         # Kludge:  Give a delay to allow SketchUp to finish starting up, otherwise can BugSplat.
-        asynch_proc = AsynchProc.new(5000) { Euclid.check_for_update(false) }
+#        asynch_proc = AsynchProc.new(5000) { Euclid.check_for_update(false) }
         # NOTE: There is a SketchUp bug that if you open a modal window in a non-repeating timer the timer will repeat until the window is closed.
         # Force the timer to stop after a safe time period--but before the timer repeats a second time.
-        AsynchProc.new(9000) { UI.stop_timer(asynch_proc.timer_id) }
+#        AsynchProc.new(9000) { UI.stop_timer(asynch_proc.timer_id) }
       end
     end
 

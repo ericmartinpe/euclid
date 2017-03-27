@@ -17,6 +17,12 @@ require("euclid/lib/legacy_openstudio/lib/observers/ModelObserver")
 require("euclid/lib/legacy_openstudio/lib/observers/SelectionObserver")
 require("euclid/lib/legacy_openstudio/lib/observers/UnitsObserver")
 
+require("bemkit")
+require("bemkit/file")
+require("bemkit/document/gbxml_model")
+
+require("euclid/lib/gbxml/interfaces/model_interface")
+
 
 module LegacyOpenStudio
 
@@ -52,10 +58,20 @@ module LegacyOpenStudio
       @selection_observer = SelectionObserver.new
       Sketchup.active_model.selection.add_observer(@selection_observer)
 
-      @model_interface = ModelInterface.new
+      # Set initial document class at start up.
+      default_document_class = BEMkit::Document::GbXMLModel
 
-      attach_input_file
-      attach_weather_file
+      if (default_document_class == BEMkit::Document::GbXMLModel)
+        #@input_file = BEMkit::File.open(path, BEMkit::Document::GbXMLModel)
+        @model_interface = Euclid::GbXML::ModelInterface.new
+        new_gbxml_input_file
+      else
+        @model_interface = ModelInterface.new
+        attach_input_file
+      end
+
+
+      #attach_weather_file
     end
 
 
@@ -136,7 +152,11 @@ module LegacyOpenStudio
       if (input_file_attached?)
         name = File.basename(@input_file.path)
       else
-        name = File.basename(model_name) + ".idf"
+        if (Plugin.model_manager.input_file.class == BEMkit::File)
+          name = File.basename(model_name) + ".xml"
+        else
+          name = File.basename(model_name) + ".idf"
+        end
       end
       return(name)
     end
@@ -154,6 +174,15 @@ module LegacyOpenStudio
     end
 
 
+    def new_gbxml_input_file
+      open_gbxml_input_file("#{BEMkit::GbXML::GEM_ROOT}/resources/new-document-template.xml")
+      @input_file.path = nil
+      #@input_file.modified = false
+      @model_interface.on_change_input_file_path
+      Plugin.dialog_manager.update_all if (Plugin.dialog_manager)  # Refresh the File Info dialog
+    end
+
+
     def new_input_file
       open_input_file(Plugin.dir + "/NewFileTemplate.idf")
       @input_file.path = nil
@@ -161,6 +190,50 @@ module LegacyOpenStudio
       @model_interface.on_change_input_file_path
       @construction_manager.reset_defaults
       @construction_manager.check_defaults
+      Plugin.dialog_manager.update_all if (Plugin.dialog_manager)  # Refresh the File Info dialog
+    end
+
+
+    def open_gbxml_input_file(path)
+      success = false
+
+      if (path.nil?)
+        puts "ModelManager.open_input_file:  nil path"
+      elsif (not File.exist?(path))
+        puts "ModelManager.open_input_file:  bad path"
+      else
+        progress_dialog = ProgressDialog.new
+
+        begin
+          #@input_file = InputFile.open(Plugin.data_dictionary, path, Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
+          @input_file = BEMkit::File.open(path, BEMkit::Document::GbXMLModel)
+          if (@input_file)
+            @model_interface = Euclid::GbXML::ModelInterface.new(@input_file)
+            @model_interface.draw_model(Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
+
+            # Zoom extents on the entities of the Euclid model only.
+            entities = (@model_interface.children.collect { |interface| interface.entity if (interface.valid_entity? and interface.entity.class != Sketchup::ShadowInfo) }).to_a
+            Sketchup.active_model.active_view.zoom(entities) if (not entities.empty?)
+          end
+
+        ensure
+          progress_dialog.destroy
+        end
+
+        success = true
+      end
+
+      # This is probably not the optimal place for this.
+      # Trying to keep GUI out of this class.
+      if (success)
+        Plugin.dialog_manager.update_all if (Plugin.dialog_manager)
+
+        if (@unviewed_errors)
+          show_errors
+        end
+      end
+
+      return(success)
     end
 
 
@@ -181,9 +254,9 @@ module LegacyOpenStudio
             @model_interface = ModelInterface.new(@input_file)
             @model_interface.draw_model(Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
 
-            if path != Plugin.dir + "/NewFileTemplate.idf"
-              Sketchup.active_model.active_view.zoom_extents
-            end
+            # Zoom extents on the entities of the Euclid model only.
+            entities = (@model_interface.children.collect { |interface| interface.entity if (interface.valid_entity? and interface.entity.class != Sketchup::ShadowInfo) }).to_a
+            Sketchup.active_model.active_view.zoom(entities) if (not entities.empty?)
           end
 
           @construction_manager.reset_defaults
@@ -225,23 +298,30 @@ module LegacyOpenStudio
 
 
     def save_input_file(path)
-      @input_file.path = path
-      @model_interface.on_change_input_file_path
-
-      if (Sketchup.active_model)
-        progress_dialog = ProgressDialog.new
-
-        begin
-          @input_file.write(path, Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
-        ensure
-          progress_dialog.destroy
-        end
+      if (@input_file.class == BEMkit::File)
+        @input_file.save_as(path, true)  # Use overwrite because there is no better information in this context
+        @model_interface.on_change_input_file_path
 
       else
-        # SketchUp has already shutdown!
-        # Do the write without a progress dialog.
-        @input_file.write(path)
+        @input_file.path = path
+        @model_interface.on_change_input_file_path
+
+        if (Sketchup.active_model)
+          progress_dialog = ProgressDialog.new
+
+          begin
+            @input_file.write(path, Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
+          ensure
+            progress_dialog.destroy
+          end
+
+        else
+          # SketchUp has already shutdown!
+          # Do the write without a progress dialog.
+          @input_file.write(path)
+        end
       end
+
     end
 
 
@@ -413,6 +493,7 @@ module LegacyOpenStudio
           end
         end
       end
+
       return(drawing_interface)
     end
 
@@ -439,7 +520,11 @@ module LegacyOpenStudio
 
 
     def location
-      return(@model_interface.children.find { |child| child.class == Location })
+      if (@input_file.class == BEMkit::File)
+        return(@model_interface.children.find { |child| child.class == Euclid::GbXML::LocationInterface })
+      else
+        return(@model_interface.children.find { |child| child.class == Location })
+      end
     end
 
 
@@ -481,7 +566,9 @@ module LegacyOpenStudio
     end
 
     def relative_coordinates?
-      if (drawing_interface = surface_geometry)
+      if (Plugin.model_manager.input_file.class == BEMkit::File)
+        return(true)  # gbXML is always relative to CAD Azimuth
+      elsif (drawing_interface = surface_geometry)
         return(drawing_interface.input_object.fields[3] == "Relative")
       else
         puts "ModelManager.relative_coordinates?:  GlobalGeometryRules is missing"
@@ -490,7 +577,9 @@ module LegacyOpenStudio
     end
 
     def relative_daylighting_coordinates?
-      if (drawing_interface = surface_geometry)
+      if (Plugin.model_manager.input_file.class == BEMkit::File)
+        return(true)  # gbXML is always relative to CAD Azimuth
+      elsif (drawing_interface = surface_geometry)
         if (drawing_interface.input_object.fields[4])
           return(drawing_interface.input_object.fields[4] == "Relative")
         else

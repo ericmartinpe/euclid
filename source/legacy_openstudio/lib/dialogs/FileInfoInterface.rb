@@ -18,7 +18,7 @@ module LegacyOpenStudio
 
     def populate_hash
       if (Plugin.model_manager.input_file.path.nil?)
-        @hash['NAME'] = "Untitled.idf"
+        @hash['NAME'] = "(Untitled)"
         @hash['PATH'] = "(Never saved)"
         @hash['SIZE'] = ""
       else
@@ -31,23 +31,39 @@ module LegacyOpenStudio
           size = "0"
         end
 
-        @hash['SIZE'] = size + " KB"
+        @hash['SIZE'] = size + " KB"  # Calculate same as Downloads server
       end
 
-      num_zones = Plugin.model_manager.input_file.find_objects_by_class_name("Zone").count
-      num_bases = Plugin.model_manager.input_file.find_objects_by_class_name("BuildingSurface:Detailed").count
-      num_subs = Plugin.model_manager.input_file.find_objects_by_class_name("FenestrationSurface:Detailed").count
-      num_shading = Plugin.model_manager.input_file.find_objects_by_class_name("Shading:Zone:Detailed", "Shading:Building:Detailed", "Shading:Site:Detailed").count
+      if (Plugin.model_manager.input_file.class == BEMkit::File)
+        @hash['DOCUMENT_CLASS'] = "CBECC-Res gbXML #{Plugin.model_manager.input_file.document.version}"
 
-      num_objs = Plugin.model_manager.input_file.objects.count
-      num_other = num_objs - num_zones - num_bases - num_subs - num_shading
+        num_shading = Plugin.model_manager.input_file.document.shading_surfaces.length
 
-      @hash['ZONES'] = num_zones.to_s
-      @hash['BASE_SURFACES'] = num_bases.to_s
-      @hash['SUB_SURFACES'] = num_subs.to_s
-      @hash['SHADING_SURFACES'] = num_shading.to_s
-      @hash['OTHER_OBJECTS'] = num_other.to_s
-      @hash['TOTAL_OBJECTS'] = num_objs.to_s
+        @hash['ZONES'] = "-"
+        @hash['BASE_SURFACES'] = "-"
+        @hash['SUB_SURFACES'] = "-"
+        @hash['SHADING_SURFACES'] = num_shading.to_s
+        @hash['OTHER_OBJECTS'] = "-"
+        @hash['TOTAL_OBJECTS'] = num_shading.to_s
+
+      else
+        @hash['DOCUMENT_CLASS'] = "EnergyPlus 8.6.0"
+
+        num_zones = Plugin.model_manager.input_file.find_objects_by_class_name("Zone").count
+        num_bases = Plugin.model_manager.input_file.find_objects_by_class_name("BuildingSurface:Detailed").count
+        num_subs = Plugin.model_manager.input_file.find_objects_by_class_name("FenestrationSurface:Detailed").count
+        num_shading = Plugin.model_manager.input_file.find_objects_by_class_name("Shading:Zone:Detailed", "Shading:Building:Detailed", "Shading:Site:Detailed").count
+
+        num_objs = Plugin.model_manager.input_file.objects.count
+        num_other = num_objs - num_zones - num_bases - num_subs - num_shading
+
+        @hash['ZONES'] = num_zones.to_s
+        @hash['BASE_SURFACES'] = num_bases.to_s
+        @hash['SUB_SURFACES'] = num_subs.to_s
+        @hash['SHADING_SURFACES'] = num_shading.to_s
+        @hash['OTHER_OBJECTS'] = num_other.to_s
+        @hash['TOTAL_OBJECTS'] = num_objs.to_s
+      end
     end
 
   end

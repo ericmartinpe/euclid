@@ -8,10 +8,7 @@
 <!--
 function onLoad() {
   window.location='skp:on_load';
-  document.getElementById('ok').focus();
 }
-function onOK() { window.location='skp:on_ok'; }
-
 function onViewIDF() { window.location='skp:on_view_idf'; }
 -->
 </script>
@@ -19,12 +16,21 @@ function onViewIDF() { window.location='skp:on_view_idf'; }
 <body onload="onLoad()">
 
 <fieldset class="label" style="margin-top:0px;">
-<legend>EnergyPlus Input File</legend>
+<legend>Input File</legend>
 
 <table border="0" cellpadding="4" width="100%" align="center" style="margin-top:8px;">
 
 <tr>
-<td width="56px" valign="top">
+<td width="100px" valign="top">
+&nbsp;&nbsp;Document Class:
+</td>
+<td valign="top">
+<input id="DOCUMENT_CLASS" name="DOCUMENT_CLASS" type="text" class="static_text" size="10" width="100%" style="width:100%;" onFocus="this.select()" style="border: 0" readonly>
+</td>
+</tr>
+
+<tr>
+<td valign="top">
 &nbsp;&nbsp;Name:
 </td>
 <td valign="top">
@@ -131,10 +137,6 @@ Total Objects
 <br>
 
 </fieldset>
-
-<p style="text-align:right; margin-top:6px;">
-<input id="ok" onclick="onOK()" type="button" class="button" value="OK" style="width:75px; margin-left:3px;">
-</p>
 
 </body>
 </html>

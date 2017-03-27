@@ -17,9 +17,9 @@ module LegacyOpenStudio
       h = Plugin.platform_select(400, 445)
       @container = WindowContainer.new("Simulation Info", w, h, 150, 150)
       @container.set_file(Plugin.dir + "/lib/dialogs/html/SimulationInfo.html")
-
       add_callbacks
     end
+
 
     def on_load
       super

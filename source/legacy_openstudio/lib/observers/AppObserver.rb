@@ -56,7 +56,11 @@ module LegacyOpenStudio
 
     def prompt_for_save
       if (Plugin.model_manager.input_file.modified?)
-        button = UI.messagebox("Save changes to the EnergyPlus input file " + Plugin.model_manager.input_file_name + "?", MB_YESNO)
+        if (Plugin.model_manager.input_file.class == BEMkit::File)
+          button = UI.messagebox("Save changes to the CBECC-Res gbXML input file " + Plugin.model_manager.input_file_name + "?", MB_YESNO )
+        else
+          button = UI.messagebox("Save changes to the EnergyPlus input file " + Plugin.model_manager.input_file_name + "?", MB_YESNO)
+        end
 
         # NOTE:  There is no 'Cancel' button because the SketchUp model is already destroyed...
         if (button == 6)  # YES

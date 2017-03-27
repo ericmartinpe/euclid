@@ -78,7 +78,7 @@ module LegacyOpenStudio
 
     def clean_entity
       super
-      @entity.name = "Shading Group"
+      @entity.name = "Euclid Shading Group"
     end
 
 
@@ -101,7 +101,7 @@ module LegacyOpenStudio
 
 
     def set_entity_name
-      @entity.name = "EnergyPlus Shading Group"
+      @entity.name = "Euclid Shading Group"
     end
 
 

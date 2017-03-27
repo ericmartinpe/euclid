@@ -23,12 +23,18 @@ require("euclid/lib/legacy_openstudio/lib/tools/NewDaylightingControlsTool")
 require("euclid/lib/legacy_openstudio/lib/tools/NewOutputIlluminanceMapTool")
 require("euclid/lib/legacy_openstudio/lib/tools/NewZoneTool")
 
+require("euclid/lib/gbxml/dialogs/simulation_info_interface")
+
 
 module LegacyOpenStudio
 
   class MenuManager
 
-    attr_accessor :new_cmd, :open_cmd, :merge_cmd, :close_cmd, :save_cmd, :save_as_cmd, :revert_cmd
+
+    attr_accessor :new_menu, :open_menu
+
+# No need for these accessors
+    attr_accessor :new_gbxml_cmd, :new_energyplus_cmd, :open_gbxml_cmd, :open_energyplus_cmd, :merge_cmd, :close_cmd, :save_cmd, :save_as_cmd, :revert_cmd
     attr_accessor :show_errors_cmd, :file_info_cmd, :sim_info_cmd, :object_info_cmd
     attr_accessor :zone_origin_cmd, :new_zone_cmd, :new_shading_cmd
     attr_accessor :new_daylighting_cmd, :new_illuminance_cmd
@@ -63,22 +69,41 @@ module LegacyOpenStudio
     end
 
 
+# Could wrap these in a helper method that takes the values as a hash.
     def create_commands
 
       # Create all the commands (They must still be added to menus and toolbars next)
-      @new_cmd = UI::Command.new("New") { Plugin.command_manager.new_input_file }
+
+      @new_cmd = UI::Command.new("New...") { Plugin.command_manager.new_input_file }
       @new_cmd.small_icon = Plugin.dir + "/lib/resources/icons/NewFile-16.png"
       @new_cmd.large_icon = Plugin.dir + "/lib/resources/icons/NewFile-24.png"
-      @new_cmd.tooltip = "New EnergyPlus Input File"
-      @new_cmd.status_bar_text = "New EnergyPlus Input File"
+      @new_cmd.tooltip = "New Euclid Document"
+      @new_cmd.status_bar_text = "Create a new Euclid document"
       @new_cmd.set_validation_proc { MF_ENABLED }
+
+
+      @new_gbxml_cmd = UI::Command.new("CBECC-Res gbXML (*.xml)") { Plugin.command_manager.new_gbxml_input_file }
+      @new_gbxml_cmd.set_validation_proc { MF_ENABLED }
+
+
+      @new_energyplus_cmd = UI::Command.new("EnergyPlus (*.idf)") { Plugin.command_manager.new_energyplus_input_file }
+      @new_energyplus_cmd.set_validation_proc { MF_ENABLED }
+
 
       @open_cmd = UI::Command.new("Open...") { Plugin.command_manager.open_input_file }
       @open_cmd.small_icon = Plugin.dir + "/lib/resources/icons/OpenFile-16.png"
       @open_cmd.large_icon = Plugin.dir + "/lib/resources/icons/OpenFile-24.png"
-      @open_cmd.tooltip = "Open EnergyPlus Input File"
-      @open_cmd.status_bar_text = "Open a new EnergyPlus input file"
+      @open_cmd.tooltip = "Open Euclid Document"
+      @open_cmd.status_bar_text = "Open an existing Euclid document"
       @open_cmd.set_validation_proc { MF_ENABLED }
+
+
+      @open_gbxml_cmd = UI::Command.new("CBECC-Res gbXML (*.xml)...") { Plugin.command_manager.open_gbxml_input_file }
+      @open_gbxml_cmd.set_validation_proc { MF_ENABLED }
+
+
+      @open_energyplus_cmd = UI::Command.new("EnergyPlus (*.idf)...") { Plugin.command_manager.open_energyplus_input_file }
+      @open_energyplus_cmd.set_validation_proc { MF_ENABLED }
 
 
       @merge_cmd = UI::Command.new("Merge...") { Plugin.command_manager.merge_input_file }
@@ -86,22 +111,18 @@ module LegacyOpenStudio
 
 
       @close_cmd = UI::Command.new("Close") { Plugin.command_manager.close_input_file }
-      @close_cmd.set_validation_proc { validate_input_file_association }
+      @close_cmd.set_validation_proc { MF_ENABLED } #validate_input_file_association }
 
 
       @save_cmd = UI::Command.new("Save") { Plugin.command_manager.save_input_file }
       @save_cmd.small_icon = Plugin.dir + "/lib/resources/icons/SaveFile-16.png"
       @save_cmd.large_icon = Plugin.dir + "/lib/resources/icons/SaveFile-24.png"
-      @save_cmd.tooltip = "Save EnergyPlus Input File"
-      @save_cmd.status_bar_text = "Save the EnergyPlus input file"
-      @save_cmd.set_validation_proc { MF_ENABLED }
+      @save_cmd.tooltip = "Save Euclid Document"
+      @save_cmd.status_bar_text = "Save the current Euclid document"
+      @save_cmd.set_validation_proc { validate_input_file_modified }
 
 
       @save_as_cmd = UI::Command.new("Save As...") { Plugin.command_manager.save_input_file_as }
-      @save_as_cmd.small_icon = Plugin.dir + "/lib/resources/icons/SaveFileAs-16.png"
-      @save_as_cmd.large_icon = Plugin.dir + "/lib/resources/icons/SaveFileAs-24.png"
-      @save_as_cmd.tooltip = "SaveAs EnergyPlus Input File"
-      @save_as_cmd.status_bar_text = "Save the EnergyPlus input as a new file"
       @save_as_cmd.set_validation_proc { MF_ENABLED }
 
 
@@ -121,15 +142,27 @@ module LegacyOpenStudio
       @file_info_cmd.set_validation_proc { Plugin.dialog_manager.validate(FileInfoInterface) if (Plugin.dialog_manager) }
 
 
-      @sim_info_cmd = UI::Command.new("Simulation Info") { Plugin.dialog_manager.show(SimulationInfoInterface)  }
-      @sim_info_cmd.set_validation_proc { Plugin.dialog_manager.validate(SimulationInfoInterface) if (Plugin.dialog_manager) }
+      @sim_info_cmd = UI::Command.new("Location Info") {
+        if (Plugin.model_manager.input_file.class == BEMkit::File)
+          Plugin.dialog_manager.show(Euclid::GbXML::SimulationInfoInterface)
+        else
+          Plugin.dialog_manager.show(SimulationInfoInterface)
+        end
+      }
+      @sim_info_cmd.set_validation_proc {
+        if (Plugin.model_manager.input_file.class == BEMkit::File)
+          Plugin.dialog_manager.validate(Euclid::GbXML::SimulationInfoInterface) if (Plugin.dialog_manager)
+        else
+          Plugin.dialog_manager.validate(SimulationInfoInterface) if (Plugin.dialog_manager)
+        end
+      }
 
 
       @object_info_cmd = UI::Command.new("Object Info") { Plugin.dialog_manager.show(ObjectInfoInterface) }
       @object_info_cmd.small_icon = Plugin.dir + "/lib/resources/icons/ObjectInfo-16.png"
       @object_info_cmd.large_icon = Plugin.dir + "/lib/resources/icons/ObjectInfo-24.png"
       @object_info_cmd.tooltip = "Show Object Info Window"
-      @object_info_cmd.status_bar_text = "Show info about the selected EnergyPlus zone or surface"
+      @object_info_cmd.status_bar_text = "Show info about the selected zone or surface"
       @object_info_cmd.set_validation_proc { Plugin.dialog_manager.validate(ObjectInfoInterface) if (Plugin.dialog_manager) }
 
 
@@ -160,17 +193,23 @@ module LegacyOpenStudio
       # On the other hand, it's nice to be able to hit Esc and go back to the previous tool.
       @new_zone_cmd.small_icon = Plugin.dir + "/lib/resources/icons/NewZone-16.png"
       @new_zone_cmd.large_icon = Plugin.dir + "/lib/resources/icons/NewZone-24.png"
-      @new_zone_cmd.tooltip = "New EnergyPlus Zone"
-      @new_zone_cmd.status_bar_text = "Create a new empty EnergyPlus zone"
-      #@new_zone_cmd.set_validation_proc { MF_ENABLED }
+      @new_zone_cmd.tooltip = "New Zone"
+      @new_zone_cmd.status_bar_text = "Create a new empty zone"
+      @new_zone_cmd.set_validation_proc {
+        if (Plugin.model_manager.input_file.class == BEMkit::File)
+          MF_GRAYED
+        else
+          MF_ENABLED
+        end
+      }
       # Need validation to make sure not inside of another group
 
 
       @new_shading_cmd = UI::Command.new("New Shading Group Tool") { Sketchup.active_model.select_tool(@new_shading_tool)  }
       @new_shading_cmd.small_icon = Plugin.dir + "/lib/resources/icons/NewShading-16.png"
       @new_shading_cmd.large_icon = Plugin.dir + "/lib/resources/icons/NewShading-24.png"
-      @new_shading_cmd.tooltip = "New EnergyPlus Shading Group"
-      @new_shading_cmd.status_bar_text = "Create a new empty EnergyPlus shading group"
+      @new_shading_cmd.tooltip = "New Shading Group"
+      @new_shading_cmd.status_bar_text = "Create a new empty shading group"
       #@new_shading_cmd.set_validation_proc { MF_ENABLED }
       # Need validation to make sure not inside of another group
 
@@ -464,8 +503,14 @@ module LegacyOpenStudio
 
       @plugin_menu = UI.menu("Plugins").add_submenu(Plugin.name)
 
-      @plugin_menu.add_item(@new_cmd)
-      @plugin_menu.add_item(@open_cmd)
+      @new_menu = @plugin_menu.add_submenu("New")
+      @new_menu.add_item(@new_gbxml_cmd)
+      @new_menu.add_item(@new_energyplus_cmd)
+
+      @open_menu = @plugin_menu.add_submenu("Open")
+      @open_menu.add_item(@open_gbxml_cmd)
+      @open_menu.add_item(@open_energyplus_cmd)
+
       #@plugin_menu.add_item(@merge_cmd)
       @plugin_menu.add_item(@close_cmd)
       @plugin_menu.add_separator
@@ -475,64 +520,63 @@ module LegacyOpenStudio
       @plugin_menu.add_separator
       @plugin_menu.add_item(@show_errors_cmd)
       @plugin_menu.add_separator
-      @plugin_menu.add_item(@file_info_cmd)
-      @plugin_menu.add_item(@sim_info_cmd)
       @plugin_menu.add_item(@object_info_cmd)
+      @plugin_menu.add_item(@sim_info_cmd)
+      @plugin_menu.add_item(@file_info_cmd)
       @plugin_menu.add_separator
-      @plugin_menu.add_item(@run_cmd)
-      @plugin_menu.add_separator
+#      @plugin_menu.add_item(@run_cmd)
+#      @plugin_menu.add_separator
       @plugin_menu.add_item(@new_zone_cmd)
       @plugin_menu.add_item(@new_shading_cmd)
-      @plugin_menu.add_item(@zone_loads_cmd)
-      @plugin_menu.add_item(@new_daylighting_cmd)
-      @plugin_menu.add_item(@new_illuminance_cmd)
-      @plugin_menu.add_separator
-      @plugin_menu.add_item(@info_tool_cmd)
-      @plugin_menu.add_item(@surface_search_cmd)
-      @plugin_menu.add_item(@set_default_constructions_cmd)
-      @plugin_menu.add_item(@surface_matching_cmd)
-      @plugin_menu.add_item(@edit_thermostats_cmd)
-      @plugin_menu.add_item(@new_construct_cmd)
-      @plugin_menu.add_item(@new_schedule_cmd)
-      @plugin_menu.add_separator
-      @rendering_menu = @plugin_menu.add_submenu("Rendering")
-      @animation_menu = @plugin_menu.add_submenu("Animation")
-      @plugin_menu.add_separator
-      @plugin_menu.add_item(@prefs_cmd)
+#      @plugin_menu.add_item(@zone_loads_cmd)
+#      @plugin_menu.add_item(@new_daylighting_cmd)
+#      @plugin_menu.add_item(@new_illuminance_cmd)
+#      @plugin_menu.add_separator
+#      @plugin_menu.add_item(@info_tool_cmd)
+#      @plugin_menu.add_item(@surface_search_cmd)
+#      @plugin_menu.add_item(@set_default_constructions_cmd)
+#      @plugin_menu.add_item(@surface_matching_cmd)
+#      @plugin_menu.add_item(@edit_thermostats_cmd)
+#      @plugin_menu.add_item(@new_construct_cmd)
+#      @plugin_menu.add_item(@new_schedule_cmd)
+#      @plugin_menu.add_separator
+#      @rendering_menu = @plugin_menu.add_submenu("Rendering")
+#      @animation_menu = @plugin_menu.add_submenu("Animation")
+#      @plugin_menu.add_separator
+#      @plugin_menu.add_item(@prefs_cmd)
       @plugin_menu.add_separator
       @plugin_menu.add_item(@help_cmd)
-      @plugin_menu.add_item(@update_cmd)
+#      @plugin_menu.add_item(@update_cmd)
       @plugin_menu.add_item(@about_cmd)
 
       #@plugin_menu.add_item(@test_cmd)
 
-
       # Add the Rendering menu
 
-      @rendering_menu.add_item(@hide_rest_cmd)
-      @rendering_menu.add_item(@hidden_geom_cmd)
-      @rendering_menu.add_item(@xray_cmd)
-      @rendering_menu.add_separator
-      @rendering_menu.add_item(@surf_mode_cmd)
-      @rendering_menu.add_item(@data_mode_cmd)
-      @rendering_menu.add_item(@boundary_mode_cmd)
+#      @rendering_menu.add_item(@hide_rest_cmd)
+#      @rendering_menu.add_item(@hidden_geom_cmd)
+#      @rendering_menu.add_item(@xray_cmd)
+#      @rendering_menu.add_separator
+#      @rendering_menu.add_item(@surf_mode_cmd)
+#      @rendering_menu.add_item(@data_mode_cmd)
+#      @rendering_menu.add_item(@boundary_mode_cmd)
       #@rendering_menu.add_item(@set_mode_only_cmd)
-      @rendering_menu.add_item(@display_color_by_layer_cmd)
-      @rendering_menu.add_item(@render_mode_5_cmd)
-      @rendering_menu.add_separator
-      @rendering_menu.add_item(@data_settings_cmd)
-      @rendering_menu.add_item(@color_scale_cmd)
-      @rendering_menu.add_item(@data_tool_cmd)
+#      @rendering_menu.add_item(@display_color_by_layer_cmd)
+#      @rendering_menu.add_item(@render_mode_5_cmd)
+#      @rendering_menu.add_separator
+#      @rendering_menu.add_item(@data_settings_cmd)
+#      @rendering_menu.add_item(@color_scale_cmd)
+#      @rendering_menu.add_item(@data_tool_cmd)
 
       # Add the Animation menu
 
-      @animation_menu.add_item(@rwd_to_start_cmd)
-      @animation_menu.add_item(@rwd_anim_cmd)
-      @animation_menu.add_item(@play_anim_cmd)
-      @animation_menu.add_item(@fwd_anim_cmd)
-      @animation_menu.add_item(@fwd_to_end_cmd)
-      @animation_menu.add_separator
-      @animation_menu.add_item(@anim_settings_cmd)
+#      @animation_menu.add_item(@rwd_to_start_cmd)
+#      @animation_menu.add_item(@rwd_anim_cmd)
+#      @animation_menu.add_item(@play_anim_cmd)
+#      @animation_menu.add_item(@fwd_anim_cmd)
+#      @animation_menu.add_item(@fwd_to_end_cmd)
+#      @animation_menu.add_separator
+#      @animation_menu.add_item(@anim_settings_cmd)
 
     end
 
@@ -542,60 +586,60 @@ module LegacyOpenStudio
       # Add the EnergyPlus command toolbar
 
       @command_toolbar = UI::Toolbar.new(Plugin.name)  # + " Commands")
-      @command_toolbar.add_item(@new_cmd)
-      @command_toolbar.add_item(@open_cmd)
+      @command_toolbar.add_item(@new_cmd)  # Forward to the default document type
+      @command_toolbar.add_item(@open_cmd)  # Forward to the default document type
       @command_toolbar.add_item(@save_cmd)
-      @command_toolbar.add_item(@save_as_cmd)
+#      @command_toolbar.add_item(@save_as_cmd)
       @command_toolbar.add_separator
       @command_toolbar.add_item(@show_errors_cmd)
       @command_toolbar.add_separator
       @command_toolbar.add_item(@new_zone_cmd)
       @command_toolbar.add_item(@new_shading_cmd)
-      @command_toolbar.add_item(@zone_loads_cmd)
-      @command_toolbar.add_item(@new_daylighting_cmd)
-      @command_toolbar.add_item(@new_illuminance_cmd)
+#      @command_toolbar.add_item(@zone_loads_cmd)
+#      @command_toolbar.add_item(@new_daylighting_cmd)
+#      @command_toolbar.add_item(@new_illuminance_cmd)
       @command_toolbar.add_separator
-      @command_toolbar.add_item(@info_tool_cmd)
+#      @command_toolbar.add_item(@info_tool_cmd)
       @command_toolbar.add_item(@object_info_cmd)
-      @command_toolbar.add_item(@outliner_cmd)
-      @command_toolbar.add_item(@surface_search_cmd)
-      @command_toolbar.add_separator
-      @command_toolbar.add_item(@surface_matching_cmd)
-      @command_toolbar.add_item(@set_default_constructions_cmd)
-      @command_toolbar.add_separator
-      @command_toolbar.add_item(@run_cmd)
+#      @command_toolbar.add_item(@outliner_cmd)
+#      @command_toolbar.add_item(@surface_search_cmd)
+#      @command_toolbar.add_separator
+#      @command_toolbar.add_item(@surface_matching_cmd)
+#      @command_toolbar.add_item(@set_default_constructions_cmd)
+#      @command_toolbar.add_separator
+#      @command_toolbar.add_item(@run_cmd)
       @command_toolbar.add_separator
       @command_toolbar.add_item(@help_cmd)
       @command_toolbar.restore
 
       # Add the EnergyPlus Rendering toolbar
 
-      @rendering_toolbar = UI::Toolbar.new(Plugin.name + " Rendering")
-      @rendering_toolbar.add_item(@hide_rest_cmd)
-      @rendering_toolbar.add_item(@hidden_geom_cmd)
-      @rendering_toolbar.add_item(@xray_cmd)
-      @rendering_toolbar.add_separator
-      @rendering_toolbar.add_item(@surf_mode_cmd)
-      @rendering_toolbar.add_item(@boundary_mode_cmd)
-      @rendering_toolbar.add_item(@data_mode_cmd)
-      @rendering_toolbar.add_separator
-      @rendering_toolbar.add_item(@data_settings_cmd)
-      @rendering_toolbar.add_item(@color_scale_cmd)
-      @rendering_toolbar.add_item(@data_tool_cmd)
+#      @rendering_toolbar = UI::Toolbar.new(Plugin.name + " Rendering")
+#      @rendering_toolbar.add_item(@hide_rest_cmd)
+#      @rendering_toolbar.add_item(@hidden_geom_cmd)
+#      @rendering_toolbar.add_item(@xray_cmd)
+#      @rendering_toolbar.add_separator
+#      @rendering_toolbar.add_item(@surf_mode_cmd)
+#      @rendering_toolbar.add_item(@boundary_mode_cmd)
+#      @rendering_toolbar.add_item(@data_mode_cmd)
+#      @rendering_toolbar.add_separator
+#      @rendering_toolbar.add_item(@data_settings_cmd)
+#      @rendering_toolbar.add_item(@color_scale_cmd)
+#      @rendering_toolbar.add_item(@data_tool_cmd)
       #@rendering_toolbar.show
 
 
       # Add the EnergyPlus Animation toolbar
 
       #@animation_toolbar = UI::Toolbar.new(Plugin.name + " Animation")
-      @rendering_toolbar.add_separator
-      @rendering_toolbar.add_item(@anim_settings_cmd)
-      @rendering_toolbar.add_item(@rwd_to_start_cmd)
-      @rendering_toolbar.add_item(@rwd_anim_cmd)
-      @rendering_toolbar.add_item(@play_anim_cmd)
-      @rendering_toolbar.add_item(@fwd_anim_cmd)
-      @rendering_toolbar.add_item(@fwd_to_end_cmd)
-      @rendering_toolbar.restore
+#      @rendering_toolbar.add_separator
+#      @rendering_toolbar.add_item(@anim_settings_cmd)
+#      @rendering_toolbar.add_item(@rwd_to_start_cmd)
+#      @rendering_toolbar.add_item(@rwd_anim_cmd)
+#      @rendering_toolbar.add_item(@play_anim_cmd)
+#      @rendering_toolbar.add_item(@fwd_anim_cmd)
+#      @rendering_toolbar.add_item(@fwd_to_end_cmd)
+#      @rendering_toolbar.restore
 
     end
 

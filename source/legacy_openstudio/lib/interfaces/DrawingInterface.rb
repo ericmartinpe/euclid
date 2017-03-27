@@ -248,7 +248,12 @@ module LegacyOpenStudio
         if (original_interface.input_object)  # DetachedShadingGroups do not have an input object!
           # Copy the input object so that all user field edits are preserved in the new surface.
           # 'copy_object' gives the input object a new unique name.
-          @input_object = Plugin.model_manager.input_file.copy_object(original_interface.input_object)
+          if (self.class == Euclid::GbXML::DetachedShadingSurfaceInterface)
+            @input_object = original_interface.input_object.copy
+            Plugin.model_manager.input_file.document.add_shading_surface(@input_object)
+          else
+            @input_object = Plugin.model_manager.input_file.copy_object(original_interface.input_object)
+          end
           @entity.input_object_key = @input_object.key
         end
 
@@ -352,6 +357,8 @@ module LegacyOpenStudio
       update_input_object
       paint_entity  # Needed to fix the floor surface colors after a push/pull into a box.
 
+      Plugin.model_manager.input_file.modified = true
+
       # Try this here for a while...
       # When moving a zone this might be ridiculous...Object Info getting hit with some many update requests...
       Plugin.dialog_manager.update(ObjectInfoInterface)
@@ -363,6 +370,8 @@ module LegacyOpenStudio
       delete_input_object
       @parent.remove_child(self) if (@parent)  # Duplicate line in 'update_parent_from_entity'
 
+      Plugin.model_manager.input_file.modified = true
+
       # Try this here for a while...
       # When moving a zone this might be ridiculous...Object Info getting hit with some many update requests...
       Plugin.dialog_manager.update(ObjectInfoInterface)
@@ -372,7 +381,13 @@ module LegacyOpenStudio
     # Undelete happens when an entity is restored after an Undo event.
     def on_undelete_entity(entity)
       @deleted = false
-      Plugin.model_manager.input_file.undelete_object(@input_object) if (@input_object)
+
+      if (Plugin.model_manager.input_file.class == BEMkit::File)
+        # This is not exactly ideal because the XML element gets re-added at the end of the file, not in its original context.
+        Plugin.model_manager.input_file.document.add_shading_surface(@input_object) if (@input_object)
+      else
+        Plugin.model_manager.input_file.undelete_object(@input_object) if (@input_object)
+      end
 
       @entity = entity  # The entity comes back with a different reference than it had originally.
       @entity.drawing_interface = self  # The reference to the drawing interface is lost when it is deleted.

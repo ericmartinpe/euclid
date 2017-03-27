@@ -5,6 +5,9 @@
 require("euclid/lib/legacy_openstudio/lib/interfaces/DetachedShadingGroup")
 require("euclid/lib/legacy_openstudio/lib/tools/NewGroupTool")
 
+require("euclid/lib/gbxml/interfaces/detached_shading_group_interface")
+require("bemkit/shading")
+
 
 module LegacyOpenStudio
 
@@ -31,7 +34,12 @@ module LegacyOpenStudio
 
       model.start_operation("Shading Group")
 
-      shading_group = DetachedShadingGroup.new
+      if (Plugin.model_manager.input_file.class == BEMkit::File)
+        shading_group = Euclid::GbXML::DetachedShadingGroupInterface.new
+      else
+        shading_group = DetachedShadingGroup.new
+      end
+
       shading_group.origin = @ip.position
       shading_group.show_origin = true
       shading_group.draw_entity

@@ -1,0 +1,89 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html" />
+<link href="../../../legacy_openstudio/lib/dialogs/html/Dialogs.css" rel="stylesheet" type="text/css" />
+<title>Location Info</title>
+<script language="javascript" src="../../../legacy_openstudio/lib/dialogs/html/Dialogs.js"></script>
+<script language="javascript">
+<!--
+function onLoad() {
+  window.location='skp:on_load';
+}
+function onMap() { window.location='skp:on_map'; }
+
+-->
+</script>
+</head>
+<body onload="onLoad()">
+
+<fieldset class="label">
+<legend>Location</legend>
+
+<table border="0" cellpadding="4" width="100%" align="center">
+<tr>
+<td width="65px">
+&nbsp;&nbsp;Name:
+</td>
+<td>
+<input id="LOCATION_NAME" name="LOCATION_NAME" type="text" class="text" size="10" width="251px" style="width:251px;" onkeyup="onChangeElement(this)">
+</td>
+</tr>
+
+</table>
+
+
+<table border="0" cellpadding="4" width="100%" align="left">
+
+<tr>
+<td width="65px">
+&nbsp;&nbsp;Latitude:
+</td>
+<td>
+<input id="LATITUDE" name="LATITUDE" type="text" class="text" size="10" style="text-align:center;" onkeyup="onChangeElement(this)">&nbsp;(deg)
+</td>
+<td width="65px">
+&nbsp;&nbsp;Longitude:
+</td>
+<td>
+<input id="LONGITUDE" name="LONGITUDE" type="text" class="text" size="10" style="text-align:center;" onkeyup="onChangeElement(this)">&nbsp;(deg)
+</td>
+</tr>
+
+<tr>
+<td>
+&nbsp;&nbsp;Time Zone:
+</td>
+<td>
+<input id="TIME_ZONE_OFFSET" name="TIME_ZONE_OFFSET" type="text" class="text" size="10" style="text-align:center;" onkeyup="onChangeElement(this)">&nbsp;(hr)
+</td>
+<td>
+&nbsp;&nbsp;Elevation:
+</td>
+<td>
+<input id="ELEVATION" name="ELEVATION" type="text" class="text" size="10" style="text-align:center;" onkeyup="onChangeElement(this)">&nbsp;(ft)
+</td>
+</tr>
+
+<tr>
+<td>
+&nbsp;&nbsp;Azimuth:
+</td>
+<td>
+<input id="AZIMUTH" name="AZIMUTH" type="text" class="text" size="10" style="text-align:center;" onkeyup="onChangeElement(this)">&nbsp;(deg)
+</td>
+<td>
+</tr>
+
+</table>
+
+<br>
+<br>
+</fieldset>
+
+
+<p style="text-align:left; margin-top:6px;">
+<input id="map" onclick="onMap()" type="button" class="button" value="Map..." style="width:75px; margin-left:3px;">
+</p>
+
+</body>
+</html>

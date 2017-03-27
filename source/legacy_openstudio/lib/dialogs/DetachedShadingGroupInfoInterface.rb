@@ -47,7 +47,11 @@ module LegacyOpenStudio
       end
 
       # Update drawing interface
-      @drawing_interface.on_change_input_object
+      #@drawing_interface.on_change_input_object  # Causes problems with "Counterclockwise:  Fix unintended reversed face"; something with comparing polygon before coordinates have been updated
+
+      # Kind of a kludge: see above
+      @drawing_interface.paint_entity
+      @drawing_interface.update_input_object
 
       return(true)
     end

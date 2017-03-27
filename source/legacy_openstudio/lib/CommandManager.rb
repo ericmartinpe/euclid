@@ -16,6 +16,25 @@ module LegacyOpenStudio
 
 
     def new_input_file
+      # Forward to whatever the current document class is.
+      if (Plugin.model_manager.input_file.class == BEMkit::File)
+        new_gbxml_input_file
+      else
+        new_energyplus_input_file
+      end
+    end
+
+
+    def new_gbxml_input_file
+      if (prompt_for_save)
+        Plugin.model_manager.close_input_file
+        Plugin.model_manager.detach_input_file
+        Plugin.model_manager.new_gbxml_input_file
+      end
+    end
+
+
+    def new_energyplus_input_file
       if (prompt_for_save)
         Plugin.model_manager.close_input_file
         Plugin.model_manager.detach_input_file
@@ -25,6 +44,32 @@ module LegacyOpenStudio
 
 
     def open_input_file
+      # Forward to whatever the current document class is.
+      if (Plugin.model_manager.input_file.class == BEMkit::File)
+        open_gbxml_input_file
+      else
+        open_energyplus_input_file
+      end
+    end
+
+
+    def open_gbxml_input_file
+      model = Sketchup.active_model
+
+      if (path = UI.open_panel("Open CBECC-Res gbXML Input File", Plugin.model_manager.input_file_dir, "CBECC-Res gbXML|*.xml|All Files|*.*||"))
+
+        Plugin.write_pref("Last Input File Dir", File.dirname(path))  # Save the dir so we can start here next time
+
+        if (prompt_for_save)
+          Plugin.model_manager.close_input_file
+          Plugin.model_manager.detach_input_file
+          success = Plugin.model_manager.open_gbxml_input_file(path)
+        end
+      end
+    end
+
+
+    def open_energyplus_input_file
 
       #Sketchup.active_model.start_operation("Open IDF")
 
@@ -105,7 +150,13 @@ module LegacyOpenStudio
 
 
     def save_input_file_as
-      if (path = UI.save_panel("Save EnergyPlus Input File", Plugin.model_manager.input_file_dir, Plugin.model_manager.input_file_name))
+      if (Plugin.model_manager.input_file.class == BEMkit::File)
+        path = UI.save_panel("Save CBECC-Res gbXML Input File", Plugin.model_manager.input_file_dir, Plugin.model_manager.input_file_name)
+      else
+        path = UI.save_panel("Save EnergyPlus Input File", Plugin.model_manager.input_file_dir, Plugin.model_manager.input_file_name)
+      end
+
+      if (path)
         Plugin.model_manager.save_input_file(path)
       end
     end
@@ -120,32 +171,39 @@ module LegacyOpenStudio
 
 
     def close_input_file
-      if (prompt_for_save)  # should save prompt occur before the 'erase all' prompt?  or after?
-        if (Plugin.read_pref("Erase Entities"))
-          erase = true
-        else
-          button = UI.messagebox("Closing the EnergyPlus input file detaches it from this SketchUp model.\n" +
-            "Do you also want to erase all of the SketchUp entities that are associated with EnergyPlus objects?", MB_YESNOCANCEL)
+      #if (prompt_for_save)  # should save prompt occur before the 'erase all' prompt?  or after?
+        #if (Plugin.read_pref("Erase Entities"))
+        #  erase = true
+        #else
+        #  button = UI.messagebox("Closing the EnergyPlus input file detaches it from this SketchUp model.\n" +
+        #    "Do you also want to erase all of the SketchUp entities that are associated with EnergyPlus objects?", MB_YESNOCANCEL)
 
-          if (button == 6)  # YES
-            erase = true
-          elsif (button == 7)  # NO
-            erase = false
-          else  # CANCEL
-            return
-          end
-        end
+        #  if (button == 6)  # YES
+        #    erase = true
+        #  elsif (button == 7)  # NO
+        #    erase = false
+        #  else  # CANCEL
+        #    return
+        #  end
+        #end
 
-        Plugin.model_manager.close_input_file
-        Plugin.model_manager.detach_input_file(erase)
-        Plugin.model_manager.new_input_file
-      end
+      #  Plugin.model_manager.close_input_file
+      #  Plugin.model_manager.detach_input_file(erase)
+      #  Plugin.model_manager.new_input_file
+      #end
+
+      # Close is the same as new.
+      new_input_file
     end
 
 
     def prompt_for_save
       if (Plugin.model_manager.input_file.modified?)
-        button = UI.messagebox("Save changes to the EnergyPlus input file " + Plugin.model_manager.input_file_name + "?", MB_YESNOCANCEL )
+        if (Plugin.model_manager.input_file.class == BEMkit::File)
+          button = UI.messagebox("Save changes to the CBECC-Res gbXML input file " + Plugin.model_manager.input_file_name + "?", MB_YESNOCANCEL )
+        else
+          button = UI.messagebox("Save changes to the EnergyPlus input file " + Plugin.model_manager.input_file_name + "?", MB_YESNOCANCEL )
+        end
 
         if (button == 6)  # YES
           save_input_file

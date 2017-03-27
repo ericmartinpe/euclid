@@ -98,6 +98,12 @@ task :compile, [:architecture] => [:dependencies] do |t, args|
   spec = Gem::Specification.load("#{root_dir}/source/libraries/bemkit/bemkit.gemspec")
   File.write("#{gemspecs_dir}/bemkit-#{BEMkit::VERSION}.gemspec", spec.to_ruby)
 
+  spec = Gem::Specification.load("#{root_dir}/source/libraries/bemkit-energyplus/bemkit-energyplus.gemspec")
+  File.write("#{gemspecs_dir}/bemkit-energyplus-#{BEMkit::VERSION}.gemspec", spec.to_ruby)
+
+  spec = Gem::Specification.load("#{root_dir}/source/libraries/bemkit-gbxml/bemkit-gbxml.gemspec")
+  File.write("#{gemspecs_dir}/bemkit-gbxml-#{BEMkit::VERSION}.gemspec", spec.to_ruby)
+
   # A Rake file or file list task dependency would only detect added or changed files, not deleted files.
   # This 'sync_tree' approach ensures that the source and target directory trees are synchronised while
   # only copying the minimum number of files.
@@ -105,6 +111,8 @@ task :compile, [:architecture] => [:dependencies] do |t, args|
   dir_mappings = [ ["source/extension/", "build/output/extension/"],
                    ["source/legacy_openstudio/", "build/output/extension/euclid/lib/legacy_openstudio/"],
                    ["source/libraries/bemkit/", "build/output/extension/euclid/lib/rubygems/gems/bemkit-#{BEMkit::VERSION}/"],
+                   ["source/libraries/bemkit-energyplus/", "build/output/extension/euclid/lib/rubygems/gems/bemkit-energyplus-#{BEMkit::VERSION}/"],
+                   ["source/libraries/bemkit-gbxml/", "build/output/extension/euclid/lib/rubygems/gems/bemkit-gbxml-#{BEMkit::VERSION}/"],
                    ["build/temp/gemspecs/", "build/output/extension/euclid/lib/rubygems/specifications/"],
                    ["source/vendor/common/", "build/output/extension/euclid/vendor/"],
                    [vendor_platform_dir, "build/output/extension/euclid/vendor/"] ]
@@ -132,6 +140,13 @@ desc "Package the installer program for local platform"
 task :package, [:architecture] => [:compile] do |t, args|
   args.with_defaults(:architecture => "win64")
 
+  puts "WARNING, WARNING, WARNING:"
+  puts "***"
+  puts "***You should do 'rake clean' first when switching architectures, otherwise platform-specific files may not be updated!"
+  puts "**"
+
+  # Running 'clean' from here doesn't work very well.
+
   puts "Packaging..."
 
   Dir.chdir(root_dir)  # Set working directory for all following shell commands; Git is context sensitive
@@ -157,7 +172,7 @@ task :package, [:architecture] => [:compile] do |t, args|
   end
 
   FileUtils.mkdir_p("#{build_dir}/package")
-  package_path = "#{build_dir}/package/euclid-#{Euclid::VERSION}-#{platform}-#{commit}.rbz"
+  package_path = "#{build_dir}/package/euclid-cbecc-res-#{Euclid::VERSION}-#{platform}-#{commit}.rbz"
 
   if (File.exist?(package_path))
     FileUtils.rm(package_path)

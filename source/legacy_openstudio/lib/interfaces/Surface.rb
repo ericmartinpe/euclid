@@ -26,7 +26,7 @@ module LegacyOpenStudio
 
       @outside_variable_key = nil
       @outside_value = nil
-      @outside_color = Sketchup::Color.new(255, 255, 255, 1.0)
+      @outside_color = Sketchup::Color.new(255, 255, 255, 1.0)  # should be a constant?
       @outside_material = nil  # not accessible
       @outside_texture = nil
       @outside_variable_def = nil
@@ -103,6 +103,10 @@ module LegacyOpenStudio
     def update_input_object
       super
       if (valid_entity?)
+        if (self.surface_polygon != self.face_polygon)
+          Plugin.model_manager.input_file.modified = true
+        end
+
         self.surface_polygon = self.face_polygon  # Update surface vertices
       end
     end
@@ -121,7 +125,7 @@ module LegacyOpenStudio
       end
 
       # Apply vertex order rule (Clockwise or Counterclockwise)
-      if (Plugin.model_manager.surface_geometry.input_object.fields[2].upcase == "CLOCKWISE")
+      if (vertex_order == "CLOCKWISE")
         points = surface_polygon.points.reverse
       else
         points = surface_polygon.points
@@ -161,7 +165,7 @@ module LegacyOpenStudio
 
         # Even though the vertex order is correct in the input object, SketchUp will sometimes draw a face
         # upside-down because of its relationship to surrounding geometry.
-        if (Plugin.model_manager.surface_geometry.input_object.fields[2].upcase == "CLOCKWISE")
+        if (vertex_order == "CLOCKWISE")
           if (@entity.normal.samedirection?(surface_polygon.normal))
             puts "Clockwise:  Fix unintended reversed face"
             # Fix unintended reversed face.
@@ -438,7 +442,7 @@ module LegacyOpenStudio
       temp_points = points
 
       # Apply vertex order rule (Clockwise or Counterclockwise)
-      if (Plugin.model_manager.surface_geometry.input_object.fields[2].upcase == "CLOCKWISE")
+      if (vertex_order == "CLOCKWISE")
         temp_points.reverse!
       end
 
@@ -492,7 +496,7 @@ module LegacyOpenStudio
         end
       end
 
-      case (Plugin.model_manager.surface_geometry.input_object.fields[1].upcase)
+      case (first_vertex)
 
       when "UPPERLEFTCORNER"
         corner = centroid + x_axis.scale(x_min) + y_axis.scale(y_max)  # ULC
@@ -535,6 +539,16 @@ module LegacyOpenStudio
       #Sketchup.active_model.selection.add(fp)
 
       return(new_points)
+    end
+
+
+    def vertex_order
+      return(Plugin.model_manager.surface_geometry.input_object.fields[2].upcase)
+    end
+
+
+    def first_vertex
+      return(Plugin.model_manager.surface_geometry.input_object.fields[1].upcase)
     end
 
   end

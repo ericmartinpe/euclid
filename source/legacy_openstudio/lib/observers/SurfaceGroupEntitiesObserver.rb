@@ -4,6 +4,7 @@
 
 require("euclid/lib/legacy_openstudio/lib/AsynchProc")
 require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingUtils")
+require("euclid/lib/gbxml/interfaces/detached_shading_surface_interface")
 
 
 module LegacyOpenStudio
@@ -52,6 +53,9 @@ module LegacyOpenStudio
             elsif (@drawing_interface.class == DetachedShadingGroup)
               puts "new detached shading surface"
               DetachedShadingSurface.new_from_entity(entity)
+            elsif (@drawing_interface.class == Euclid::GbXML::DetachedShadingGroupInterface)
+              puts "new gbXML detached shading surface"
+              Euclid::GbXML::DetachedShadingSurfaceInterface.new_from_entity(entity)
             else
               puts "SurfaceGroupEntitiesObserver.onElementAdded:  unhandled SurfaceGroup subclass"
             end

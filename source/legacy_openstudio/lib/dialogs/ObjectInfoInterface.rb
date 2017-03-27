@@ -17,6 +17,9 @@ require("euclid/lib/legacy_openstudio/lib/dialogs/NoSelectionInfoInterface")
 
 require("euclid/lib/legacy_openstudio/lib/dialogs/ObjectInfoDialog")
 
+require("euclid/lib/gbxml/dialogs/detached_shading_group_info_interface")
+require("euclid/lib/gbxml/dialogs/detached_shading_surface_info_interface")
+
 
 module LegacyOpenStudio
 
@@ -65,6 +68,14 @@ module LegacyOpenStudio
 
       when "LegacyOpenStudio::DaylightingControls"
         @active_interface = DaylightingControlsInfoInterface.new
+        @hash = @active_interface.hash
+
+      when "Euclid::GbXML::DetachedShadingGroupInterface"
+        @active_interface = Euclid::GbXML::DetachedShadingGroupInfoInterface.new
+        @hash = @active_interface.hash
+
+      when "Euclid::GbXML::DetachedShadingSurfaceInterface"
+        @active_interface = Euclid::GbXML::DetachedShadingSurfaceInfoInterface.new
         @hash = @active_interface.hash
 
       else  # NilClass
