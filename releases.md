@@ -1,5 +1,10 @@
 # Releases
 
+## 0.9.3
+
+- Add support for new "Foundation" (Kiva) boundary condition.
+- Update (nominally) to *EnergyPlus 8.7*. NOTE: The Daylighting:Controls object is still not yet handled correctly.
+
 ## 0.9.2
 
 - Fix bug where OpenStudio extension was being detected as already loaded even when disabled.
@@ -7,7 +12,7 @@
 ## 0.9.1
 
 - Disable (temporarily) the Daylighting:Controls tool and rendering until the new 8.6 changes are handled in the UI.
-- Update (nominally) to EnergyPlus 8.6. NOTE: The Daylighting:Controls object has changed in 8.6 and is not yet handled correctly.
+- Update (nominally) to *EnergyPlus 8.6*. NOTE: The Daylighting:Controls object has changed in 8.6 and is not yet handled correctly.
 - Disable default constructions dialog prompt.
 - Change behavior of text boxes in Object Info dialog so that input object fields are updated instantaneously as you type.
 - Fix bug where Object Info dialog was not being updated when the selection was changed in certain ways.
