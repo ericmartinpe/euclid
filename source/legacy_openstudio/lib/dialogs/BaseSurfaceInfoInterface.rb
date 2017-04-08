@@ -104,6 +104,9 @@ module LegacyOpenStudio
       when "ZONE"
         outside_boundary_object = Plugin.model_manager.input_file.find_object_by_class_and_name("ZONE", @hash['OUTSIDE_BOUNDARY_OBJECT'])
 
+      when "FOUNDATION"
+        outside_boundary_object = Plugin.model_manager.input_file.find_object_by_class_and_name("FOUNDATION:KIVA", @hash['OUTSIDE_BOUNDARY_OBJECT'])
+
       when "OTHERSIDECOEFFICIENTS"
         outside_boundary_object = Plugin.model_manager.input_file.find_object_by_class_and_name("SURFACEPROPERTY:OTHERSIDECOEFFICIENTS", @hash['OUTSIDE_BOUNDARY_OBJECT'])
 

@@ -203,6 +203,9 @@ module LegacyOpenStudio
                     @entity.back_material = Plugin.model_manager.construction_manager.outdoors_int
                   end
                end
+        elsif (boundary.upcase == "FOUNDATION")
+          @entity.material = Plugin.model_manager.construction_manager.foundation_ext
+          @entity.back_material = Plugin.model_manager.construction_manager.foundation_int
         elsif (boundary.upcase == "GROUND")
           @entity.material = Plugin.model_manager.construction_manager.ground_ext
           @entity.back_material = Plugin.model_manager.construction_manager.ground_int

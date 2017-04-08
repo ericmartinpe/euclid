@@ -119,6 +119,18 @@ module LegacyOpenStudio
         object_names = Plugin.model_manager.input_file.find_objects_by_class_name("ZONE").collect { |object| object.name }
         set_select_options("OUTSIDE_BOUNDARY_OBJECT", object_names.sort)
 
+      when "FOUNDATION"
+        @hash['SUN'] = false
+        @hash['WIND'] = false
+        @hash['VIEW_FACTOR_TO_GROUND'] = "0.0"
+
+        disable_element("SUN")
+        disable_element("WIND")
+        disable_element("VIEW_FACTOR_TO_GROUND")
+        enable_element("OUTSIDE_BOUNDARY_OBJECT")
+        object_names = Plugin.model_manager.input_file.find_objects_by_class_name("FOUNDATION:KIVA").collect { |object| object.name }
+        set_select_options("OUTSIDE_BOUNDARY_OBJECT", object_names.sort)
+
       when "OTHERSIDECOEFFICIENTS"
         @hash['VIEW_FACTOR_TO_GROUND'] = "0.0"
 

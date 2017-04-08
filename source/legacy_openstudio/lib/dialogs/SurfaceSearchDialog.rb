@@ -102,7 +102,7 @@ module LegacyOpenStudio
         object_names = Plugin.model_manager.construction_manager.constructions.collect { |object| object.name }
         object_names = [""].concat(object_names.sort)
         set_select_options("CONSTRUCTION", object_names)
-        set_select_options("OUTSIDE_BOUNDARY_CONDITION", ["", "Surface", "Adiabatic", "Zone", "Outdoors", "Ground", "GroundFCfactorMethod",
+        set_select_options("OUTSIDE_BOUNDARY_CONDITION", ["", "Surface", "Adiabatic", "Zone", "Outdoors", "Foundation", "Ground", "GroundFCfactorMethod",
                                                                                   "GroundSlabPreprocessorAverage", "GroundSlabPreprocessorCore", "GroundSlabPreprocessorPerimeter",
                                                                                   "GroundBasementPreprocessorAverageWall", "GroundBasementPreprocessorAverageFloor",
                                                                                   "GroundBasementPreprocessorUpperWall", "GroundBasementPreprocessorLowerWall",

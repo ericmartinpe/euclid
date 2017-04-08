@@ -20,7 +20,7 @@ module LegacyOpenStudio
     attr_reader :surface_ext, :adiabatic_ext, :zone_ext, :ground_ext, :groundfcfactormethod_ext, :groundslabpreprocessoraverage_ext
     attr_reader :groundslabpreprocessorcore_ext, :groundslabpreprocessorperimeter_ext, :groundbasementpreprocessoraveragewall_ext
     attr_reader :groundbasementpreprocessoraveragefloor_ext, :groundbasementpreprocessorupperwall_ext, :groundbasementpreprocessorlowerwall_ext
-    attr_reader :othersidecoefficients_ext, :othersideconditionsmodel_ext
+    attr_reader :othersidecoefficients_ext, :othersideconditionsmodel_ext, :foundation_ext, :foundation_int
     attr_reader :surface_int, :adiabatic_int, :zone_int, :outdoors_int, :ground_int, :groundfcfactormethod_int, :groundslabpreprocessoraverage_int
     attr_reader :groundslabpreprocessorcore_int, :groundslabpreprocessorperimeter_int, :groundbasementpreprocessoraveragewall_int
     attr_reader :groundbasementpreprocessoraveragefloor_int, :groundbasementpreprocessorupperwall_int, :groundbasementpreprocessorlowerwall_int
@@ -80,6 +80,9 @@ module LegacyOpenStudio
 
       @outdoorssunwind_ext = get_material("EnergyPlus_Outdoorssunwind_Ext", Sketchup::Color.new(68, 119, 161, 1.0))
       @outdoorssunwind_int = get_material("EnergyPlus_Outdoorssunwind_Int", Sketchup::Color.new(68, 119, 161, 1.0))
+
+      @foundation_ext = get_material("EnergyPlus_Foundation_Ext", Sketchup::Color.new(30, 50, 130, 1.0))
+      @foundation_int = get_material("EnergyPlus_Foundation_Int", Sketchup::Color.new(76, 103, 213, 1.0))
 
       @ground_ext = get_material("EnergyPlus_Ground_Ext", Sketchup::Color.new(204, 183, 122, 1.0))
       @ground_int = get_material("EnergyPlus_Ground_Int", Sketchup::Color.new(204, 183, 122, 1.0))
