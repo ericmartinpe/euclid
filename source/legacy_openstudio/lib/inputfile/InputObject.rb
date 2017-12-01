@@ -117,6 +117,13 @@ module LegacyOpenStudio
         context += line + "\n"
       end
 
+      if (fields[0].nil?)
+        Plugin.model_manager.add_error("Error:  Loose semicolon found outside of an object; the line will be ignored.\n")
+        Plugin.model_manager.add_error("You might want to delete or comment out the line.  The bad line follows below:\n")
+        Plugin.model_manager.add_error("#{line}\n\n")  # Would be better to report the line number, but currently not available
+        return(nil)
+      end
+
       # Strip certain vestigial input objects that are still in some input files but do nothing.
       # DesignBuilder stills adds these.
       case (fields[0].upcase)
