@@ -30,6 +30,9 @@ module LegacyOpenStudio
 
       # All geographic location information is in line 1
       line = file.gets
+      if (not line.valid_encoding?)
+        line = line.encode('UTF-16be', :invalid => :replace, :replace => '?').encode('UTF-8')
+      end
       array = line.split(',')
       @city = array[1].strip
       @state = array[2].strip
@@ -50,6 +53,9 @@ module LegacyOpenStudio
 
       # All data period information is in line 8
       line = file.gets
+      if (not line.valid_encoding?)
+        line = line.encode('UTF-16be', :invalid => :replace, :replace => '?').encode('UTF-8')
+      end
       array = line.split(',')
       @time_step = (60.0 / array[2].to_f).to_i  # minutes
 
