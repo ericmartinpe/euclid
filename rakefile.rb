@@ -6,7 +6,6 @@ build_dir = "#{root_dir}/build"
 
 require("fileutils")
 require("pathname")
-require("zip")
 require("#{root_dir}/lib/util")
 require("#{root_dir}/source/extension/euclid/lib/version")
 
@@ -104,6 +103,8 @@ end
 desc "Package the installer program for local platform"
 task :package, [:architecture] => [:compile] do |t, args|
   args.with_defaults(:architecture => "win64")
+
+  require("zip")
 
   puts "Packaging..."
 
