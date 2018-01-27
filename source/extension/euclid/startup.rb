@@ -23,6 +23,10 @@ else
       UI.messagebox("Unable to load the Euclid extension.\n\nThe Legacy OpenStudio extension is already loaded. Disable Legacy OpenStudio using #{extensions_ui} before using the Euclid extension.", MB_OK)
     else
 
+      # Windows encodes this path as Windows-1252. The other directory paths are UTF-8.
+      # This causes compatibility errors if a user home directory has special characters in the user name.
+      gem_path = ENV['GEM_PATH'].encode("UTF-8")
+
       if (RUBY_PLATFORM =~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/)  # Windows
         gem_path_delimiter = ";"
       elsif (RUBY_PLATFORM =~ /darwin|mac os/)  # Mac
@@ -32,7 +36,8 @@ else
       # Enable SketchUp to search in additional directories for Ruby gems required by this extension.
       lib_gems = File.expand_path("#{__dir__}/lib/rubygems")
       vendor_gems = File.expand_path("#{__dir__}/vendor/rubygems")
-      ENV['GEM_PATH'] = [ ENV['GEM_PATH'], lib_gems, vendor_gems ].join(gem_path_delimiter)
+
+      ENV['GEM_PATH'] = [gem_path, lib_gems, vendor_gems].join(gem_path_delimiter)
 
       require("euclid/lib/legacy_openstudio/lib/PluginManager")
     end
