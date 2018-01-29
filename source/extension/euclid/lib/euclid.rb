@@ -42,10 +42,14 @@ module Euclid
   def self.check_for_update(verbose = true)
     puts "Checking for update..."
 
+    latest_version = nil
+
     begin
-      latest_version = Net::HTTP.get("bigladdersoftware.com", "/updates/euclid-latest-version")
-    rescue  # Something failed, e.g., no internet connection or website down
-      latest_version = nil
+      uri = URI.parse("https://bigladdersoftware.com/updates/euclid-latest-version")
+      response = Net::HTTP.get(uri).strip
+      latest_version = Gem::Version.new(response) if (not response.empty?)
+    rescue
+      # Something failed, e.g., no internet connection, website down, or malformed version number.
     end
 
     puts "installed_version=#{Euclid::VERSION}"
@@ -54,17 +58,17 @@ module Euclid
     if (latest_version)
       skip_version = LegacyOpenStudio::Plugin.read_pref('Skip Update')
 
-      if (Gem::Version.new(latest_version) > Gem::Version.new(Euclid::VERSION))
-        if (latest_version != skip_version or verbose)
+      if (latest_version > Gem::Version.new(Euclid::VERSION))
+        if (latest_version.to_s != skip_version or verbose)
           button = UI.messagebox("A newer version (#{latest_version}) of Euclid is ready for download.\n" +
             "Do you want to update to the newer version?\n\n" +
             "Click YES to visit the Euclid website to get the download.\n" +
             "Click NO to skip this version and not ask you again.\n" +
             "Click CANCEL to remind you again next time.", MB_YESNOCANCEL)
           if (button == 6)  # YES
-            UI.openURL("http://bigladdersoftware.com/projects/euclid")
+            UI.openURL("https://bigladdersoftware.com/projects/euclid")
           elsif (button == 7)  # NO
-            LegacyOpenStudio::Plugin.write_pref('Skip Update', latest_version)
+            LegacyOpenStudio::Plugin.write_pref('Skip Update', latest_version.to_s)
           end
         end
 
