@@ -22,9 +22,10 @@ module LegacyOpenStudio
         @hash['BASE_SURFACE'] = @input_object.fields[4].to_s
         @hash['OUTSIDE_BOUNDARY_OBJECT'] = @input_object.fields[5].to_s
         @hash['VIEW_FACTOR_TO_GROUND'] = @input_object.fields[6]
-        @hash['SHADING_DEVICE'] = @input_object.fields[7].to_s
-        @hash['FRAME_DIVIDER'] = @input_object.fields[8].to_s
-        @hash['MULTIPLIER'] = @input_object.fields[9]
+        # Removed input field for "WINDOWPROPERTY:SHADINGCONTROL" in "FENESTRATIONSURFACE:DETAILED" object for EnergyPlus v9.0
+        # @hash['SHADING_DEVICE'] = @input_object.fields[7].to_s
+        @hash['FRAME_DIVIDER'] = @input_object.fields[7].to_s
+        @hash['MULTIPLIER'] = @input_object.fields[8]
 
 
         # Need better method here
@@ -105,19 +106,20 @@ module LegacyOpenStudio
 
       @input_object.fields[6] = @hash['VIEW_FACTOR_TO_GROUND'].strip
 
-      if (shading_device = Plugin.model_manager.input_file.find_object_by_class_and_name("WINDOWPROPERTY:SHADINGCONTROL", @hash['SHADING_DEVICE']))
-        @input_object.fields[7] = shading_device
-      else
-        @input_object.fields[7] = @hash['SHADING_DEVICE']
-      end
+      # Removed input field for "WINDOWPROPERTY:SHADINGCONTROL" in "FENESTRATIONSURFACE:DETAILED" object for EnergyPlus v9.0
+      # if (shading_device = Plugin.model_manager.input_file.find_object_by_class_and_name("WINDOWPROPERTY:SHADINGCONTROL", @hash['SHADING_DEVICE']))
+      #   @input_object.fields[7] = shading_device
+      # else
+      #   @input_object.fields[7] = @hash['SHADING_DEVICE']
+      # end
 
       if (frame_divider = Plugin.model_manager.input_file.find_object_by_class_and_name("WINDOWPROPERTY:FRAMEANDDIVIDER", @hash['FRAME_DIVIDER']))
-        @input_object.fields[8] = frame_divider
+        @input_object.fields[7] = frame_divider
       else
-        @input_object.fields[8] = @hash['FRAME_DIVIDER']
+        @input_object.fields[7] = @hash['FRAME_DIVIDER']
       end
 
-      @input_object.fields[9] = @hash['MULTIPLIER'].strip
+      @input_object.fields[8] = @hash['MULTIPLIER'].strip
       # Possibly warn if > 1 and using Full Interior solar distribution
 
       # Update object text with changes

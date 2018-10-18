@@ -44,11 +44,12 @@ module LegacyOpenStudio
       set_select_options("FRAME_DIVIDER", object_names.sort)
 
       # Populate shading device list
-      object_names = Plugin.model_manager.input_file.find_objects_by_class_name("WINDOWPROPERTY:SHADINGCONTROL").collect { |object| object.name }
-      if (not object_names.contains?(@hash['SHADING_DEVICE']))
-        object_names.add(@hash['SHADING_DEVICE'])
-      end
-      set_select_options("SHADING_DEVICE", object_names.sort)
+      # Removed input field for "WINDOWPROPERTY:SHADINGCONTROL" in "FENESTRATIONSURFACE:DETAILED" object for EnergyPlus v9.0
+      # object_names = Plugin.model_manager.input_file.find_objects_by_class_name("WINDOWPROPERTY:SHADINGCONTROL").collect { |object| object.name }
+      # if (not object_names.contains?(@hash['SHADING_DEVICE']))
+      #   object_names.add(@hash['SHADING_DEVICE'])
+      # end
+      # set_select_options("SHADING_DEVICE", object_names.sort)
 
       on_change_type
 
@@ -74,17 +75,20 @@ module LegacyOpenStudio
       case (@hash['TYPE'].upcase)
 
       when "WINDOW", "GLASSDOOR"
-        enable_element("SHADING_DEVICE")
+        # Removed input field for "WINDOWPROPERTY:SHADINGCONTROL" in "FENESTRATIONSURFACE:DETAILED" object for EnergyPlus v9.0
+        # enable_element("SHADING_DEVICE")
         enable_element("FRAME_DIVIDER")
         enable_element("MULTIPLIER")
 
       when "DOOR"
-        disable_element("SHADING_DEVICE")
+        # Removed input field for "WINDOWPROPERTY:SHADINGCONTROL" in "FENESTRATIONSURFACE:DETAILED" object for EnergyPlus v9.0
+        # disable_element("SHADING_DEVICE")
         disable_element("FRAME_DIVIDER")
         enable_element("MULTIPLIER")
 
       when "TDD:DOME", "TDD:DIFFUSER"
-        disable_element("SHADING_DEVICE")
+        # Removed input field for "WINDOWPROPERTY:SHADINGCONTROL" in "FENESTRATIONSURFACE:DETAILED" object for EnergyPlus v9.0
+        # disable_element("SHADING_DEVICE")
         disable_element("FRAME_DIVIDER")
         disable_element("MULTIPLIER")
       end

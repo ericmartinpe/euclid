@@ -13,7 +13,7 @@ module LegacyOpenStudio
 
     def initialize
       super
-      @first_vertex_field = 11
+      @first_vertex_field = 10
     end
 
 
@@ -27,11 +27,12 @@ module LegacyOpenStudio
       @input_object.fields[6] = ""
       @input_object.fields[7] = ""
       @input_object.fields[8] = ""
-      @input_object.fields[9] = ""
+      # Removed input field for "WINDOWPROPERTY:SHADINGCONTROL" in "FENESTRATIONSURFACE:DETAILED" object for EnergyPlus v9.0
+      # @input_object.fields[9] = ""
 
       @input_object.fields[3] = default_construction # do after setting boundary conditions
 
-      @input_object.fields[12] = 0  # kludge to make fields list long enough for call below
+      @input_object.fields[11] = 0  # kludge to make fields list long enough for call below
 
       super
     end
@@ -278,7 +279,7 @@ module LegacyOpenStudio
     end
 
     def multiplier
-      value = @input_object.fields[9].to_i
+      value = @input_object.fields[8].to_i
       if (value > 0)
         return(value)
       else
