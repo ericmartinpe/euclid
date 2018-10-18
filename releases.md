@@ -1,5 +1,9 @@
 # Releases
 
+## 0.9.4
+
+- Update (nominally) to *EnergyPlus 9.0*. NOTE: The FenestrationSurface:Detailed and RunPeriod objects have updated sets of input fields for *EnergyPlus 9.0*, so *Euclid 0.9.4* is **NOT** backwards-compatible with previous versions of *EnergyPlus*.
+
 ## 0.9.3
 
 - Add support for new "Foundation" (Kiva) boundary condition.
