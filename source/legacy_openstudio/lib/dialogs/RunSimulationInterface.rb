@@ -46,8 +46,10 @@ module LegacyOpenStudio
         @hash['ANNUAL_SIMULATION'] = true
         @hash['START_MONTH'] = "1"
         @hash['START_DATE'] = "1"
+        @hash['START_YEAR'] = ""
         @hash['END_MONTH'] = "12"
         @hash['END_DATE'] = "31"
+        @hash['END_YEAR'] = ""
         @hash['START_DAY'] = "SUNDAY"
       else
         run_period = objects.to_a.first
@@ -55,9 +57,11 @@ module LegacyOpenStudio
 
         @hash['START_MONTH'] = run_period.fields[2]
         @hash['START_DATE'] = run_period.fields[3]
-        @hash['END_MONTH'] = run_period.fields[4]
-        @hash['END_DATE'] = run_period.fields[5]
-        @hash['START_DAY'] = run_period.fields[6].upcase
+        @hash['START_YEAR'] = run_period.fields[4]
+        @hash['END_MONTH'] = run_period.fields[5]
+        @hash['END_DATE'] = run_period.fields[6]
+        @hash['END_YEAR'] = run_period.fields[7]
+        @hash['START_DAY'] = run_period.fields[8].upcase
 
         if (@hash['START_MONTH'] == "1" and @hash['START_DATE'] == "1" and @hash['END_MONTH'] == "12" and @hash['END_DATE'] == "31")
           @hash['ANNUAL_SIMULATION'] = true
@@ -154,9 +158,11 @@ module LegacyOpenStudio
       run_period.fields[1] = '' # default
       run_period.fields[2] = @hash['START_MONTH']
       run_period.fields[3] = @hash['START_DATE']
-      run_period.fields[4] = @hash['END_MONTH']
-      run_period.fields[5] = @hash['END_DATE']
-      run_period.fields[6] = @hash['START_DAY']
+      run_period.fields[4] = @hash['START_YEAR']
+      run_period.fields[5] = @hash['END_MONTH']
+      run_period.fields[6] = @hash['END_DATE']
+      run_period.fields[7] = @hash['END_YEAR']
+      run_period.fields[8] = @hash['START_DAY']
 
       # DLM@20101109: this fix removes a warning in the E+ error file but introduces a fatal error
       # when the last field of the run period object is blank
