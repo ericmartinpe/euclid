@@ -415,16 +415,16 @@ module LegacyOpenStudio
         end
 
         if object.class_definition.name.upcase == "VERSION"
-          version_string = DataDictionary::version(@data_dictionary.path)
+          version_string = DataDictionary::version(@data_dictionary.path)[0..2]
           version_pattern = Regexp.new("^#{Regexp.escape(version_string)}")
 
-          # pad idf_version_string with 0's if neccesary
+          # add or remove 0's from idf_version_string if neccesary
           idf_version_string = object.fields[1].to_s
-          if not idf_version_string.match(/\d+\.\d+\.\d+/)
-            if idf_version_string.match(/\d+\.\d+/)
-              idf_version_string += ".0"   # if version string = 7.0
+          if not idf_version_string.match(/\d+\.\d+/)
+            if idf_version_string.match(/\d+\.\d+\.\d+/)
+              idf_version_string -= ".0"   # if version string = 7.0.0
             else
-              idf_version_string += ".0.0" # if version string = 7
+              idf_version_string += ".0" # if version string = 7
             end
           end
 
