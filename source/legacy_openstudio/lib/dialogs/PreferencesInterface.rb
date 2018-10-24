@@ -62,7 +62,7 @@ module LegacyOpenStudio
           #return(false)
         else
           user_version = DataDictionary.version(idd_path)
-          if (user_version != Plugin.energyplus_version[0..2])
+          if (user_version != Plugin.energyplus_version)
             UI.messagebox("WARNING:  The EnergyPlus engine you have specified is version " + user_version + ".  The plugin is designed for version " +
               Plugin.energyplus_version + ".\nThere might be problems with compatibility. Try updating your EnergyPlus engine if there are a lot of simulation errors.")
           end
