@@ -39,7 +39,8 @@ module LegacyOpenStudio
           total_area = @drawing_interface.area.to_feet.to_feet
         end
 
-        @hash['VERTICES'] = @input_object.fields[10].to_s
+        # Removed input field for "WINDOWPROPERTY:SHADINGCONTROL" in "FENESTRATIONSURFACE:DETAILED" object for EnergyPlus v9.0
+        @hash['VERTICES'] = @input_object.fields[9].to_s
         @hash['UNIT_AREA'] = unit_area.round_to(Plugin.model_manager.length_precision).to_s + " " + Plugin.model_manager.units_hash['m2'][i]
         @hash['TOTAL_AREA'] = total_area.round_to(Plugin.model_manager.length_precision).to_s + " " + Plugin.model_manager.units_hash['m2'][i]
         @hash['OBJECT_TEXT'] = @input_object.to_idf
