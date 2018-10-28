@@ -18,8 +18,8 @@ module LegacyOpenStudio
       super
       # Should apply user's precision setting here   --automatically done, I think
       # Also:  show relative coordinates?
-      Sketchup.set_status_text("Select a point to insert the Daylighting:Controls = " + @ip.position.to_s)
-      view.tooltip = "New Daylighting:Controls"
+      Sketchup.set_status_text("Select a point to insert the Daylighting:ReferencePoint = " + @ip.position.to_s)
+      view.tooltip = "New Daylighting:ReferencePoint"
     end
 
 
@@ -48,14 +48,17 @@ module LegacyOpenStudio
         return false
       end
 
+      #   Temporarily disable since a zone can have multiple Daylighting:ReferencePoint objects
+
       # test to see if there are already any Daylight Control Pairs in this zone
-      Plugin.model_manager.daylighting_controls.each do |daylighting_controls|
-        if daylighting_controls.zone == this_zone.input_object
-          UI.messagebox "Zone #{this_zone.input_object} already has Daylighting:Controls"
-          Sketchup.send_action("selectSelectionTool:")
-          return false
-        end
-      end
+      # Plugin.model_manager.daylighting_controls.each do |daylighting_controls|
+      #   if daylighting_controls.zone == this_zone.input_object
+      #     UI.messagebox "(Tool) Zone #{this_zone.input_object} already has Daylighting:ReferencePoint. This will add a new instance to zone #{this_zone.input_object}."
+      #     Sketchup.send_action("selectSelectionTool:")
+      #     return false
+      #     break
+      #   end
+      # end
 
       Sketchup.active_model.start_operation("Daylighting:Controls")
 
@@ -71,7 +74,7 @@ module LegacyOpenStudio
       daylighting_controls.create_input_object
       daylighting_controls.zone = this_zone
       daylighting_controls.sketchup_sensor1 = initial_position
-      daylighting_controls.reset_lengths
+      # daylighting_controls.reset_lengths
       daylighting_controls.draw_entity
 
       Sketchup.active_model.selection.add(daylighting_controls.entity)

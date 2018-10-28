@@ -8,6 +8,6 @@
 SKETCHUP_CONSOLE.show
 
 # EDIT THIS PATH TO POINT TO YOUR WORKING COPY OF THE REPOSITORY.
-$LOAD_PATH << "C:/Projects/Euclid/euclid-for-sketchup~/build/output/extension"
+$LOAD_PATH << "C:/Projects/euclid/build/output/extension"
 
 load("euclid.rb")

@@ -25,26 +25,33 @@ module LegacyOpenStudio
 
     def create_input_object
 
-      @input_object = InputObject.new("DAYLIGHTING:CONTROLS")
-      @input_object.fields[1] = # Zone
-      @input_object.fields[2] = "1" # Total Daylighting Reference Points
-      @input_object.fields[3] = "" # X-Coordinate of First Reference Point
-      @input_object.fields[4] = "" # Y-Coordinate of First Reference Point
-      @input_object.fields[5] = "" # Z-Coordinate of First Reference Point
-      @input_object.fields[6] = "" # X-Coordinate of Second Reference Point
-      @input_object.fields[7] = "" # Y-Coordinate of Second Reference Point
-      @input_object.fields[8] = "" # Z-Coordinate of Second Reference Point
-      @input_object.fields[9] = "1" # Fraction of Zone Controlled by First Reference Point
-      @input_object.fields[10] = "0" # Fraction of Zone Controlled by Second Reference Point
-      @input_object.fields[11] = "500" # Illuminance Setpoint at First Reference Point
-      @input_object.fields[12] = "500" # Illuminance Setpoint at Second Reference Point
-      @input_object.fields[13] = "1" # Lighting Control Type, 1=continuous,2=stepped,3=continuous/off
-      @input_object.fields[14] = "0" # Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
-      @input_object.fields[15] = "22" # Maximum Allowable Discomfort Glare Index
-      @input_object.fields[16] = "0.3" # Minimum Input Power Fraction for Continuous Dimming Control
-      @input_object.fields[17] = "0.2" # Minimum Light Output Fraction for Continuous Dimming Control
-      @input_object.fields[18] = "1" # Number of Stepped Control Steps
-      @input_object.fields[19] = "1" # Probability Lighting will be Reset When Needed in Manual Stepped Control
+      @input_object = InputObject.new("DAYLIGHTING:REFERENCEPOINT")
+      @input_object.fields[1] = # Name
+      @input_object.fields[2] = # Zone Name
+      @input_object.fields[3] = "" # X-Coordinate of Reference Point
+      @input_object.fields[4] = "" # Y-Coordinate of Reference Point
+      @input_object.fields[5] = "" # Z-Coordinate of Reference Point
+
+      # @input_object = InputObject.new("DAYLIGHTING:CONTROLS")
+      # @input_object.fields[1] = # Zone
+      # @input_object.fields[2] = "1" # Total Daylighting Reference Points
+      # @input_object.fields[3] = "" # X-Coordinate of First Reference Point
+      # @input_object.fields[4] = "" # Y-Coordinate of First Reference Point
+      # @input_object.fields[5] = "" # Z-Coordinate of First Reference Point
+      # @input_object.fields[6] = "" # X-Coordinate of Second Reference Point
+      # @input_object.fields[7] = "" # Y-Coordinate of Second Reference Point
+      # @input_object.fields[8] = "" # Z-Coordinate of Second Reference Point
+      # @input_object.fields[9] = "1" # Fraction of Zone Controlled by First Reference Point
+      # @input_object.fields[10] = "0" # Fraction of Zone Controlled by Second Reference Point
+      # @input_object.fields[11] = "500" # Illuminance Setpoint at First Reference Point
+      # @input_object.fields[12] = "500" # Illuminance Setpoint at Second Reference Point
+      # @input_object.fields[13] = "1" # Lighting Control Type, 1=continuous,2=stepped,3=continuous/off
+      # @input_object.fields[14] = "0" # Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
+      # @input_object.fields[15] = "22" # Maximum Allowable Discomfort Glare Index
+      # @input_object.fields[16] = "0.3" # Minimum Input Power Fraction for Continuous Dimming Control
+      # @input_object.fields[17] = "0.2" # Minimum Light Output Fraction for Continuous Dimming Control
+      # @input_object.fields[18] = "1" # Number of Stepped Control Steps
+      # @input_object.fields[19] = "1" # Probability Lighting will be Reset When Needed in Manual Stepped Control
 
       super
     end
@@ -71,7 +78,7 @@ module LegacyOpenStudio
         end
 
         # zone
-        @input_object.fields[1] = @parent.input_object  # Parent should already have been updated.
+        @input_object.fields[2] = @parent.input_object  # Parent should already have been updated.
 
         decimal_places = Plugin.model_manager.length_precision
         if (decimal_places < 6)
@@ -90,22 +97,22 @@ module LegacyOpenStudio
         parent_transformation = @parent.entity.transformation
         entity_transformation = @entity.transformation
         sensor1_transformation = @entity.definition.entities[0].transformation
-        sensor2_transformation = @entity.definition.entities[1].transformation
+        # sensor2_transformation = @entity.definition.entities[1].transformation
 
         # sensor 1, always have sensor one
         sensor1_position = (parent_transformation*entity_transformation*sensor1_transformation).origin
         self.sketchup_sensor1 = sensor1_position
 
         # sensor 2 position has been updated if it was blank before
-        if @input_object.fields[2].to_i == 2
-          if (@input_object.fields[6].to_s.empty? or @input_object.fields[7].to_s.empty? or @input_object.fields[8].to_s.empty?)
-            reset_lengths
-            update_entity
-          else
-            sensor2_position = (parent_transformation*entity_transformation*sensor2_transformation).origin
-            self.sketchup_sensor2 = sensor2_position
-          end
-        end
+        # if @input_object.fields[2].to_i == 2
+        #   if (@input_object.fields[6].to_s.empty? or @input_object.fields[7].to_s.empty? or @input_object.fields[8].to_s.empty?)
+        #     reset_lengths
+        #     update_entity
+        #   else
+        #     sensor2_position = (parent_transformation*entity_transformation*sensor2_transformation).origin
+        #     self.sketchup_sensor2 = sensor2_position
+        #   end
+        # end
 
         #puts "After DaylightingControls.update_input_object"
         #puts "input_object_sensor2 = #{input_object_sensor2}"
@@ -118,7 +125,7 @@ module LegacyOpenStudio
     def parent_from_input_object
       parent = nil
       if (@input_object)
-        parent = Plugin.model_manager.zones.find { |object| object.input_object.equal?(@input_object.fields[1]) }
+        parent = Plugin.model_manager.zones.find { |object| object.input_object.equal?(@input_object.fields[2]) }
       end
       return(parent)
     end
@@ -127,9 +134,9 @@ module LegacyOpenStudio
 
     def create_entity
       if (@parent.nil?)
-        puts "DaylightingControls parent is nil"
+        puts "DaylightingReferencePoint parent is nil"
 
-        # Create a new zone just for this DaylightingControls.
+        # Create a new zone just for this DaylightingReferencePoint.
         @parent = Zone.new
         @parent.create_input_object
         @parent.draw_entity(false)
@@ -182,33 +189,33 @@ module LegacyOpenStudio
         entity_transformation = @entity.transformation
 
         # the fixed rotation angle
-        glare_angle = -@input_object.fields[14].to_f
-        rotation_angle = 0
-        if (Plugin.model_manager.relative_daylighting_coordinates?)
-          # for some reason building azimuth is in EnergyPlus system and zone azimuth is in SketchUp system
-          rotation_angle = -Plugin.model_manager.building.azimuth + @parent.azimuth.radians
-        end
-        sensor_rotation = Geom::Transformation.rotation([0, 0, 0], [0, 0, 1], rotation_angle.degrees+glare_angle.degrees)
+        # glare_angle = -@input_object.fields[14].to_f
+        # rotation_angle = 0
+        # if (Plugin.model_manager.relative_daylighting_coordinates?)
+        #   # for some reason building azimuth is in EnergyPlus system and zone azimuth is in SketchUp system
+        #   rotation_angle = -Plugin.model_manager.building.azimuth + @parent.azimuth.radians
+        # end
+        # sensor_rotation = Geom::Transformation.rotation([0, 0, 0], [0, 0, 1], rotation_angle.degrees+glare_angle.degrees)
 
         # move sensors, works because we have a unique definition
-        sensor1_transformation = (parent_transformation*entity_transformation).inverse*Geom::Transformation.translation(sketchup_sensor1)*sensor_rotation
+        sensor1_transformation = (parent_transformation*entity_transformation).inverse*Geom::Transformation.translation(sketchup_sensor1) # *sensor_rotation (temporarily disable sensor rotation)
         #puts "sensor1_transformation = #{sensor1_transformation.origin}"
         @entity.definition.entities[0].transformation = sensor1_transformation
 
-        if sketchup_sensor2
-          sensor2_transformation = (parent_transformation*entity_transformation).inverse*Geom::Transformation.translation(sketchup_sensor2)*sensor_rotation
-          #puts "not reset, sensor2_transformation = #{sensor2_transformation.origin}"
-          @entity.definition.entities[1].transformation = sensor2_transformation
-          @entity.definition.entities[1].hidden = false
-        else
-          sensor2_transformation = sensor1_transformation
-          #puts "reset to sensor1, sensor2_transformation = #{sensor2_transformation.origin}"
-          @entity.definition.entities[1].transformation = sensor2_transformation
-          @entity.definition.entities[1].hidden = true
-          @input_object.fields[6] = ""
-          @input_object.fields[7] = ""
-          @input_object.fields[8] = ""
-        end
+        # if sketchup_sensor2
+        #   sensor2_transformation = (parent_transformation*entity_transformation).inverse*Geom::Transformation.translation(sketchup_sensor2)*sensor_rotation
+        #   #puts "not reset, sensor2_transformation = #{sensor2_transformation.origin}"
+        #   @entity.definition.entities[1].transformation = sensor2_transformation
+        #   @entity.definition.entities[1].hidden = false
+        # else
+        #   sensor2_transformation = sensor1_transformation
+        #   #puts "reset to sensor1, sensor2_transformation = #{sensor2_transformation.origin}"
+        #   @entity.definition.entities[1].transformation = sensor2_transformation
+        #   @entity.definition.entities[1].hidden = true
+        #   @input_object.fields[6] = ""
+        #   @input_object.fields[7] = ""
+        #   @input_object.fields[8] = ""
+        # end
 
         add_observers if had_observers
 
@@ -259,7 +266,7 @@ module LegacyOpenStudio
 
         # add observers for the children too
         @entity.definition.entities[0].add_observer(@observer_child0)
-        @entity.definition.entities[1].add_observer(@observer_child1)
+        # @entity.definition.entities[1].add_observer(@observer_child1)
       end
     end
 
@@ -270,18 +277,18 @@ module LegacyOpenStudio
 
         # remove observers for the children too
         @entity.definition.entities[0].remove_observer(@observer_child0)
-        @entity.definition.entities[1].remove_observer(@observer_child1)
+        # @entity.definition.entities[1].remove_observer(@observer_child1)
       end
     end
 
 ##### Begin new methods for the interface #####
 
     def zone
-      return(@input_object.fields[1])
+      return(@input_object.fields[2])
     end
 
     def zone=(zone)
-      @input_object.fields[1] = zone.input_object
+      @input_object.fields[2] = zone.input_object
       @parent = zone
     end
 
@@ -319,48 +326,48 @@ module LegacyOpenStudio
     end
 
     # Gets the sensor2 point of the InputObject as it literally appears in the input fields.
-    def input_object_sensor2
-
-      result = nil
-
-      if @input_object.fields[2].to_i == 2 and not (@input_object.fields[6].to_s.empty? or @input_object.fields[7].to_s.empty? or @input_object.fields[8].to_s.empty?)
-        x = @input_object.fields[6].to_f.m
-        y = @input_object.fields[7].to_f.m
-        z = @input_object.fields[8].to_f.m
-        result = Geom::Point3d.new(x,y,z)
-      end
-
-      return(result)
-    end
+    # def input_object_sensor2
+    #
+    #   result = nil
+    #
+    #   if @input_object.fields[2].to_i == 2 and not (@input_object.fields[6].to_s.empty? or @input_object.fields[7].to_s.empty? or @input_object.fields[8].to_s.empty?)
+    #     x = @input_object.fields[6].to_f.m
+    #     y = @input_object.fields[7].to_f.m
+    #     z = @input_object.fields[8].to_f.m
+    #     result = Geom::Point3d.new(x,y,z)
+    #   end
+    #
+    #   return(result)
+    # end
 
     # Sets the sensor2 point of the InputObject as it literally appears in the input fields.
-    def input_object_sensor2=(point)
-
-      decimal_places = Plugin.model_manager.length_precision
-      if (decimal_places < 6)
-        decimal_places = 6  # = 4
-        # Always keep at least 4 places for now, until I figure out how to keep the actual saved in the idf from being reduced upon loading
-        # There's nothing in the API that prevents from drawing at finer precision than the option settings.
-        # Just have to figure out how to keep this routine from messing it up...
-
-        # UPDATE:  Looks like more than 4 is necesssary to get the solar shading right in EnergyPlus, otherwise surfaces can be positioned
-        # incorrectly, e.g., one wall could overlap another because of the less accurate coordinates.
-      end
-      format_string = "%0." + decimal_places.to_s + "f"  # This could be stored in a more central place
-
-      x = point.x.to_m.round_to(decimal_places)
-      y = point.y.to_m.round_to(decimal_places)
-      z = point.z.to_m.round_to(decimal_places)
-
-      @input_object.fields[6] = format(format_string, x)
-      @input_object.fields[7] = format(format_string, y)
-      @input_object.fields[8] = format(format_string, z)
-    end
+    # def input_object_sensor2=(point)
+    #
+    #   decimal_places = Plugin.model_manager.length_precision
+    #   if (decimal_places < 6)
+    #     decimal_places = 6  # = 4
+    #     # Always keep at least 4 places for now, until I figure out how to keep the actual saved in the idf from being reduced upon loading
+    #     # There's nothing in the API that prevents from drawing at finer precision than the option settings.
+    #     # Just have to figure out how to keep this routine from messing it up...
+    #
+    #     # UPDATE:  Looks like more than 4 is necesssary to get the solar shading right in EnergyPlus, otherwise surfaces can be positioned
+    #     # incorrectly, e.g., one wall could overlap another because of the less accurate coordinates.
+    #   end
+    #   format_string = "%0." + decimal_places.to_s + "f"  # This could be stored in a more central place
+    #
+    #   x = point.x.to_m.round_to(decimal_places)
+    #   y = point.y.to_m.round_to(decimal_places)
+    #   z = point.z.to_m.round_to(decimal_places)
+    #
+    #   @input_object.fields[6] = format(format_string, x)
+    #   @input_object.fields[7] = format(format_string, y)
+    #   @input_object.fields[8] = format(format_string, z)
+    # end
 
     # Returns the general coordinate transformation from absolute to relative.
     # The 'inverse' method can be called on the resulting transformation to go from relative to absolute.
     def coordinate_transformation
-      #puts "DaylightingControls.coordinate_transformation"
+      #puts "DaylightingReferencePoint.coordinate_transformation"
 
       if (@parent.nil?)
         puts "OutputIlluminanceMap.coordinate_transformation:  parent reference is missing"
@@ -395,42 +402,42 @@ module LegacyOpenStudio
     end
 
     # Returns sensor2 of the InputObject as it should be drawn in the relative SketchUp coordinate system.
-    def sketchup_sensor2
-
-      result = nil
-      if (Plugin.model_manager.relative_daylighting_coordinates?)
-        if input_object_sensor2
-          result = input_object_sensor2.transform(coordinate_transformation)
-        end
-      else
-        result = input_object_sensor2
-      end
-
-      return(result)
-
-    end
+    # def sketchup_sensor2
+    #
+    #   result = nil
+    #   if (Plugin.model_manager.relative_daylighting_coordinates?)
+    #     if input_object_sensor2
+    #       result = input_object_sensor2.transform(coordinate_transformation)
+    #     end
+    #   else
+    #     result = input_object_sensor2
+    #   end
+    #
+    #   return(result)
+    #
+    # end
 
      # Sets the sensor2 of the InputObject from the relative SketchUp coordinate system.
-     def sketchup_sensor2=(point)
-
-       if (Plugin.model_manager.relative_daylighting_coordinates?)
-         self.input_object_sensor2 = point.transform(coordinate_transformation.inverse)
-       else
-         self.input_object_sensor2 = point
-       end
-    end
+    #  def sketchup_sensor2=(point)
+    #
+    #    if (Plugin.model_manager.relative_daylighting_coordinates?)
+    #      self.input_object_sensor2 = point.transform(coordinate_transformation.inverse)
+    #    else
+    #      self.input_object_sensor2 = point
+    #    end
+    # end
 
     # set sensor2 somewhere reasonable once sensor1 is placed
-    def reset_lengths
-
-      # set number of sensors to 2
-      @input_object.fields[2] = "2"
-
-      @input_object.fields[6] = (@input_object.fields[3].to_f + 1).to_s
-      @input_object.fields[7] = @input_object.fields[4].to_s
-      @input_object.fields[8] = @input_object.fields[5].to_s
-
-    end
+    # def reset_lengths
+    #
+    #   # set number of sensors to 2
+    #   @input_object.fields[2] = "2"
+    #
+    #   @input_object.fields[6] = (@input_object.fields[3].to_f + 1).to_s
+    #   @input_object.fields[7] = @input_object.fields[4].to_s
+    #   @input_object.fields[8] = @input_object.fields[5].to_s
+    #
+    # end
 
   end
 

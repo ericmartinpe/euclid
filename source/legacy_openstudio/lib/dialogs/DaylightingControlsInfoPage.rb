@@ -22,34 +22,34 @@ module LegacyOpenStudio
       #@container.execute_function("setBackgroundColor('" + default_dialog_color + "')")
       update_units
       update
-      update_elements
+      # update_elements
     end
 
 
     def on_change_element(d, p)
       super
-      update_elements
+      # update_elements
       report
     end
 
 
-    def update_elements
-
-      num_points = @hash['NUMPOINTS'].to_i
-      if num_points == 1
-        disable_element('X2')
-        disable_element('Y2')
-        disable_element('Z2')
-        disable_element('FRAC2')
-        disable_element('SETPOINT2')
-      else
-        enable_element('X2')
-        enable_element('Y2')
-        enable_element('Z2')
-        enable_element('FRAC2')
-        enable_element('SETPOINT2')
-      end
-    end
+    # def update_elements
+    #
+    #   num_points = @hash['NUMPOINTS'].to_i
+    #   if num_points == 1
+    #     disable_element('X2')
+    #     disable_element('Y2')
+    #     disable_element('Z2')
+    #     disable_element('FRAC2')
+    #     disable_element('SETPOINT2')
+    #   else
+    #     enable_element('X2')
+    #     enable_element('Y2')
+    #     enable_element('Z2')
+    #     enable_element('FRAC2')
+    #     enable_element('SETPOINT2')
+    #   end
+    # end
 
   end
 

@@ -171,9 +171,10 @@ module LegacyOpenStudio
                     if daylighting_controls.entity == entity
                       already_exists = true
                     elsif daylighting_controls.zone == @drawing_interface.input_object
-                      need_to_remove = true
-                      error_message = "Zone #{@drawing_interface.input_object} already has Daylighting:Controls"
-                      break
+                    #   Temporarily disable since a zone can have multiple Daylighting:ReferencePoint objects
+                    #   need_to_remove = true
+                    #   error_message = "(Observer) Zone #{@drawing_interface.input_object} already has Daylighting:ReferencePoint. This will add a new instance to zone #{@drawing_interface.input_object}."
+                    #   break
                     end
                   end
 

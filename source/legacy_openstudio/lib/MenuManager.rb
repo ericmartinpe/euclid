@@ -174,12 +174,12 @@ module LegacyOpenStudio
       #@new_shading_cmd.set_validation_proc { MF_ENABLED }
       # Need validation to make sure not inside of another group
 
-      @new_daylighting_cmd = UI::Command.new("New Daylighting Control Tool") { Sketchup.active_model.select_tool(@new_daylighting_tool)  }
+      @new_daylighting_cmd = UI::Command.new("New Daylighting Reference Point Tool") { Sketchup.active_model.select_tool(@new_daylighting_tool)  }
       @new_daylighting_cmd.small_icon = Plugin.dir + "/lib/resources/icons/NewDaylighting-16.png"
       @new_daylighting_cmd.large_icon = Plugin.dir + "/lib/resources/icons/NewDaylighting-24.png"
-      @new_daylighting_cmd.tooltip = "New EnergyPlus Daylighting Control"
-      @new_daylighting_cmd.status_bar_text = "Create a new EnergyPlus daylighting control"
-      @new_daylighting_cmd.set_validation_proc { MF_GRAYED }  # Temporarily disable until new (v 8.6) daylighting objects are handled in the UI
+      @new_daylighting_cmd.tooltip = "New EnergyPlus Daylighting Reference Point"
+      @new_daylighting_cmd.status_bar_text = "Create a new EnergyPlus daylighting reference point"
+      # @new_daylighting_cmd.set_validation_proc { MF_GRAYED }  # Temporarily disable until new (v 8.6) daylighting objects are handled in the UI
 
       @new_illuminance_cmd = UI::Command.new("New Illuminance Map Tool") { Sketchup.active_model.select_tool(@new_illuminance_tool)  }
       @new_illuminance_cmd.small_icon = Plugin.dir + "/lib/resources/icons/NewIlluminance-16.png"
