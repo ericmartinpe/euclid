@@ -15,7 +15,7 @@ module Euclid
         msg += "This error may cause unpredictable behavior in the extension--continue this session with caution! "
         msg += "It would probably be a good idea to exit SketchUp and start again.\n\n"
 
-        msg += "For help, please email us at <info@bigladdersoftware.com>.\n\n"
+        msg += "For help, please email us at <euclid@bigladdersoftware.com>.\n\n"
 
         msg += "When reporting a problem, please copy the information below into your email (scroll down):\n\n"
 

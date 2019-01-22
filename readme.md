@@ -25,7 +25,7 @@ For the time being, *Euclid* is still sufficiently similar to the *Legacy OpenSt
 
 ## Support
 
-To get help with *Euclid* you can send us an email at <info@bigladdersoftware.com> or consider posting your question on [*Unmet Hours*](https://unmethours.com/questions/)--a question-and-answer website for building energy modelers.
+To get help with *Euclid* you can send us an email at <euclid@bigladdersoftware.com> or consider posting your question on [*Unmet Hours*](https://unmethours.com/questions/)--a question-and-answer website for building energy modelers.
 
 ## License
 
