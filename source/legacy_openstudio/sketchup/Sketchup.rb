@@ -158,7 +158,7 @@ class Sketchup::Color
 
   def hsba
     # HSB = Hue, Saturation, Brightness; identical to HSV = hue, brightness, value
-    var_R = red / 255.to_f  # RGB values = 0 ÷ 255
+    var_R = red / 255.to_f  # RGB values = 0 - 255
     var_G = green / 255.to_f
     var_B = blue / 255.to_f
 
@@ -170,7 +170,7 @@ class Sketchup::Color
 
     if (del_Max == 0)
       # This is a gray, no chroma...
-      h = 0  # HSV results = 0 ÷ 1
+      h = 0  # HSV results = 0 - 1
       s = 0
     else
       # Chromatic data...
@@ -197,7 +197,7 @@ class Sketchup::Color
 
 
   def hsba=(color_array)
-    h = color_array[0] / 360.to_f  # HSV values = 0 ÷ 1
+    h = color_array[0] / 360.to_f  # HSV values = 0 - 1
     s = color_array[1] / 100.to_f
     v = color_array[2] / 100.to_f
     a = color_array[3]
@@ -241,7 +241,7 @@ class Sketchup::Color
         var_b = var_2
       end
 
-      self.red = (var_r * 255).to_i  # RGB results = 0 ÷ 255
+      self.red = (var_r * 255).to_i  # RGB results = 0 - 255
       self.green = (var_g * 255).to_i
       self.blue = (var_b * 255).to_i
       self.alpha = a
