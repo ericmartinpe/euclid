@@ -1,4 +1,4 @@
-# Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
+# Copyright (c) 2017-2019 Big Ladder Software LLC. All rights reserved.
 # See the file "license.txt" for additional terms and conditions.
 
 root_dir = __dir__

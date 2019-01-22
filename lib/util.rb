@@ -1,5 +1,5 @@
-# Copyright (c) 2015 Big Ladder Software.  All rights reserved.
-# See the file "License.txt" for additional terms and conditions.
+# Copyright (c) 2015-2019 Big Ladder Software LLC. All rights reserved.
+# See the file "license.txt" for additional terms and conditions.
 
 require 'fileutils'
 require 'pathname'
