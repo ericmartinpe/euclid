@@ -118,8 +118,20 @@ module LegacyOpenStudio
           run_period.end_month = run_period_input_object.fields[5].to_i
           run_period.end_date = run_period_input_object.fields[6].to_i
 
-          start_time = Time.utc(Time.now.year, run_period.start_month, run_period.start_date)
-          end_time = Time.utc(Time.now.year, run_period.end_month, run_period.end_date)
+          if run_period_input_object.fields[4].nil?
+            start_year = Time.now.year
+          else
+            start_year = run_period_input_object.fields[4].to_i
+          end
+
+          if run_period_input_object.fields[7].nil?
+            end_year = Time.now.year
+          else
+            end_year = run_period_input_object.fields[7].to_i
+          end
+
+          start_time = Time.utc(start_year, run_period.start_month, run_period.start_date)
+          end_time = Time.utc(end_year, run_period.end_month, run_period.end_date)
           run_period.interval = TimeInterval.new(start_time, end_time)
         end
       end
