@@ -57,11 +57,11 @@ module LegacyOpenStudio
         @hash['START_HOUR'] = "0"
         set_element_value("START_HOUR", "0")
 
-        @hash['END_MONTH'] = run_period.fields[4]
-        set_element_value("END_MONTH", run_period.fields[4])
+        @hash['END_MONTH'] = run_period.fields[5]
+        set_element_value("END_MONTH", run_period.fields[5])
 
-        @hash['END_DATE'] = run_period.fields[5]
-        set_element_value("END_DATE", run_period.fields[5])
+        @hash['END_DATE'] = run_period.fields[6]
+        set_element_value("END_DATE", run_period.fields[6])
 
         @hash['END_HOUR'] = "23"
         set_element_value("END_HOUR", "23")
