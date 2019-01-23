@@ -22,9 +22,10 @@ module LegacyOpenStudio
         @hash['BASE_SURFACE'] = @input_object.fields[4].to_s
         @hash['OUTSIDE_BOUNDARY_OBJECT'] = @input_object.fields[5].to_s
         @hash['VIEW_FACTOR_TO_GROUND'] = @input_object.fields[6]
-        @hash['SHADING_DEVICE'] = @input_object.fields[7].to_s
-        @hash['FRAME_DIVIDER'] = @input_object.fields[8].to_s
-        @hash['MULTIPLIER'] = @input_object.fields[9]
+        # Removed input field for "WINDOWPROPERTY:SHADINGCONTROL" in "FENESTRATIONSURFACE:DETAILED" object for EnergyPlus v9.0
+        # @hash['SHADING_DEVICE'] = @input_object.fields[7].to_s
+        @hash['FRAME_DIVIDER'] = @input_object.fields[7].to_s
+        @hash['MULTIPLIER'] = @input_object.fields[8]
 
 
         # Need better method here
@@ -38,7 +39,8 @@ module LegacyOpenStudio
           total_area = @drawing_interface.area.to_feet.to_feet
         end
 
-        @hash['VERTICES'] = @input_object.fields[10].to_s
+        # Removed input field for "WINDOWPROPERTY:SHADINGCONTROL" in "FENESTRATIONSURFACE:DETAILED" object for EnergyPlus v9.0
+        @hash['VERTICES'] = @input_object.fields[9].to_s
         @hash['UNIT_AREA'] = unit_area.round_to(Plugin.model_manager.length_precision).to_s + " " + Plugin.model_manager.units_hash['m2'][i]
         @hash['TOTAL_AREA'] = total_area.round_to(Plugin.model_manager.length_precision).to_s + " " + Plugin.model_manager.units_hash['m2'][i]
         @hash['OBJECT_TEXT'] = @input_object.to_idf
@@ -105,19 +107,20 @@ module LegacyOpenStudio
 
       @input_object.fields[6] = @hash['VIEW_FACTOR_TO_GROUND'].strip
 
-      if (shading_device = Plugin.model_manager.input_file.find_object_by_class_and_name("WINDOWPROPERTY:SHADINGCONTROL", @hash['SHADING_DEVICE']))
-        @input_object.fields[7] = shading_device
-      else
-        @input_object.fields[7] = @hash['SHADING_DEVICE']
-      end
+      # Removed input field for "WINDOWPROPERTY:SHADINGCONTROL" in "FENESTRATIONSURFACE:DETAILED" object for EnergyPlus v9.0
+      # if (shading_device = Plugin.model_manager.input_file.find_object_by_class_and_name("WINDOWPROPERTY:SHADINGCONTROL", @hash['SHADING_DEVICE']))
+      #   @input_object.fields[7] = shading_device
+      # else
+      #   @input_object.fields[7] = @hash['SHADING_DEVICE']
+      # end
 
       if (frame_divider = Plugin.model_manager.input_file.find_object_by_class_and_name("WINDOWPROPERTY:FRAMEANDDIVIDER", @hash['FRAME_DIVIDER']))
-        @input_object.fields[8] = frame_divider
+        @input_object.fields[7] = frame_divider
       else
-        @input_object.fields[8] = @hash['FRAME_DIVIDER']
+        @input_object.fields[7] = @hash['FRAME_DIVIDER']
       end
 
-      @input_object.fields[9] = @hash['MULTIPLIER'].strip
+      @input_object.fields[8] = @hash['MULTIPLIER'].strip
       # Possibly warn if > 1 and using Full Interior solar distribution
 
       # Update object text with changes
