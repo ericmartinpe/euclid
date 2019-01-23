@@ -60,50 +60,53 @@ module LegacyOpenStudio
 
 
     def attach_input_file
-      if (path = @model_interface.model.input_file_path)
-        if (File.exist?(path))
-          open_input_file(path)
-          return
-        else
-          message = "Cannot locate the attached EnergyPlus input file at:\n" + path +
-            "\nDo you want to browse for the EnergyPlus input file?\n\n" +
-            "Click YES, if you want to browse for the input file.\n" +
-            "Click NO, if you want to detach the object references and start a new input file.\n"
-        end
+      new_input_file
+      return  # Skip/ignore all of the stuff below that attempts to re-attach an IDF file to the SKP file
 
-      else
-        # Check for EnergyPlus groups even though there is no IDF file attached.
-        # NOTE:  This can happen if the user was prompted to save the IDF for the first time
-        #        when SketchUp exits or opens a new model.
-        if (not @model_interface.has_surface_groups?)
-          new_input_file
-          return
-        else
-          message = "EnergyPlus object references were detected, but no input file is attached.\n" +
-            "Do you want to browse for an existing EnergyPlus input file to reattach?\n\n" +
-            "Click YES, if you want to reattach an input file.\n" +
-            "Click NO, if you want to detach the object references and start a new input file.\n"
-        end
-      end
-
-
-      button = UI.messagebox(message, MB_YESNO)
-
-      if (button == 6)  # YES
-        if (path = UI.open_panel("Open EnergyPlus Input File", File.dirname(@model_interface.model_path), "EnergyPlus|*.idf|All Files|*.*||"))
-          open_input_file(path)
-          return
-        end
-
-      elsif (button == 7)  # NO
-        button = UI.messagebox("Do you also want to erase all of the SketchUp entities that were associated with EnergyPlus objects?", MB_YESNO)
-
-        if (button == 6)  # YES
-          @model_interface.erase_model
-        end
-
-        new_input_file
-      end
+      # if (path = @model_interface.model.input_file_path)
+      #   if (File.exist?(path))
+      #     open_input_file(path)
+      #     return
+      #   else
+      #     message = "Cannot locate the attached EnergyPlus input file at:\n" + path +
+      #       "\nDo you want to browse for the EnergyPlus input file?\n\n" +
+      #       "Click YES, if you want to browse for the input file.\n" +
+      #       "Click NO, if you want to detach the object references and start a new input file.\n"
+      #   end
+      #
+      # else
+      #   # Check for EnergyPlus groups even though there is no IDF file attached.
+      #   # NOTE:  This can happen if the user was prompted to save the IDF for the first time
+      #   #        when SketchUp exits or opens a new model.
+      #   if (not @model_interface.has_surface_groups?)
+      #     new_input_file
+      #     return
+      #   else
+      #     message = "EnergyPlus object references were detected, but no input file is attached.\n" +
+      #       "Do you want to browse for an existing EnergyPlus input file to reattach?\n\n" +
+      #       "Click YES, if you want to reattach an input file.\n" +
+      #       "Click NO, if you want to detach the object references and start a new input file.\n"
+      #   end
+      # end
+      #
+      #
+      # button = UI.messagebox(message, MB_YESNO)
+      #
+      # if (button == 6)  # YES
+      #   if (path = UI.open_panel("Open EnergyPlus Input File", File.dirname(@model_interface.model_path), "EnergyPlus|*.idf|All Files|*.*||"))
+      #     open_input_file(path)
+      #     return
+      #   end
+      #
+      # elsif (button == 7)  # NO
+      #   button = UI.messagebox("Do you also want to erase all of the SketchUp entities that were associated with EnergyPlus objects?", MB_YESNO)
+      #
+      #   if (button == 6)  # YES
+      #     @model_interface.erase_model
+      #   end
+      #
+      #   new_input_file
+      # end
     end
 
 

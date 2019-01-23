@@ -174,8 +174,8 @@ module LegacyOpenStudio
       end
 
       # Erase unattached entities.
-      unattached_entities = entity_hash.values
-      @model.entities.erase_entities(unattached_entities)
+      # unattached_entities = entity_hash.values
+      # @model.entities.erase_entities(unattached_entities)
 
       # Reconstruct all the DetachedShadingGroup interfaces.  Because they are not derived from input objects,
       # they must be artificially reassociated with the groups around detached shading surfaces.
