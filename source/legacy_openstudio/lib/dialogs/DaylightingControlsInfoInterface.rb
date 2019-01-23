@@ -67,6 +67,7 @@ module LegacyOpenStudio
 
         end
 
+        @hash['UNIT'] = Plugin.model_manager.units_hash['m'][i] + ":"
         @hash['OBJECT_TEXT'] = @input_object.to_idf
 
         # count number of Daylight Reference Points in this zone
