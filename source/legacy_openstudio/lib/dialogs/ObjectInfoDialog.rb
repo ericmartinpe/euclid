@@ -126,7 +126,7 @@ module LegacyOpenStudio
         @info_page = OutputIlluminanceMapInfoPage.new(@output_illuminance_map_frame, @interface, @hash)
 
       when "LegacyOpenStudio::DaylightingControls"
-        h = Plugin.platform_select('480', '520')
+        h = Plugin.platform_select('189', '210')
         function_call = "setRows('0px,0px,0px,0px,0px,0px,0px,0px," + h + "px,0px,*,6px')"
         @info_page = DaylightingControlsInfoPage.new(@daylighting_controls_frame, @interface, @hash)
 
