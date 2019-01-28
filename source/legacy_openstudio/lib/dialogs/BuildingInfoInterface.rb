@@ -18,10 +18,18 @@ module LegacyOpenStudio
 
         @hash['NAME'] = @input_object.fields[1]
         @hash['ROTATION'] = @input_object.fields[2]
-        @hash['TERRAIN'] = @input_object.fields[3].upcase
+        if (@input_object.fields[3].empty?)
+          @hash['TERRAIN'] = "SUBURBS"  # Show default value when blank
+        else
+          @hash['TERRAIN'] = @input_object.fields[3].upcase
+        end
         @hash['LOADS_TOLERANCE'] = @input_object.fields[4]
         @hash['TEMPERATURE_TOLERANCE'] = @input_object.fields[5]
-        @hash['SOLAR_DISTRIBUTION'] = @input_object.fields[6].upcase
+        if (@input_object.fields[6].empty?)
+          @hash['SOLAR_DISTRIBUTION'] = "FULLEXTERIOR"  # Show default value when blank
+        else
+          @hash['SOLAR_DISTRIBUTION'] = @input_object.fields[6].upcase
+        end
         @hash['MAX_WARMUP_DAYS'] = @input_object.fields[7]
 
         zones = Plugin.model_manager.zones
