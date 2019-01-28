@@ -58,8 +58,8 @@ module LegacyOpenStudio
       input_object_copy = @input_object.copy
 
       @input_object.fields[1] = @hash['NAME'].strip
-      @input_object.fields[2] = @hash['ROTATION'].strip
-      @input_object.fields[7] = @hash['MULTIPLIER'].strip
+      @input_object.fields[2] = @hash['ROTATION'].strip if (@hash['ROTATION'])
+      @input_object.fields[7] = @hash['MULTIPLIER'].strip if (@hash['MULTIPLIER'])
 
       if (@input_object.fields[13].nil?)
         if (@hash['INCLUDE_FLOOR_AREA'])
