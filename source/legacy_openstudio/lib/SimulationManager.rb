@@ -231,14 +231,14 @@ module LegacyOpenStudio
         UI.messagebox("EnergyPlus will be launched in a new instance of the Terminal application.\n\nAfter the simulation is finished, you MUST quit out of the Terminal application before any Actions On Completion will be started.")
 
         if (@readvars_flag)
-          readvars_path = Plugin.energyplus_dir + "/readvars"
+          readvars_path = Plugin.energyplus_dir + "/PostProcess/ReadVarsESO"
         else
           readvars_path = ''
         end
 
         # This shell command MUST have "open -W" in it or thread will die immediately.
         # Environment variables are used to pass arguments to the "open" child process.
-        @active_thread = UI.shell_command("run_dir='" + run_dir + "'\nexport run_dir\nengine_path='" + Plugin.energyplus_path + "'\nexport engine_path\nreadvars_path='" + readvars_path + "'\nexport readvars_path\nopen -W '" + Plugin.dir + "/run/run_energyplus' -n")
+        @active_thread = UI.shell_command("run_dir='" + run_dir + "'\nexport run_dir\nengine_path='" + Plugin.energyplus_path + "'\nexport engine_path\nreadvars_path='" + readvars_path + "'\nexport readvars_path\nopen -W -F -n '" + Plugin.dir + "/run/run_energyplus'")
       end
 
       Sketchup.active_model.active_view.animation = self
@@ -276,7 +276,7 @@ module LegacyOpenStudio
               readvars_path = Plugin.energyplus_dir + "/readvars.exe"
             end
           else
-            readvars_path = Plugin.energyplus_dir + "/readvars"
+            readvars_path = Plugin.energyplus_dir + "/PostProcess/ReadVarsESO"
           end
 
           if (File.exist?(readvars_path))
