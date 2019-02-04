@@ -414,23 +414,12 @@ module LegacyOpenStudio
           end
         end
 
-        if object.class_definition.name.upcase == "VERSION"
-          version_string = DataDictionary::version(@data_dictionary.path)
-          version_pattern = Regexp.new("^#{Regexp.escape(version_string)}")
-
-          # pad idf_version_string with 0's if neccesary
-          idf_version_string = object.fields[1].to_s
-          if not idf_version_string.match(/\d+\.\d+\.\d+/)
-            if idf_version_string.match(/\d+\.\d+/)
-              idf_version_string += ".0"   # if version string = 7.0
-            else
-              idf_version_string += ".0.0" # if version string = 7
-            end
-          end
-
-          if not version_pattern.match(idf_version_string)
-            Plugin.model_manager.add_error("Warning:  " + "Idf file '#{path}' has version '#{object.fields[1]}', plugin version is '#{version_string}'\n")
-            Plugin.model_manager.add_error("Please convert your file to the plugin version using the EnergyPlus transition program for best results.\n\n")
+        if (object.class_definition.name.upcase == "VERSION")
+          version = Gem::Version.new(object.fields[1].to_s)
+          if (not Plugin.energyplus_version.satisfied_by?(version))
+            Plugin.model_manager.add_error("Warning:  Input file specifies EnergyPlus version #{version}.  " +
+              "The plugin is designed for EnergyPlus #{Plugin.energyplus_version}.  " +
+              "Please convert your file to a compatible version using the EnergyPlus transition program for best results.\n\n")
           end
         end
 

@@ -207,7 +207,7 @@ module LegacyOpenStudio
 
 
     def energyplus_version
-      return('9.0.1')
+      return(Gem::Requirement.new("~>9.0.0"))  # Version requirement using twiddle wakka notation
     end
 
   end

@@ -61,10 +61,12 @@ module LegacyOpenStudio
           #@dialog.update
           #return(false)
         else
-          user_version = DataDictionary.version(idd_path)
-          if (user_version != Plugin.energyplus_version)
-            UI.messagebox("WARNING:  The EnergyPlus engine you have specified is version " + user_version + ".  The plugin is designed for version " +
-              Plugin.energyplus_version + ".\nThere might be problems with compatibility. Try updating your EnergyPlus engine if there are a lot of simulation errors.")
+          version_string = DataDictionary.version(idd_path)
+          version = Gem::Version.new(version_string)
+          if (not Plugin.energyplus_version.satisfied_by?(version))
+            UI.messagebox("WARNING:  The EnergyPlus engine you have specified is version #{version}.  " +
+              "The plugin is designed for EnergyPlus #{Plugin.energyplus_version}.\n\n" +
+              "There might be problems with compatibility. Try changing your EnergyPlus engine if there are simulation errors.")
           end
         end
       end
