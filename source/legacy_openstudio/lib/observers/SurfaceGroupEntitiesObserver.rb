@@ -223,7 +223,7 @@ module LegacyOpenStudio
               end
 
             else
-              puts "unknown object added"
+              #puts "unknown object added"
             end
 
           end
@@ -238,21 +238,21 @@ module LegacyOpenStudio
     end
 
 
-    def onElementRemoved(entities, entity)
+    #def onElementRemoved(entities, entity)
       #puts "SurfaceGroupEntitiesObserver.onElementRemoved:" + entity.to_s
-    end
+    #end
 
 
-    def onElementModified(entities, entity)
-      puts "SurfaceGroupEntitiesObserver.onElementModified"
-    end
+    #def onElementModified(entities, entity)
+      #puts "SurfaceGroupEntitiesObserver.onElementModified"
+    #end
 
 
     # Gets called when ALL entities are deleted, but only if the group is closed, or after the group is closed.
     # This would be a good place to prompt if the user wants to erase the zone completely.
-    def onEraseEntities(entities)
+    #def onEraseEntities(entities)
       #puts "SurfaceGroupEntitiesObserver.onEraseEntities"
-    end
+    #end
 
   end
 

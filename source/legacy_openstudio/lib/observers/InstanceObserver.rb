@@ -15,8 +15,8 @@ module LegacyOpenStudio
       @drawing_interface = drawing_interface
     end
 
-    def onOpen(group)
-    end
+    #def onOpen(group)
+    #end
 
     def onClose(group)
       Plugin.model_manager.selection_changed

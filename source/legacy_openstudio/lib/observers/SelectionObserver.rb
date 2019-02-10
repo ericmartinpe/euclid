@@ -28,10 +28,10 @@ module LegacyOpenStudio
     end
 
 
-    def onSelectionRemoved(selection)
+    #def onSelectionRemoved(selection)
       # Not sure when this is called.
       #puts "SelectionObserver.onSelectionRemoved"
-    end
+    #end
 
   end
 

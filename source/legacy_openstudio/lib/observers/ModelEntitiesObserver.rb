@@ -77,20 +77,20 @@ module LegacyOpenStudio
     end
 
 
-    def onElementRemoved(entities, entity)
+    #def onElementRemoved(entities, entity)
       #puts "ModelEntitiesObserver.onElementRemoved"
-    end
+    #end
 
 
-    def onElementModified(entities, entity)
-      puts "ModelEntitiesObserver.onElementModified"
-    end
+    #def onElementModified(entities, entity)
+      #puts "ModelEntitiesObserver.onElementModified"
+    #end
 
 
     # Only gets called when the model closes, I think.
-    def onEraseEntities(entities)
+    #def onEraseEntities(entities)
       #puts "ModelEntitiesObserver.onEraseEntities"
-    end
+    #end
 
   end
 
