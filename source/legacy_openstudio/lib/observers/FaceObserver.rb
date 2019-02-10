@@ -26,9 +26,40 @@ module LegacyOpenStudio
 
         #puts "on change proc for " + entity.to_s
 
-        # Need to check the parent entity to make sure this face didn't find itself outside of a Group after an explode.
-        if (@drawing_interface.valid_entity? and @drawing_interface.parent_from_entity)
-          @drawing_interface.on_change_entity
+        case (Sketchup.active_model.tools.active_tool_id)
+        when (21041)  # PushPullTool
+          # 'onChangeEntity' does not get called for bordering faces; only gets called for the face this is being
+          # push/pulled. The result was that push/pulling a wall of a zone was not updating the bordering walls,
+          # roof, and floor which created bad geometry.
+
+          # On the first push/pull of a single face, the new bordering faces are already created at this point.
+          # This is problematic because the new faces have not yet been updated with their own drawing_interface
+          # attributes. Consequently the drawing_interface for the original face was being updated 6 times
+          # (or more)--once for each face. The solution is to only update the unique drawing_interfaces.
+
+          puts "push-pull surface: update immediate bordering surfaces"
+          unique_interfaces = []
+          @drawing_interface.entity.edges.each do |edge|
+            edge.faces.each do |face|
+              interface = face.drawing_interface
+              if (not unique_interfaces.include?(interface))
+                unique_interfaces << interface
+              end
+            end
+          end
+
+          unique_interfaces.each do |interface|
+            if (interface.valid_entity? and interface.parent_from_entity)
+              interface.on_change_entity
+            end
+          end
+        else
+
+          # Original update for just the changed surface:
+          # Need to check the parent entity to make sure this face didn't find itself outside of a Group after an explode.
+          if (@drawing_interface.valid_entity? and @drawing_interface.parent_from_entity)
+            @drawing_interface.on_change_entity
+          end
         end
       }
     end
