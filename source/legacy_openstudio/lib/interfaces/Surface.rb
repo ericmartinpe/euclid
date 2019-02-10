@@ -207,6 +207,7 @@ module LegacyOpenStudio
 
 
     def paint_entity
+      remove_observers
       if (Plugin.model_manager.rendering_mode == 0)
         paint_surface_type
       elsif (Plugin.model_manager.rendering_mode == 1)
@@ -218,6 +219,7 @@ module LegacyOpenStudio
       elsif (Plugin.model_manager.rendering_mode == 4)
         paint_normal
       end
+      add_observers
     end
 
 
