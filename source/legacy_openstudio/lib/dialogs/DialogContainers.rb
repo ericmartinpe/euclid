@@ -88,7 +88,13 @@ module LegacyOpenStudio
       if (@web_dialog.visible?)
         @web_dialog.bring_to_front
       else
-        @web_dialog.show
+        if (Plugin.platform == Platform_Mac)
+          # 'show_modal' on Mac is not truly modal--it doesn't prevent interaction with the main window.
+          # It just keeps it on top like a palette window, basically the same behavior as 'show' on Windows.
+          @web_dialog.show_modal
+        else
+          @web_dialog.show
+        end
       end
     end
 
