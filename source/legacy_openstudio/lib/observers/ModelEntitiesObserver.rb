@@ -82,10 +82,8 @@ module LegacyOpenStudio
     end
 
 
-    # This method gets called for every edge that gets drawn...so gets lots of hits!
-    # UPDATE:  Broken in SU6 M3--was working in previous versions!  *args should catch any number of arguments, even none.
-    def onContentsModified(*args)
-      #puts "ModelEntitiesObserver.onContentsModified"
+    def onElementModified(entities, entity)
+      puts "ModelEntitiesObserver.onElementModified"
     end
 
 
