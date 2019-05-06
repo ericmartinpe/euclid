@@ -86,7 +86,7 @@ module LegacyOpenStudio
       case (@hash['CLASS'])
 
       when "LegacyOpenStudio::Building"
-        h = Plugin.platform_select('340', '370')
+        h = Plugin.platform_select('341', '370')
         function_call = "setRows('" + h + "px,0px,0px,0px,0px,0px,0px,0px,0px,0px,*,6px')"
         @info_page = BuildingInfoPage.new(@building_frame, @interface, @hash)
 
@@ -96,32 +96,32 @@ module LegacyOpenStudio
         @info_page = ZoneInfoPage.new(@zone_frame, @interface, @hash)
 
       when "LegacyOpenStudio::BaseSurface"
-        h = Plugin.platform_select('366', '397')
+        h = Plugin.platform_select('372', '397')
         function_call = "setRows('0px,0px," + h + "px,0px,0px,0px,0px,0px,0px,0px,*,6px')"
         @info_page = BaseSurfaceInfoPage.new(@base_surface_frame, @interface, @hash)
 
       when "LegacyOpenStudio::SubSurface"
-        h = Plugin.platform_select('367', '404')
+        h = Plugin.platform_select('346', '404')
         function_call = "setRows('0px,0px,0px," + h + "px,0px,0px,0px,0px,0px,0px,*,6px')"
         @info_page = SubSurfaceInfoPage.new(@sub_surface_frame, @interface, @hash)
 
       when "LegacyOpenStudio::AttachedShadingSurface"
-        h = Plugin.platform_select('189', '210')
+        h = Plugin.platform_select('200', '210')
         function_call = "setRows('0px,0px,0px,0px," + h + "px,0px,0px,0px,0px,0px,*,6px')"
         @info_page = AttachedShadingSurfaceInfoPage.new(@attached_shading_surface_frame, @interface, @hash)
 
       when "LegacyOpenStudio::DetachedShadingGroup"
-        h = Plugin.platform_select('142', '158')
+        h = Plugin.platform_select('154', '158')
         function_call = "setRows('0px,0px,0px,0px,0px," + h + "px,0px,0px,0px,0px,*,6px')"
         @info_page = DetachedShadingGroupInfoPage.new(@detached_shading_group_frame, @interface, @hash)
 
       when "LegacyOpenStudio::DetachedShadingSurface"
-        h = Plugin.platform_select('164', '184')
+        h = Plugin.platform_select('172', '184')
         function_call = "setRows('0px,0px,0px,0px,0px,0px," + h + "px,0px,0px,0px,*,6px')"
         @info_page = DetachedShadingSurfaceInfoPage.new(@detached_shading_surface_frame, @interface, @hash)
 
       when "LegacyOpenStudio::OutputIlluminanceMap"
-        h = Plugin.platform_select('280', '340')
+        h = Plugin.platform_select('289', '340')
         function_call = "setRows('0px,0px,0px,0px,0px,0px,0px," + h + "px,0px,0px,*,6px')"
         @info_page = OutputIlluminanceMapInfoPage.new(@output_illuminance_map_frame, @interface, @hash)
 
@@ -131,7 +131,7 @@ module LegacyOpenStudio
         @info_page = DaylightingControlsInfoPage.new(@daylighting_controls_frame, @interface, @hash)
 
       else
-        h = Plugin.platform_select('300', '336')
+        h = Plugin.platform_select('338', '336')
         function_call = "setRows('0px,0px,0px,0px,0px,0px,0px,0px,0px," + h + "px,*,6px')"
         @info_page = NoSelectionInfoPage.new(@no_selection_frame, @interface, @hash)
       end
