@@ -284,8 +284,8 @@ module LegacyOpenStudio
       end
 
       @units_hash = Hash.new
-      @units_hash['m'] = ["(m)", "(ft)", 1.0]
-      @units_hash['m2'] = ["(m\u00b2)", "(ft\u00b2)", 1.0]
+      @units_hash['m'] = ["m", "ft", 1.0]
+      @units_hash['m2'] = ["m\u00b2", "ft\u00b2", 1.0]
       @units_hash['m3'] = ["(m\u00b3)", "(ft\u00b3)", 1.0]
       @units_hash['People/100m2'] = ["(Number of People/100 m\u00b2)", "(Number of People/1000 ft\u00b2)", 1.0]
       @units_hash['W/m2'] = ["(W/m\u00b2)", "(W/ft\u00b2)", 1.0]
