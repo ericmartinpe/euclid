@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2019 Big Ladder Software LLC. All rights reserved.
+# Copyright (c) 2015-2020 Big Ladder Software LLC. All rights reserved.
 # See the file "license.txt" for additional terms and conditions.
 
 require 'fileutils'
