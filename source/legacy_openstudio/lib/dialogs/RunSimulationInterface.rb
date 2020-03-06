@@ -44,6 +44,7 @@ module LegacyOpenStudio
       objects = Plugin.model_manager.input_file.find_objects_by_class_name("RunPeriod")
       if (objects.empty?)
         @hash['ANNUAL_SIMULATION'] = true
+        @hash['RUN_PERIOD_NAME'] = "Simulation" # name of RunPeriod cannot be left blank as of EnergyPlus v9.2
         @hash['START_MONTH'] = "1"
         @hash['START_DATE'] = "1"
         @hash['START_YEAR'] = ""
@@ -55,6 +56,13 @@ module LegacyOpenStudio
         run_period = objects.to_a.first
         # Only can handle the first run period currently; multiple run periods are actually allowed in EnergyPlus.
 
+        # Check if loaded RunPeriod object has name input field set, cannot be left blank as of EnergyPlus v9.2
+        if (run_period.fields[1].empty?)
+          UI.messagebox("RunPeriod object has no name, yet this is a required input field.\nSetting RunPeriod object name to 'Simulation'.")
+          @hash['RUN_PERIOD_NAME'] = "Simulation" # name of RunPeriod
+        else
+          @hash['RUN_PERIOD_NAME'] = run_period.fields[1] # name of RunPeriod
+        end
         @hash['START_MONTH'] = run_period.fields[2]
         @hash['START_DATE'] = run_period.fields[3]
         @hash['START_YEAR'] = run_period.fields[4]
@@ -155,7 +163,7 @@ module LegacyOpenStudio
         run_period = objects.to_a.first
       end
 
-      run_period.fields[1] = '' # default
+      run_period.fields[1] = @hash['RUN_PERIOD_NAME'] # name of RunPeriod cannot be left blank as of EnergyPlus v9.2
       run_period.fields[2] = @hash['START_MONTH']
       run_period.fields[3] = @hash['START_DATE']
       run_period.fields[4] = @hash['START_YEAR']
