@@ -19,6 +19,7 @@ module LegacyOpenStudio
         @hash['NAME'] = @input_object.fields[1]
         @hash['ROTATION'] = @input_object.fields[2]
         @hash['MULTIPLIER'] = @input_object.fields[7]
+        @hash['UNIT_FLOOR_AREA'] = @input_object.fields[10]
 
         if (@input_object.fields[13].nil?)
           @hash['INCLUDE_FLOOR_AREA'] = true
@@ -60,6 +61,7 @@ module LegacyOpenStudio
       @input_object.fields[1] = @hash['NAME'].strip
       @input_object.fields[2] = @hash['ROTATION'].strip if (@hash['ROTATION'])
       @input_object.fields[7] = @hash['MULTIPLIER'].strip if (@hash['MULTIPLIER'])
+      @input_object.fields[10] = @drawing_interface.unit_floor_area.to_m.to_m.round_to(Plugin.model_manager.length_precision).to_s
 
       if (@input_object.fields[13].nil?)
         if (@hash['INCLUDE_FLOOR_AREA'])
