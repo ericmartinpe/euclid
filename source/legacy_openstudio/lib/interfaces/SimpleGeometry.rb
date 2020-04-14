@@ -166,9 +166,9 @@ module LegacyOpenStudio
           input_object.fields[3..4] = old_fields[2..3]
           input_object.fields[5] = ""
           input_object.fields[6] = ""
-          input_object.fields[7..9] = old_fields[4..6]
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[7..8] = old_fields[4..5]
+          input_object.fields[9] = "4"
+          input_object.fields[10..21] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -185,10 +185,9 @@ module LegacyOpenStudio
           input_object.fields[5] = ""
           input_object.fields[6] = ""
           input_object.fields[7] = ""
-          input_object.fields[8] = ""
-          input_object.fields[9] = old_fields[4]
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[8] = old_fields[4]
+          input_object.fields[9] = "4"
+          input_object.fields[10..21] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -205,10 +204,9 @@ module LegacyOpenStudio
           input_object.fields[5] = ""
           input_object.fields[6] = ""
           input_object.fields[7] = ""
-          input_object.fields[8] = ""
-          input_object.fields[9] = old_fields[4]
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[8] = old_fields[4]
+          input_object.fields[9] = "4"
+          input_object.fields[10..21] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -224,10 +222,9 @@ module LegacyOpenStudio
           input_object.fields[3..5] = old_fields[2..4]
           input_object.fields[6] = ""
           input_object.fields[7] = ""
-          input_object.fields[8] = ""
-          input_object.fields[9] = old_fields[5]
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[8] = old_fields[5]
+          input_object.fields[9] = "4"
+          input_object.fields[10..21] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -243,10 +240,9 @@ module LegacyOpenStudio
           input_object.fields[3..5] = old_fields[2..4]
           input_object.fields[6] = ""
           input_object.fields[7] = ""
-          input_object.fields[8] = ""
-          input_object.fields[9] = old_fields[5]
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[8] = old_fields[5]
+          input_object.fields[9] = "4"
+          input_object.fields[10..21] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -262,10 +258,9 @@ module LegacyOpenStudio
           input_object.fields[3..5] = old_fields[2..4]
           input_object.fields[6] = ""
           input_object.fields[7] = ""
-          input_object.fields[8] = ""
-          input_object.fields[9] = old_fields[5]
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[8] = old_fields[5]
+          input_object.fields[9] = "4"
+          input_object.fields[10..21] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -547,7 +542,7 @@ module LegacyOpenStudio
         base_surface = input_object.fields[4]
         surface_transform = SimpleGeometry.base_surface_transform(base_surface)
 
-        vertices = input_object.fields[11..-1]
+        vertices = input_object.fields[10..-1]
         number_of_vertices = (vertices.size / 3)
 
         points = []
@@ -592,10 +587,10 @@ module LegacyOpenStudio
         hash['base_surface'] = base_surface
 
       when "Window", "GlazedDoor"
-        hash['x1'] = input_object.fields[7].to_f
-        hash['z1'] = input_object.fields[8].to_f
-        hash['length'] = input_object.fields[9].to_f
-        hash['height'] = input_object.fields[10].to_f
+        hash['x1'] = input_object.fields[6].to_f
+        hash['z1'] = input_object.fields[7].to_f
+        hash['length'] = input_object.fields[8].to_f
+        hash['height'] = input_object.fields[9].to_f
         hash['base_surface'] = input_object.fields[3]
 
       when "Door"
