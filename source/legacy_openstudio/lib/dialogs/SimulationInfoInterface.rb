@@ -22,17 +22,17 @@ module LegacyOpenStudio
       if (input_object.fields[3].upcase == "RELATIVE")
         @hash['COORDINATE_SYSTEM'] = "RELATIVE"
       else
-        @hash['COORDINATE_SYSTEM'] = "ABSOLUTE"
+        @hash['COORDINATE_SYSTEM'] = "WORLD"
       end
 
-      if (input_object.fields[4] and input_object.fields[4].upcase == "ABSOLUTE")
-        @hash['DAYLIGHTING_COORDINATE_SYSTEM'] = "ABSOLUTE"
+      if (input_object.fields[4] and input_object.fields[4].upcase == "WORLD")
+        @hash['DAYLIGHTING_COORDINATE_SYSTEM'] = "WORLD"
       else
         @hash['DAYLIGHTING_COORDINATE_SYSTEM'] = "RELATIVE"
       end
 
-      if (input_object.fields[5] and input_object.fields[5].upcase == "ABSOLUTE")
-        @hash['RECTANGULAR_COORDINATE_SYSTEM'] = "ABSOLUTE"
+      if (input_object.fields[5] and input_object.fields[5].upcase == "WORLD")
+        @hash['RECTANGULAR_COORDINATE_SYSTEM'] = "WORLD"
       else
         @hash['RECTANGULAR_COORDINATE_SYSTEM'] = "RELATIVE"
       end
@@ -77,19 +77,19 @@ module LegacyOpenStudio
       if (@hash['COORDINATE_SYSTEM'] == "RELATIVE")
         input_object.fields[3] = "Relative"
       else
-        input_object.fields[3] = "Absolute"
+        input_object.fields[3] = "World"
       end
 
       if (@hash['DAYLIGHTING_COORDINATE_SYSTEM'] == "RELATIVE")
         input_object.fields[4] = "Relative"
       else
-        input_object.fields[4] = "Absolute"
+        input_object.fields[4] = "World"
       end
 
       if (@hash['RECTANGULAR_COORDINATE_SYSTEM'] == "RELATIVE")
         input_object.fields[5] = "Relative"
       else
-        input_object.fields[5] = "Absolute"
+        input_object.fields[5] = "World"
       end
 
       if (@hash['VERTEX_ORDER'] == "CLOCKWISE")

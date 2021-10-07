@@ -411,7 +411,7 @@ module LegacyOpenStudio
     end
 
 
-    # Returns the polygon of the face in absolute coordinates.
+    # Returns the polygon of the face in absolute coordinates. As of EnergyPlus v9.3, using only 'World' coordinates and removing 'Absolute' coordinates option.
     # NOTE:  BaseSurface overrides this method significantly.
     def face_polygon  # entity_polygon
       if (valid_entity?)

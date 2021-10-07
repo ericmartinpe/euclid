@@ -243,7 +243,7 @@ module LegacyOpenStudio
       end
     end
 
-    # Returns the polygon of the face in absolute coordinates.
+    # Returns the polygon of the face in absolute coordinates. As of EnergyPlus v9.3, using only 'World' coordinates and removing 'Absolute' coordinates option.
     # This is overridden from the Surface class to subtract the vertices of any sub surfaces.
     # This can probably be optimized quite a bit.
     def face_polygon
