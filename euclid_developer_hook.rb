@@ -3,6 +3,7 @@
 
 ####################################################
 # COPY THIS FILE TO THE SKETCHUP PLUGINS DIRECTORY #
+# "C:\Users\[your user name]\AppData\Roaming\SketchUp\SketchUp 2017\SketchUp\Plugins" #
 ####################################################
 
 SKETCHUP_CONSOLE.show
