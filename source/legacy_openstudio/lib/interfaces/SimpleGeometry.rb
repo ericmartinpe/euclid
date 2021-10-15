@@ -106,7 +106,7 @@ module LegacyOpenStudio
           input_object.class_definition = Plugin.data_dictionary.get_class_def("Shading:Zone:Detailed")
           input_object.fields[0] = "Shading:Zone:Detailed"
           input_object.fields[1] = old_fields[1]
-          input_object.fields[2] = old_fields[2].fields[3]  # Get base surface...no error trapping
+          input_object.fields[2] = old_fields[2].fields[4]  # Get base surface...no error trapping
           input_object.fields[3] = ""
           input_object.fields[4] = "4"
           input_object.fields[5..16] = vertices
@@ -122,7 +122,7 @@ module LegacyOpenStudio
           new_input_object = InputObject.new("Shading:Zone:Detailed")
           new_input_object.fields[0] = "Shading:Zone:Detailed"
           new_input_object.fields[1] = old_fields[1] + " L"
-          new_input_object.fields[2] = old_fields[2].fields[3]  # Get base surface...no error trapping
+          new_input_object.fields[2] = old_fields[2].fields[4]  # Get base surface...no error trapping
           new_input_object.fields[3] = ""
           new_input_object.fields[4] = "4"
           new_input_object.fields[5..16] = vertices_left
@@ -138,7 +138,7 @@ module LegacyOpenStudio
           input_object.class_definition = Plugin.data_dictionary.get_class_def("Shading:Zone:Detailed")
           input_object.fields[0] = "Shading:Zone:Detailed"
           input_object.fields[1] = old_fields[1] + " R"
-          input_object.fields[2] = old_fields[2].fields[3]  # Get base surface...no error trapping
+          input_object.fields[2] = old_fields[2].fields[4]  # Get base surface...no error trapping
           input_object.fields[3] = ""
           input_object.fields[4] = "4"
           input_object.fields[5..16] = vertices_right
