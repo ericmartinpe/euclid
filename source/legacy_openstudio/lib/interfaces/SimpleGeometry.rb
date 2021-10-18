@@ -26,7 +26,7 @@ module LegacyOpenStudio
 
         case (surface_geometry.fields[3].upcase)
         when "ABSOLUTE", "WORLD", "WORLDCOORDINATESYSTEM", "WCS"
-          normal_coord_sys = "Absolute"
+          normal_coord_sys = "World" # as of EnergyPlus v9.3, "Absolute" is not a viable input o
         else
           normal_coord_sys = "Relative"
         end
@@ -34,7 +34,7 @@ module LegacyOpenStudio
         if (surface_geometry.fields[5])
           case (surface_geometry.fields[5].upcase)
           when "ABSOLUTE", "WORLD", "WORLDCOORDINATESYSTEM", "WCS"
-            simple_coord_sys = "Absolute"
+            simple_coord_sys = "World" # as of EnergyPlus v9.3, "Absolute" is not a viable input option
           else
             simple_coord_sys = "Relative"
           end
@@ -42,9 +42,9 @@ module LegacyOpenStudio
           simple_coord_sys = "Relative"  # Default
         end
 
-        if (simple_coord_sys == "Relative" and normal_coord_sys == "Absolute")
+        if (simple_coord_sys == "Relative" and normal_coord_sys == "World")
           coord_change = REL_TO_ABS
-        elsif (simple_coord_sys == "Absolute" and normal_coord_sys == "Relative")
+        elsif (simple_coord_sys == "World" and normal_coord_sys == "Relative")
           coord_change = ABS_TO_REL
         else
           coord_change = NO_CHANGE
@@ -106,7 +106,7 @@ module LegacyOpenStudio
           input_object.class_definition = Plugin.data_dictionary.get_class_def("Shading:Zone:Detailed")
           input_object.fields[0] = "Shading:Zone:Detailed"
           input_object.fields[1] = old_fields[1]
-          input_object.fields[2] = old_fields[2].fields[3]  # Get base surface...no error trapping
+          input_object.fields[2] = old_fields[2].fields[4]  # Get base surface...no error trapping
           input_object.fields[3] = ""
           input_object.fields[4] = "4"
           input_object.fields[5..16] = vertices
@@ -122,7 +122,7 @@ module LegacyOpenStudio
           new_input_object = InputObject.new("Shading:Zone:Detailed")
           new_input_object.fields[0] = "Shading:Zone:Detailed"
           new_input_object.fields[1] = old_fields[1] + " L"
-          new_input_object.fields[2] = old_fields[2].fields[3]  # Get base surface...no error trapping
+          new_input_object.fields[2] = old_fields[2].fields[4]  # Get base surface...no error trapping
           new_input_object.fields[3] = ""
           new_input_object.fields[4] = "4"
           new_input_object.fields[5..16] = vertices_left
@@ -138,7 +138,7 @@ module LegacyOpenStudio
           input_object.class_definition = Plugin.data_dictionary.get_class_def("Shading:Zone:Detailed")
           input_object.fields[0] = "Shading:Zone:Detailed"
           input_object.fields[1] = old_fields[1] + " R"
-          input_object.fields[2] = old_fields[2].fields[3]  # Get base surface...no error trapping
+          input_object.fields[2] = old_fields[2].fields[4]  # Get base surface...no error trapping
           input_object.fields[3] = ""
           input_object.fields[4] = "4"
           input_object.fields[5..16] = vertices_right

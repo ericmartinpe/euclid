@@ -13,7 +13,7 @@ module LegacyOpenStudio
       @input_object = InputObject.new("GLOBALGEOMETRYRULES")
       @input_object.fields[1] = "UpperLeftCorner"
       @input_object.fields[2] = "Counterclockwise"
-      @input_object.fields[3] = "Absolute"
+      @input_object.fields[3] = "World"
 
       super
     end
@@ -106,14 +106,14 @@ module LegacyOpenStudio
             @input_object.fields[3] = "Relative"
 
           when "WCS", "WORLDCOORDINATESYSTEM", "WORLD", "ABSOLUTE"
-            @input_object.fields[3] = "Absolute"
+            @input_object.fields[3] = "World"
 
           else
             puts "SurfaceGeometry.coordinate_system:  bad input for coordinate system"
             Plugin.model_manager.add_error("Error:  Bad input for coordinate system in GlobalGeometryRules object.\n")
-            Plugin.model_manager.add_error("Coordinate system has been reset to Absolute.\n\n")
+            Plugin.model_manager.add_error("Coordinate system has been reset to World.\n\n")
 
-            @input_object.fields[3] = "Absolute"
+            @input_object.fields[3] = "World"
           end
         end
 
