@@ -171,10 +171,10 @@ module LegacyOpenStudio
 
       if (platform == Platform_Windows)
         hash['Text Editor Path'] = "C:/WINDOWS/system32/notepad.exe"
-        hash['EnergyPlus Path'] = "C:/EnergyPlusV9-3-0/EnergyPlus.exe"  # Default installation path
+        hash['EnergyPlus Path'] = "C:/EnergyPlusV9-6-0/EnergyPlus.exe"  # Default installation path
       elsif (platform == Platform_Mac)
         hash['Text Editor Path'] = "/Applications/TextEdit.app"
-        hash['EnergyPlus Path'] = "/Applications/EnergyPlus-9-3-0/energyplus"  # Default installation path
+        hash['EnergyPlus Path'] = "/Applications/EnergyPlus-9-6-0/energyplus"  # Default installation path
         hash['Check For Update'] = false
       end
 
@@ -207,7 +207,7 @@ module LegacyOpenStudio
 
 
     def energyplus_version
-      return(Gem::Requirement.new("~>9.3.0"))  # Version requirement using twiddle wakka notation
+      return(Gem::Requirement.new("~>9.6.0"))  # Version requirement using twiddle wakka notation
     end
 
   end
