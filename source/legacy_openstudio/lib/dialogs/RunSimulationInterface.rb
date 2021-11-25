@@ -22,6 +22,8 @@ module LegacyOpenStudio
       if (objects.empty?)
         @hash['RUN_DESIGN_DAYS'] = true
         @hash['RUN_WEATHER_FILE'] = true
+        @hash['DO_HVAC_SIZING'] = false
+        @hash['MAX_HVAC_SIZING_PASSES'] = "1"
       else
         run_control = objects.to_a.first
         if (run_control.fields[4].upcase == "YES")
@@ -35,6 +37,14 @@ module LegacyOpenStudio
         else
           @hash['RUN_WEATHER_FILE'] = false
         end
+
+        if (run_control.fields[6].upcase == "YES")
+          @hash['DO_HVAC_SIZING'] = true
+        else
+          @hash['DO_HVAC_SIZING'] = false
+        end
+
+        @hash['MAX_HVAC_SIZING_PASSES'] = run_control.fields[7]
       end
 
       @hash['RUN_DIR'] = Dir.tmpdir + "/OpenStudio/run"
@@ -152,6 +162,18 @@ module LegacyOpenStudio
         run_control.fields[5] = "Yes"
       else
         run_control.fields[5] = "No"
+      end
+
+      if (@hash['DO_HVAC_SIZING'])
+        run_control.fields[6] = "Yes"
+      else
+        run_control.fields[6] = "No"
+      end
+
+      if (@hash['MAX_HVAC_SIZING_PASSES'].empty?)
+        run_control.fields[7] = "1"
+      else
+        run_control.fields[7] = @hash['MAX_HVAC_SIZING_PASSES']
       end
 
       # Configure the RUN PERIOD object

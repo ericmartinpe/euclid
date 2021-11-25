@@ -50,6 +50,10 @@ function onClickRunWeatherFile() {
 
 }
 
+function onClickDoHVACSizing() {
+  if (document.getElementById('DO_HVAC_SIZING').checked) {
+  }
+}
 
 function onClickAnnualSimulation(element) {
   if (element) {
@@ -146,6 +150,14 @@ function onClickCloseShell() { window.location='skp:on_click_close_shell'; }
 </td>
 <td>
 <input id="RUN_WEATHER_FILE" name="RUN_WEATHER_FILE" type="checkbox" onclick="onClickRunWeatherFile()" onchange="onChangeElement(this)"><label for="RUN_WEATHER_FILE">Run weather file simulation</label>
+</td>
+</tr>
+<tr>
+<td width="238px">
+&nbsp;&nbsp;<input id="DO_HVAC_SIZING" name="DO_HVAC_SIZING" type="checkbox" onclick="onClickDoHVACSizing()" onchange="onChangeElement(this)"><label for="DO_HVAC_SIZING">Do HVAC sizing for design days</label>
+</td>
+<td>
+<input id="MAX_HVAC_SIZING_PASSES" name="MAX_HVAC_SIZING_PASSES" type="text" class="text" size="2" style="text-align:center;" onkeyup="onChangeElement(this)">&nbsp;<label for="MAX_HVAC_SIZING_PASSES">Max passes for HVAC sizing</label>
 </td>
 </tr>
 
