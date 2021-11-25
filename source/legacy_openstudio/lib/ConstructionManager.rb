@@ -238,7 +238,7 @@ module LegacyOpenStudio
     end
 
     def constructions
-      result = Plugin.model_manager.input_file.find_objects_by_class_name("CONSTRUCTION", "CONSTRUCTION:INTERNALSOURCE",
+      result = Plugin.model_manager.input_file.find_objects_by_class_name("CONSTRUCTION",
                     "CONSTRUCTION:CFACTORUNDERGROUNDWALL", "CONSTRUCTION:FFACTORGROUNDFLOOR", "CONSTRUCTION:WINDOWDATAFILE",
                     "CONSTRUCTION:AIRBOUNDARY", "CONSTRUCTION:WINDOWEQUIVALENTLAYER", "CONSTRUCTION:COMPLEXFENESTRATIONSTATE")
       return result
