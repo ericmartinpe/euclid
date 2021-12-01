@@ -13,7 +13,7 @@ module LegacyOpenStudio
 
     def initialize
       super
-      @first_vertex_field = 11
+      @first_vertex_field = 12
     end
 
 
@@ -26,23 +26,24 @@ module LegacyOpenStudio
       @input_object.fields[2] = default_surface_type   # infer_surface_type
       @input_object.fields[3] = ""
       @input_object.fields[4] = ""  # Zone
+      @input_object.fields[5] = ""  # Space
 
       if (@input_object.fields[2] == "Floor")
-        @input_object.fields[5] = "Ground"
-        @input_object.fields[6] = ""
-        @input_object.fields[7] = "NoSun"
-        @input_object.fields[8] = "NoWind"
+        @input_object.fields[6] = "Ground"
+        @input_object.fields[7] = ""
+        @input_object.fields[8] = "NoSun"
+        @input_object.fields[9] = "NoWind"
       else
-        @input_object.fields[5] = "Outdoors"
-        @input_object.fields[6] = ""
-        @input_object.fields[7] = "SunExposed"
-        @input_object.fields[8] = "WindExposed"
+        @input_object.fields[6] = "Outdoors"
+        @input_object.fields[7] = ""
+        @input_object.fields[8] = "SunExposed"
+        @input_object.fields[9] = "WindExposed"
       end
 
       @input_object.fields[3] = default_construction # do after setting boundary conditions
 
-      @input_object.fields[9] = ""
-      @input_object.fields[12] = 0  # kludge to make fields list long enough for call below
+      @input_object.fields[10] = ""
+      @input_object.fields[13] = 0  # kludge to make fields list long enough for call below
 
       super
     end
@@ -160,16 +161,16 @@ module LegacyOpenStudio
     end
 
     def boundary
-      # field 7 is sun, 8 is wind
-      return(@input_object.fields[5])
+      # field 8 is sun, 9 is wind
+      return(@input_object.fields[6])
     end
 
     def sun
-      return(@input_object.fields[7])
+      return(@input_object.fields[8])
     end
 
     def wind
-      return(@input_object.fields[8])
+      return(@input_object.fields[9])
     end
 
 
@@ -310,7 +311,7 @@ module LegacyOpenStudio
     end
 
     def exterior?
-      return (@input_object.fields[5] == "Ground" or @input_object.fields[5] == "Outdoors")
+      return (@input_object.fields[6] == "Ground" or @input_object.fields[6] == "Outdoors")
     end
 
     def default_construction
@@ -395,10 +396,10 @@ module LegacyOpenStudio
       if (@input_object.fields[2].upcase == "ROOF")
         @input_object.fields[2] = "Ceiling"
       end
-      @input_object.fields[5] = 'Surface'
-      @input_object.fields[6] = other.name
-      @input_object.fields[7] = "NoSun"
-      @input_object.fields[8] = "NoWind"
+      @input_object.fields[6] = 'Surface'
+      @input_object.fields[7] = other.name
+      @input_object.fields[8] = "NoSun"
+      @input_object.fields[9] = "NoWind"
       @input_object.fields[3] = default_construction # do after making interior
       #if render set to by boundary then change materials to surface
           if (Plugin.model_manager.rendering_mode == 2)
@@ -418,10 +419,10 @@ module LegacyOpenStudio
       end
 
       if (@input_object.fields[2] == "Floor")
-        @input_object.fields[5] = "Ground"
-        @input_object.fields[6] = ""
-        @input_object.fields[7] = "NoSun"
-        @input_object.fields[8] = "NoWind"
+        @input_object.fields[6] = "Ground"
+        @input_object.fields[7] = ""
+        @input_object.fields[8] = "NoSun"
+        @input_object.fields[9] = "NoWind"
       #if render set to by boundary then change materials to surface
           if (Plugin.model_manager.rendering_mode == 2)
               #apply material to front and back face
@@ -430,10 +431,10 @@ module LegacyOpenStudio
           else
           end
       else
-        @input_object.fields[5] = "Outdoors"
-        @input_object.fields[6] = ""
-        @input_object.fields[7] = "SunExposed"
-        @input_object.fields[8] = "WindExposed"
+        @input_object.fields[6] = "Outdoors"
+        @input_object.fields[7] = ""
+        @input_object.fields[8] = "SunExposed"
+        @input_object.fields[9] = "WindExposed"
       #if render set to by boundary then change materials to surface
           if (Plugin.model_manager.rendering_mode == 2)
               #apply material to front and back face

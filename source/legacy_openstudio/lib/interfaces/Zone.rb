@@ -470,7 +470,7 @@ module LegacyOpenStudio
     def unit_exterior_area
       area = 0.0
       for child in @children
-        if (child.class == BaseSurface and child.input_object.fields[5].upcase == "OUTDOORS")
+        if (child.class == BaseSurface and child.input_object.fields[6].upcase == "OUTDOORS")
           area += child.gross_area
         end
       end
@@ -488,7 +488,7 @@ module LegacyOpenStudio
       # "Total" area, includes multiplier
       area = 0.0
       for child in @children
-        if (child.class == BaseSurface and child.input_object.fields[5].upcase == "OUTDOORS")
+        if (child.class == BaseSurface and child.input_object.fields[6].upcase == "OUTDOORS")
           area += child.glazing_area
         end
       end
