@@ -74,6 +74,14 @@ module LegacyOpenStudio
         @input_object.fields[4] = @hash['ZONE']
       end
 
+      # Lookup Space object
+      objects = Plugin.model_manager.input_file.find_objects_by_class_name("SPACE")
+      if (object = objects.find { |object| object.name == @hash['SPACE'] })
+        @input_object.fields[5] = object
+      else
+        @input_object.fields[5] = @hash['SPACE']
+      end
+      
       @input_object.fields[6] = @input_object.class_definition.field_definitions[6].get_choice_key(@hash['OUTSIDE_BOUNDARY_CONDITION'])
 
       case (@hash['OUTSIDE_BOUNDARY_CONDITION'])
