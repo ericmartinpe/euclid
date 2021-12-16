@@ -91,7 +91,7 @@ module LegacyOpenStudio
         @info_page = BuildingInfoPage.new(@building_frame, @interface, @hash)
 
       when "LegacyOpenStudio::Zone"
-        h = Plugin.platform_select('273', '293')
+        h = Plugin.platform_select('297', '321')
         function_call = "setRows('0px," + h + "px,0px,0px,0px,0px,0px,0px,0px,0px,*,6px')"
         @info_page = ZoneInfoPage.new(@zone_frame, @interface, @hash)
 

@@ -32,6 +32,9 @@ module LegacyOpenStudio
         @hash['SURFACES'] = @drawing_interface.base_surface_count
         @hash['SUB_SURFACES'] = @drawing_interface.sub_surface_count
 
+        @hash['SPACES_TO_ZONE'] = @drawing_interface.spaces_assigned_to_zone_count
+        @hash['SPACES_TO_SURFACES'] = @drawing_interface.spaces_assigned_to_surfaces_count
+
         # Need better method here
         if (Plugin.model_manager.units_system == "SI")
           i = 0
