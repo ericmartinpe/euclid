@@ -86,7 +86,7 @@ module LegacyOpenStudio
       case (@hash['CLASS'])
 
       when "LegacyOpenStudio::Building"
-        h = Plugin.platform_select('341', '371')
+        h = Plugin.platform_select('365', '399')
         function_call = "setRows('" + h + "px,0px,0px,0px,0px,0px,0px,0px,0px,0px,*,6px')"
         @info_page = BuildingInfoPage.new(@building_frame, @interface, @hash)
 

@@ -35,6 +35,9 @@ module LegacyOpenStudio
         zones = Plugin.model_manager.zones
         @hash['ZONES'] = zones.count
 
+        spaces = Plugin.model_manager.input_file.find_objects_by_class_name("SPACE").collect { |object| object }
+        @hash['SPACES'] = spaces.count
+
         floor_area = 0.0
         exterior_area = 0.0  # Exterior
         exterior_glazing_area = 0.0  # Exterior
