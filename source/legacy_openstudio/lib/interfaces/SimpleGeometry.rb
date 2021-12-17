@@ -106,7 +106,7 @@ module LegacyOpenStudio
           input_object.class_definition = Plugin.data_dictionary.get_class_def("Shading:Zone:Detailed")
           input_object.fields[0] = "Shading:Zone:Detailed"
           input_object.fields[1] = old_fields[1]
-          input_object.fields[2] = old_fields[2].fields[4]  # Get base surface...no error trapping
+          input_object.fields[2] = old_fields[2].fields[3]  # Get base surface...no error trapping
           input_object.fields[3] = ""
           input_object.fields[4] = "4"
           input_object.fields[5..16] = vertices
@@ -122,7 +122,7 @@ module LegacyOpenStudio
           new_input_object = InputObject.new("Shading:Zone:Detailed")
           new_input_object.fields[0] = "Shading:Zone:Detailed"
           new_input_object.fields[1] = old_fields[1] + " L"
-          new_input_object.fields[2] = old_fields[2].fields[4]  # Get base surface...no error trapping
+          new_input_object.fields[2] = old_fields[2].fields[3]  # Get base surface...no error trapping
           new_input_object.fields[3] = ""
           new_input_object.fields[4] = "4"
           new_input_object.fields[5..16] = vertices_left
@@ -138,7 +138,7 @@ module LegacyOpenStudio
           input_object.class_definition = Plugin.data_dictionary.get_class_def("Shading:Zone:Detailed")
           input_object.fields[0] = "Shading:Zone:Detailed"
           input_object.fields[1] = old_fields[1] + " R"
-          input_object.fields[2] = old_fields[2].fields[4]  # Get base surface...no error trapping
+          input_object.fields[2] = old_fields[2].fields[3]  # Get base surface...no error trapping
           input_object.fields[3] = ""
           input_object.fields[4] = "4"
           input_object.fields[5..16] = vertices_right
@@ -317,14 +317,14 @@ module LegacyOpenStudio
           input_object.fields[0] = "BuildingSurface:Detailed"
           input_object.fields[1] = old_fields[1]
           input_object.fields[2] = "Wall"
-          input_object.fields[3..4] = old_fields[2..3]
-          input_object.fields[5] = "Outdoors"
-          input_object.fields[6] = ""
-          input_object.fields[7] = "SunExposed"
-          input_object.fields[8] = "WindExposed"
-          input_object.fields[9] = ""
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[3..5] = old_fields[2..4]
+          input_object.fields[6] = "Outdoors"
+          input_object.fields[7] = ""
+          input_object.fields[8] = "SunExposed"
+          input_object.fields[9] = "WindExposed"
+          input_object.fields[10] = ""
+          input_object.fields[11] = "4"
+          input_object.fields[12..23] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -337,14 +337,14 @@ module LegacyOpenStudio
           input_object.fields[0] = "BuildingSurface:Detailed"
           input_object.fields[1] = old_fields[1]
           input_object.fields[2] = "Wall"
-          input_object.fields[3..4] = old_fields[2..3]
-          input_object.fields[5] = "Adiabatic"
-          input_object.fields[6] = ""
-          input_object.fields[7] = "NoSun"
-          input_object.fields[8] = "NoWind"
-          input_object.fields[9] = ""
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[3..5] = old_fields[2..4]
+          input_object.fields[6] = "Adiabatic"
+          input_object.fields[7] = ""
+          input_object.fields[8] = "NoSun"
+          input_object.fields[9] = "NoWind"
+          input_object.fields[10] = ""
+          input_object.fields[11] = "4"
+          input_object.fields[12..23] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -357,14 +357,14 @@ module LegacyOpenStudio
           input_object.fields[0] = "BuildingSurface:Detailed"
           input_object.fields[1] = old_fields[1]
           input_object.fields[2] = "Wall"
-          input_object.fields[3..4] = old_fields[2..3]
-          input_object.fields[5] = "Ground"
-          input_object.fields[6] = ""
-          input_object.fields[7] = "NoSun"
-          input_object.fields[8] = "NoWind"
-          input_object.fields[9] = ""
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[3..5] = old_fields[2..4]
+          input_object.fields[6] = "Ground"
+          input_object.fields[7] = ""
+          input_object.fields[8] = "NoSun"
+          input_object.fields[9] = "NoWind"
+          input_object.fields[10] = ""
+          input_object.fields[11] = "4"
+          input_object.fields[12..23] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -377,14 +377,14 @@ module LegacyOpenStudio
           input_object.fields[0] = "BuildingSurface:Detailed"
           input_object.fields[1] = old_fields[1]
           input_object.fields[2] = "Wall"
-          input_object.fields[3..4] = old_fields[2..3]
-          input_object.fields[5] = "Surface"
-          input_object.fields[6] = old_fields[4]
-          input_object.fields[7] = "NoSun"
-          input_object.fields[8] = "NoWind"
-          input_object.fields[9] = ""
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[3..5] = old_fields[2..4]
+          input_object.fields[6] = "Surface"
+          input_object.fields[7] = old_fields[4]
+          input_object.fields[8] = "NoSun"
+          input_object.fields[9] = "NoWind"
+          input_object.fields[10] = ""
+          input_object.fields[11] = "4"
+          input_object.fields[12..23] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -397,14 +397,14 @@ module LegacyOpenStudio
           input_object.fields[0] = "BuildingSurface:Detailed"
           input_object.fields[1] = old_fields[1]
           input_object.fields[2] = "Roof"
-          input_object.fields[3..4] = old_fields[2..3]
-          input_object.fields[5] = "Outdoors"
-          input_object.fields[6] = ""
-          input_object.fields[7] = "SunExposed"
-          input_object.fields[8] = "WindExposed"
-          input_object.fields[9] = ""
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[3..5] = old_fields[2..4]
+          input_object.fields[6] = "Outdoors"
+          input_object.fields[7] = ""
+          input_object.fields[8] = "SunExposed"
+          input_object.fields[9] = "WindExposed"
+          input_object.fields[10] = ""
+          input_object.fields[11] = "4"
+          input_object.fields[12..23] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -417,14 +417,14 @@ module LegacyOpenStudio
           input_object.fields[0] = "BuildingSurface:Detailed"
           input_object.fields[1] = old_fields[1]
           input_object.fields[2] = "Ceiling"
-          input_object.fields[3..4] = old_fields[2..3]
-          input_object.fields[5] = "Adiabatic"
-          input_object.fields[6] = ""
-          input_object.fields[7] = "NoSun"
-          input_object.fields[8] = "NoWind"
-          input_object.fields[9] = ""
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[3..5] = old_fields[2..4]
+          input_object.fields[6] = "Adiabatic"
+          input_object.fields[7] = ""
+          input_object.fields[8] = "NoSun"
+          input_object.fields[9] = "NoWind"
+          input_object.fields[10] = ""
+          input_object.fields[11] = "4"
+          input_object.fields[12..23] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -437,14 +437,14 @@ module LegacyOpenStudio
           input_object.fields[0] = "BuildingSurface:Detailed"
           input_object.fields[1] = old_fields[1]
           input_object.fields[2] = "Ceiling"
-          input_object.fields[3..4] = old_fields[2..3]
-          input_object.fields[5] = "Surface"
-          input_object.fields[6] = old_fields[4]
-          input_object.fields[7] = "NoSun"
-          input_object.fields[8] = "NoWind"
-          input_object.fields[9] = ""
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[3..5] = old_fields[2..4]
+          input_object.fields[6] = "Surface"
+          input_object.fields[7] = old_fields[4]
+          input_object.fields[8] = "NoSun"
+          input_object.fields[9] = "NoWind"
+          input_object.fields[10] = ""
+          input_object.fields[11] = "4"
+          input_object.fields[12..23] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -457,14 +457,14 @@ module LegacyOpenStudio
           input_object.fields[0] = "BuildingSurface:Detailed"
           input_object.fields[1] = old_fields[1]
           input_object.fields[2] = "Floor"
-          input_object.fields[3..4] = old_fields[2..3]
-          input_object.fields[5] = "Ground"
-          input_object.fields[6] = ""
-          input_object.fields[7] = "NoSun"
-          input_object.fields[8] = "NoWind"
-          input_object.fields[9] = ""
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[3..5] = old_fields[2..4]
+          input_object.fields[6] = "Ground"
+          input_object.fields[7] = ""
+          input_object.fields[8] = "NoSun"
+          input_object.fields[9] = "NoWind"
+          input_object.fields[10] = ""
+          input_object.fields[11] = "4"
+          input_object.fields[12..23] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -477,14 +477,14 @@ module LegacyOpenStudio
           input_object.fields[0] = "BuildingSurface:Detailed"
           input_object.fields[1] = old_fields[1]
           input_object.fields[2] = "Floor"
-          input_object.fields[3..4] = old_fields[2..3]
-          input_object.fields[5] = "Adiabatic"
-          input_object.fields[6] = ""
-          input_object.fields[7] = "NoSun"
-          input_object.fields[8] = "NoWind"
-          input_object.fields[9] = ""
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[3..5] = old_fields[2..4]
+          input_object.fields[6] = "Adiabatic"
+          input_object.fields[7] = ""
+          input_object.fields[8] = "NoSun"
+          input_object.fields[9] = "NoWind"
+          input_object.fields[10] = ""
+          input_object.fields[11] = "4"
+          input_object.fields[12..23] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -497,14 +497,14 @@ module LegacyOpenStudio
           input_object.fields[0] = "BuildingSurface:Detailed"
           input_object.fields[1] = old_fields[1]
           input_object.fields[2] = "Floor"
-          input_object.fields[3..4] = old_fields[2..3]
-          input_object.fields[5] = "Surface"
-          input_object.fields[6] = old_fields[4]
-          input_object.fields[7] = "NoSun"
-          input_object.fields[8] = "NoWind"
-          input_object.fields[9] = ""
-          input_object.fields[10] = "4"
-          input_object.fields[11..22] = vertices
+          input_object.fields[3..5] = old_fields[2..4]
+          input_object.fields[6] = "Surface"
+          input_object.fields[7] = old_fields[4]
+          input_object.fields[8] = "NoSun"
+          input_object.fields[9] = "NoWind"
+          input_object.fields[10] = ""
+          input_object.fields[11] = "4"
+          input_object.fields[12..23] = vertices
           input_object.context = nil
           input_object.format_context
           input_file.modified = true
@@ -521,15 +521,6 @@ module LegacyOpenStudio
 
       case (input_object.class_definition.name)
       when "Wall:Exterior", "Wall:Adiabatic", "Wall:Underground", "Roof", "Ceiling:Adiabatic", "Floor:GroundContact", "Floor:Adiabatic"
-        hash['azimuth'] = -input_object.fields[4].to_f.degrees
-        hash['tilt'] = -input_object.fields[5].to_f.degrees
-        hash['x1'] = input_object.fields[6].to_f
-        hash['y1'] = input_object.fields[7].to_f
-        hash['z1'] = input_object.fields[8].to_f
-        hash['length'] = input_object.fields[9].to_f
-        hash['height'] = input_object.fields[10].to_f
-
-      when "Wall:Interzone", "Ceiling:Interzone", "Floor:Interzone"
         hash['azimuth'] = -input_object.fields[5].to_f.degrees
         hash['tilt'] = -input_object.fields[6].to_f.degrees
         hash['x1'] = input_object.fields[7].to_f
@@ -537,6 +528,15 @@ module LegacyOpenStudio
         hash['z1'] = input_object.fields[9].to_f
         hash['length'] = input_object.fields[10].to_f
         hash['height'] = input_object.fields[11].to_f
+
+      when "Wall:Interzone", "Ceiling:Interzone", "Floor:Interzone"
+        hash['azimuth'] = -input_object.fields[6].to_f.degrees
+        hash['tilt'] = -input_object.fields[7].to_f.degrees
+        hash['x1'] = input_object.fields[8].to_f
+        hash['y1'] = input_object.fields[9].to_f
+        hash['z1'] = input_object.fields[10].to_f
+        hash['length'] = input_object.fields[11].to_f
+        hash['height'] = input_object.fields[12].to_f
 
       when "FenestrationSurface:Detailed"
         base_surface = input_object.fields[4]
@@ -786,11 +786,11 @@ module LegacyOpenStudio
         case input_object.class_name.upcase
           when "BUILDINGSURFACE:DETAILED","WALL:DETAILED", "ROOFCEILING:DETAILED", "FLOOR:DETAILED"
             if input_object.class_name.upcase == "BUILDINGSURFACE:DETAILED"
+              number_of_vertices = input_object.fields[11].to_i
+              vertices = input_object.fields[12..-1]
+            else
               number_of_vertices = input_object.fields[10].to_i
               vertices = input_object.fields[11..-1]
-            else
-              number_of_vertices = input_object.fields[9].to_i
-              vertices = input_object.fields[10..-1]
             end
 
             if number_of_vertices == 0 # autocalculate
