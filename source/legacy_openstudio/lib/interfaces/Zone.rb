@@ -523,7 +523,7 @@ module LegacyOpenStudio
       spaces = 0
       objects = Plugin.model_manager.input_file.find_objects_by_class_name("SPACE").collect { |object| object }
       for object in objects
-        if object.fields[2].name == @input_object.name
+        if object.fields[2].to_s == @input_object.name
           spaces += 1
         end
       end

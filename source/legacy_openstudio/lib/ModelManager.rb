@@ -4,6 +4,7 @@
 
 require("euclid/lib/legacy_openstudio/lib/ConstructionManager")
 require("euclid/lib/legacy_openstudio/lib/ScheduleManager")
+require("euclid/lib/legacy_openstudio/lib/SpaceManager")
 require("euclid/lib/legacy_openstudio/lib/ResultsManager")
 
 require("euclid/lib/legacy_openstudio/lib/dialogs/ProgressDialog")
@@ -22,7 +23,7 @@ module LegacyOpenStudio
 
   class ModelManager
 
-    attr_accessor :guid, :units_system, :units_hash, :length_precision, :angle_precision, :construction_manager, :schedule_manager, :results_manager, :zone_loads_manager
+    attr_accessor :guid, :units_system, :units_hash, :length_precision, :angle_precision, :construction_manager, :schedule_manager, :space_manager, :results_manager, :zone_loads_manager
     attr_accessor :input_file, :components, :weather_file, :model_interface, :rendering_mode, :unviewed_errors, :model_observer, :selection_observer
 
 
@@ -44,6 +45,7 @@ module LegacyOpenStudio
 
       @construction_manager = ConstructionManager.new
       @schedule_manager = ScheduleManager.new
+      @space_manager = SpaceManager.new
       @results_manager = ResultsManager.new  # Requires model_manager in 'initialize'
 
       @model_observer = ModelObserver.new

@@ -217,6 +217,9 @@ module LegacyOpenStudio
       @new_schedule_cmd = UI::Command.new("New Schedule Stub") { Plugin.model_manager.schedule_manager.new_schedule_stub }
       @new_schedule_cmd.set_validation_proc { MF_ENABLED }
 
+      @new_space_cmd = UI::Command.new("New Space Stub") { Plugin.model_manager.space_manager.new_space_stub }
+      @new_space_cmd.set_validation_proc { MF_ENABLED }
+
       @run_cmd = UI::Command.new("Run Simulation...") { Plugin.dialog_manager.show(RunSimulationInterface) }
       @run_cmd.small_icon = Plugin.dir + "/lib/resources/icons/RunEnergyPlus-16.png"
       @run_cmd.large_icon = Plugin.dir + "/lib/resources/icons/RunEnergyPlus-24.png"
@@ -494,6 +497,7 @@ module LegacyOpenStudio
       @plugin_menu.add_item(@edit_thermostats_cmd)
       @plugin_menu.add_item(@new_construct_cmd)
       @plugin_menu.add_item(@new_schedule_cmd)
+      @plugin_menu.add_item(@new_space_cmd)
       @plugin_menu.add_separator
       @rendering_menu = @plugin_menu.add_submenu("Rendering")
       @animation_menu = @plugin_menu.add_submenu("Animation")
