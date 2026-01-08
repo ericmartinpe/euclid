@@ -1,0 +1,107 @@
+{
+    "Version": {
+        "Version 1": {
+            "version_identifier": "25.1"
+        }
+    },
+    "Building": {
+        "Simple Building": {
+            "north_axis": 0.0,
+            "terrain": "Suburbs",
+            "loads_convergence_tolerance_value": 0.04,
+            "temperature_convergence_tolerance_value": 0.4,
+            "solar_distribution": "FullExterior",
+            "maximum_number_of_warmup_days": 25,
+            "minimum_number_of_warmup_days": 6
+        }
+    },
+    "GlobalGeometryRules": {
+        "GlobalGeometryRules 1": {
+            "starting_vertex_position": "UpperLeftCorner",
+            "vertex_entry_direction": "Counterclockwise",
+            "coordinate_system": "Relative"
+        }
+    },
+    "Zone": {
+        "Zone_1": {
+            "direction_of_relative_north": 0.0,
+            "x_origin": 0.0,
+            "y_origin": 0.0,
+            "z_origin": 0.0,
+            "type": "",
+            "multiplier": 1,
+            "ceiling_height": "autocalculate",
+            "volume": "autocalculate"
+        }
+    },
+    "BuildingSurface:Detailed": {
+        "Wall_South": {
+            "surface_type": "Wall",
+            "construction_name": "Exterior Wall",
+            "zone_name": "Zone_1",
+            "space_name": "",
+            "outside_boundary_condition": "Outdoors",
+            "outside_boundary_condition_object": "",
+            "sun_exposure": "SunExposed",
+            "wind_exposure": "WindExposed",
+            "view_factor_to_ground": 0.5,
+            "number_of_vertices": 4,
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 0.0,
+                    "vertex_y_coordinate": 0.0,
+                    "vertex_z_coordinate": 3.0
+                },
+                {
+                    "vertex_x_coordinate": 0.0,
+                    "vertex_y_coordinate": 0.0,
+                    "vertex_z_coordinate": 0.0
+                },
+                {
+                    "vertex_x_coordinate": 10.0,
+                    "vertex_y_coordinate": 0.0,
+                    "vertex_z_coordinate": 0.0
+                },
+                {
+                    "vertex_x_coordinate": 10.0,
+                    "vertex_y_coordinate": 0.0,
+                    "vertex_z_coordinate": 3.0
+                }
+            ]
+        },
+        "Floor": {
+            "surface_type": "Floor",
+            "construction_name": "Floor Construction",
+            "zone_name": "Zone_1",
+            "space_name": "",
+            "outside_boundary_condition": "Ground",
+            "outside_boundary_condition_object": "",
+            "sun_exposure": "NoSun",
+            "wind_exposure": "NoWind",
+            "view_factor_to_ground": 0.0,
+            "number_of_vertices": 4,
+            "vertices": [
+                {
+                    "vertex_x_coordinate": 0.0,
+                    "vertex_y_coordinate": 0.0,
+                    "vertex_z_coordinate": 0.0
+                },
+                {
+                    "vertex_x_coordinate": 0.0,
+                    "vertex_y_coordinate": 10.0,
+                    "vertex_z_coordinate": 0.0
+                },
+                {
+                    "vertex_x_coordinate": 10.0,
+                    "vertex_y_coordinate": 10.0,
+                    "vertex_z_coordinate": 0.0
+                },
+                {
+                    "vertex_x_coordinate": 10.0,
+                    "vertex_y_coordinate": 0.0,
+                    "vertex_z_coordinate": 0.0
+                }
+            ]
+        }
+    }
+}
