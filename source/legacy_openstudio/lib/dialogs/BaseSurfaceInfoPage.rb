@@ -25,6 +25,13 @@ module LegacyOpenStudio
       end
       set_select_options("ZONE", object_names.sort)
 
+      # Populate space list
+      object_names = Plugin.model_manager.input_file.find_objects_by_class_name("SPACE").collect { |object| object.name }
+      if (not object_names.contains?(@hash['SPACE']))
+        object_names.add(@hash['SPACE'])
+      end
+      set_select_options("SPACE", object_names.sort)
+      
       # Populate construction list
       object_names = Plugin.model_manager.construction_manager.constructions.collect { |object| object.name }
       if (not object_names.contains?(@hash['CONSTRUCTION']))

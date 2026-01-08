@@ -190,6 +190,32 @@ class Geom::PolygonLoop
   end
 
 
+  def points_make_line?
+    # Verify that points of the loop don't make a line
+    edge_lengths = []
+    for i in 0...@points.length
+      this_point = @points[i]
+
+      if (i == @points.length - 1)
+        next_point = @points.first
+      else
+        next_point = @points[i + 1]
+      end
+
+      # Calculate and store edge length
+      edge_length = this_point.distance(next_point)
+      edge_lengths << edge_length
+    end
+
+    total_edge_length = edge_lengths.inject(0, :+)
+    max_edge_length = edge_lengths.max
+    if (total_edge_length == 2*max_edge_length) # other edge_length values are 0
+      return(true)
+    else
+      return(false)
+    end
+  end
+
   def valid?
     reduced_points = self.reduce
 
@@ -429,6 +455,10 @@ class Geom::Polygon
   def reduce!
     @loops.each { |polygon_loop| polygon_loop.reduce! }
     return(self)
+  end
+
+  def points_make_line? 
+    return(@outer_loop.points_make_line?)
   end
 
 

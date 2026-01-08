@@ -470,7 +470,7 @@ module LegacyOpenStudio
     def unit_exterior_area
       area = 0.0
       for child in @children
-        if (child.class == BaseSurface and child.input_object.fields[5].upcase == "OUTDOORS")
+        if (child.class == BaseSurface and child.input_object.fields[6].upcase == "OUTDOORS")
           area += child.gross_area
         end
       end
@@ -488,7 +488,7 @@ module LegacyOpenStudio
       # "Total" area, includes multiplier
       area = 0.0
       for child in @children
-        if (child.class == BaseSurface and child.input_object.fields[5].upcase == "OUTDOORS")
+        if (child.class == BaseSurface and child.input_object.fields[6].upcase == "OUTDOORS")
           area += child.glazing_area
         end
       end
@@ -518,6 +518,29 @@ module LegacyOpenStudio
       return(count)
     end
 
+    # Counts all spaces assigned directly to zone.
+    def spaces_assigned_to_zone_count
+      spaces = 0
+      objects = Plugin.model_manager.input_file.find_objects_by_class_name("SPACE").collect { |object| object }
+      for object in objects
+        if object.fields[2].name == @input_object.name
+          spaces += 1
+        end
+      end
+      return(spaces)
+    end
+
+    # Counts all spaces assigned to base surfaces in the zone.
+    def spaces_assigned_to_surfaces_count
+      spaces = []
+      for child in @children
+        if (child.class == BaseSurface and child.input_object.fields[5] != "")
+          spaces << child.input_object.fields[5]
+        end
+      end
+      return(spaces.uniq.length())
+    end
+    
 
   end
 

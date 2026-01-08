@@ -20,13 +20,14 @@ module LegacyOpenStudio
         @hash['TYPE'] = @input_object.fields[2].upcase
         @hash['CONSTRUCTION'] = @input_object.fields[3].to_s
         @hash['ZONE'] = @input_object.fields[4].to_s
-        @hash['OUTSIDE_BOUNDARY_CONDITION'] = @input_object.fields[5].upcase
-        @hash['OUTSIDE_BOUNDARY_OBJECT'] = @input_object.fields[6].to_s
+        @hash['SPACE'] = @input_object.fields[5].to_s
+        @hash['OUTSIDE_BOUNDARY_CONDITION'] = @input_object.fields[6].upcase
+        @hash['OUTSIDE_BOUNDARY_OBJECT'] = @input_object.fields[7].to_s
 
-        @hash['SUN'] = (@input_object.fields[7].upcase == "SUNEXPOSED")
-        @hash['WIND'] = (@input_object.fields[8].upcase == "WINDEXPOSED")
+        @hash['SUN'] = (@input_object.fields[8].upcase == "SUNEXPOSED")
+        @hash['WIND'] = (@input_object.fields[9].upcase == "WINDEXPOSED")
 
-        @hash['VIEW_FACTOR_TO_GROUND'] = @input_object.fields[9]
+        @hash['VIEW_FACTOR_TO_GROUND'] = @input_object.fields[10]
 
 
         # Need better method here
@@ -42,7 +43,7 @@ module LegacyOpenStudio
 
         @hash['AREA'] = gross_area.round_to(Plugin.model_manager.length_precision).to_s + " " + Plugin.model_manager.units_hash['m2'][i]
         @hash['NET_AREA'] = net_area.round_to(Plugin.model_manager.length_precision).to_s + " " + Plugin.model_manager.units_hash['m2'][i]
-        @hash['VERTICES'] = @input_object.fields[10].to_s
+        @hash['VERTICES'] = @input_object.fields[11].to_s
         @hash['SUB_SURFACES'] = @drawing_interface.sub_surface_count
         @hash['PERCENT_GLAZING'] = @drawing_interface.percent_glazing.round_to(1).to_s + " %"
         @hash['OBJECT_TEXT'] = @input_object.to_idf
@@ -73,7 +74,15 @@ module LegacyOpenStudio
         @input_object.fields[4] = @hash['ZONE']
       end
 
-      @input_object.fields[5] = @input_object.class_definition.field_definitions[5].get_choice_key(@hash['OUTSIDE_BOUNDARY_CONDITION'])
+      # Lookup Space object
+      objects = Plugin.model_manager.input_file.find_objects_by_class_name("SPACE")
+      if (object = objects.find { |object| object.name == @hash['SPACE'] })
+        @input_object.fields[5] = object
+      else
+        @input_object.fields[5] = @hash['SPACE']
+      end
+      
+      @input_object.fields[6] = @input_object.class_definition.field_definitions[6].get_choice_key(@hash['OUTSIDE_BOUNDARY_CONDITION'])
 
       case (@hash['OUTSIDE_BOUNDARY_CONDITION'])
 
@@ -116,26 +125,26 @@ module LegacyOpenStudio
       end
 
       if (outside_boundary_object.nil?)
-        @input_object.fields[6] = ""
+        @input_object.fields[7] = ""
       else
-        @input_object.fields[6] = outside_boundary_object
+        @input_object.fields[7] = outside_boundary_object
       end
 
 
       if (@hash['SUN'])
-        @input_object.fields[7] = "SunExposed"
+        @input_object.fields[8] = "SunExposed"
       else
-        @input_object.fields[7] = "NoSun"
+        @input_object.fields[8] = "NoSun"
       end
 
       if (@hash['WIND'])
-        @input_object.fields[8] = "WindExposed"
+        @input_object.fields[9] = "WindExposed"
       else
-        @input_object.fields[8] = "NoWind"
+        @input_object.fields[9] = "NoWind"
       end
 
 
-      @input_object.fields[9] = @hash['VIEW_FACTOR_TO_GROUND'].strip
+      @input_object.fields[10] = @hash['VIEW_FACTOR_TO_GROUND'].strip
 
 
       # Update object text with changes

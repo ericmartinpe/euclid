@@ -67,6 +67,20 @@ module LegacyOpenStudio
           return(false)
         end
 
+        # Check that vertices don't make a line
+        if(input_object_polygon.points_make_line?)
+          Plugin.model_manager.add_error("Error:  " + @input_object.key + "\n")
+          Plugin.model_manager.add_error("The vertices for this surface form a line.\n")
+          Plugin.model_manager.add_error("This error cannot be automatically fixed.  The surface will not be drawn.\n\n")
+
+          # Best outcome is that the offending surface is commented out in the code and the DrawingInterface and InputObject
+          # are deleted.  This needs more supporting work before this can be done.
+          delete_input_object
+          #@input_object.comment_out!  # comment out the input object in the IDF
+
+          return(false)
+        end
+
         # Check that vertices are all in the same plane
         plane = Geom.fit_plane_to_points(points[0..2])
         new_points = []
