@@ -130,6 +130,7 @@ task :package, [:architecture] => [:compile] do |t, args|
     platform = "mac"
   end
 
+  set_read_write(build_dir)  # Set writable to allow package directory creation
   FileUtils.mkdir_p("#{build_dir}/package")
   package_path = "#{build_dir}/package/euclid-#{Euclid::VERSION}-#{platform}-#{commit}.rbz"
 
@@ -140,15 +141,17 @@ task :package, [:architecture] => [:compile] do |t, args|
   output_dir = Pathname.new("#{root_dir}/build/output/extension")
   paths = Pathname.glob("#{root_dir}/build/output/extension/**/{*,.*}")
 
-  zip = Zip::File.open(package_path, Zip::File::CREATE)
-  paths.each do |path|
-    if (File.extname(path) != ".cache")  # Filter out Energy+.idd.cache files
-      #puts "  Adding: #{path}"
-      zip.add(path.relative_path_from(output_dir), path)
+  Zip::File.open(package_path, create: true) do |zip|
+    paths.each do |path|
+      if (File.extname(path) != ".cache")  # Filter out Energy+.idd.cache files
+        #puts "  Adding: #{path}"
+        zip.add(path.relative_path_from(output_dir), path)
+      end
     end
+    puts "  Writing zip at: #{package_path}..."
   end
-  puts "  Writing zip at: #{package_path}..."
-  zip.close
+
+  set_read_only(build_dir)  # Set read-only to prevent accidental editing
 
   puts "  Packaging complete."
 end
