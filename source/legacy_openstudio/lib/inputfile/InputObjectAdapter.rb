@@ -23,10 +23,13 @@ module LegacyOpenStudio
     def get_field(identifier)
       if @is_json
         if identifier.is_a?(Integer)
-          # Convert field index to property name
-          return @object.name if identifier == 1  # Name is always field 1
+          # Convert field index to property name using FieldMapper
           prop_name = FieldMapper.to_property(@object.class_name, identifier)
-          return @object[prop_name] if prop_name
+          if prop_name
+            # Special case: "name" property maps to object key in epJSON
+            return @object.key if prop_name == "name"
+            return @object[prop_name]
+          end
         else
           # Direct property access by name
           return @object[identifier]
@@ -50,10 +53,12 @@ module LegacyOpenStudio
     def set_field(identifier, value)
       if @is_json
         if identifier.is_a?(Integer)
-          # Can't set name via field index for JSON (name is the object key)
-          return if identifier == 1
           prop_name = FieldMapper.to_property(@object.class_name, identifier)
-          @object[prop_name] = value if prop_name
+          if prop_name
+            # Can't change the object key (name) after creation
+            return if prop_name == "name"
+            @object[prop_name] = value
+          end
         else
           # Direct property access by name
           @object[identifier] = value
@@ -74,15 +79,32 @@ module LegacyOpenStudio
     # @return [Array<Float>] Flat array [x1, y1, z1, x2, y2, z2, ...]
     def get_vertices
       if @is_json
-        vertices_array = @object["vertices"] || []
-        # Convert epJSON vertex objects to flat array for compatibility
-        vertices_array.flat_map do |v|
-          [
-            v["vertex_x_coordinate"] || 0.0,
-            v["vertex_y_coordinate"] || 0.0,
-            v["vertex_z_coordinate"] || 0.0
-          ]
+        # Check if vertices are stored as an array (BuildingSurface:Detailed)
+        vertices_array = @object["vertices"]
+        if vertices_array && !vertices_array.empty?
+          # Convert epJSON vertex objects to flat array for compatibility
+          return vertices_array.flat_map do |v|
+            [
+              v["vertex_x_coordinate"] || 0.0,
+              v["vertex_y_coordinate"] || 0.0,
+              v["vertex_z_coordinate"] || 0.0
+            ]
+          end
         end
+        
+        # For FenestrationSurface:Detailed, vertices are stored as individual properties
+        # vertex_1_x_coordinate, vertex_1_y_coordinate, vertex_1_z_coordinate, etc.
+        num_vertices = @object["number_of_vertices"] || 0
+        result = []
+        (1..num_vertices).each do |i|
+          x = @object["vertex_#{i}_x_coordinate"]
+          y = @object["vertex_#{i}_y_coordinate"]
+          z = @object["vertex_#{i}_z_coordinate"]
+          if x && y && z
+            result << x.to_f << y.to_f << z.to_f
+          end
+        end
+        result
       else
         # IDF: vertices start at different indices depending on object type
         start_idx = FieldMapper.vertices_start_index(@object.class_name)
@@ -114,9 +136,26 @@ module LegacyOpenStudio
     #   - Array of coordinate arrays [[x1, y1, z1], [x2, y2, z2], ...]
     def set_vertices(points_data)
       if @is_json
-        vertices = convert_to_epjson_vertices(points_data)
-        @object["vertices"] = vertices
-        @object["number_of_vertices"] = vertices.length
+        # Check if this object uses vertex array format (BuildingSurface:Detailed)
+        # or individual vertex properties (FenestrationSurface:Detailed)
+        if @object.class_name.upcase.include?("BUILDINGSURFACE")
+          # BuildingSurface:Detailed uses vertices array
+          vertices = convert_to_epjson_vertices(points_data)
+          @object["vertices"] = vertices
+          @object["number_of_vertices"] = vertices.length
+        else
+          # FenestrationSurface:Detailed uses individual vertex_N_x/y/z_coordinate properties
+          flat_coords = convert_to_flat_coordinates(points_data)
+          num_vertices = flat_coords.length / 3
+          @object["number_of_vertices"] = num_vertices
+          
+          (1..num_vertices).each do |i|
+            idx = (i - 1) * 3
+            @object["vertex_#{i}_x_coordinate"] = flat_coords[idx].to_f
+            @object["vertex_#{i}_y_coordinate"] = flat_coords[idx + 1].to_f
+            @object["vertex_#{i}_z_coordinate"] = flat_coords[idx + 2].to_f
+          end
+        end
       else
         # IDF: replace vertices in fields array
         start_idx = FieldMapper.vertices_start_index(@object.class_name)
@@ -152,6 +191,10 @@ module LegacyOpenStudio
     def convert_to_epjson_vertices(points_data)
       vertices = []
       
+      if points_data.empty?
+        return vertices
+      end
+      
       if points_data.first.respond_to?(:x) && points_data.first.respond_to?(:y) && points_data.first.respond_to?(:z)
         # Array of Point3d objects
         points_data.each do |point|
@@ -170,8 +213,9 @@ module LegacyOpenStudio
             "vertex_z_coordinate" => coords[2].to_f
           }
         end
-      elsif points_data.first.is_a?(Numeric)
-        # Flat array of coordinates
+      else
+        # Flat array of coordinates (Numeric or String)
+        # Convert to float to handle both numbers and formatted strings
         (0...points_data.length).step(3) do |i|
           vertices << {
             "vertex_x_coordinate" => points_data[i].to_f,
@@ -189,6 +233,10 @@ module LegacyOpenStudio
     def convert_to_flat_coordinates(points_data)
       coords = []
       
+      if points_data.empty?
+        return coords
+      end
+      
       if points_data.first.respond_to?(:x) && points_data.first.respond_to?(:y) && points_data.first.respond_to?(:z)
         # Array of Point3d objects
         points_data.each do |point|
@@ -201,8 +249,8 @@ module LegacyOpenStudio
         points_data.each do |coord_array|
           coords.concat(coord_array.map(&:to_f))
         end
-      elsif points_data.first.is_a?(Numeric)
-        # Already flat array
+      else
+        # Flat array (Numeric or String) - convert all to float
         coords = points_data.map(&:to_f)
       end
       

@@ -11,6 +11,7 @@
 module LegacyOpenStudio
 
   class Bag
+    include Enumerable
 
     def initialize(this_object = nil)
       @objects = []

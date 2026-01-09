@@ -3,6 +3,7 @@
 # See the file "License.txt" for additional terms and conditions.
 
 require("euclid/lib/legacy_openstudio/lib/dialogs/DialogInterface")
+require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 
 
 module LegacyOpenStudio
@@ -15,22 +16,23 @@ module LegacyOpenStudio
 
       if (not @drawing_interface.nil?)
         @input_object = @drawing_interface.input_object
+        adapter = InputObjectAdapter.new(@input_object)
 
-        @hash['NAME'] = @input_object.fields[1]
-        @hash['ROTATION'] = @input_object.fields[2]
-        if (@input_object.fields[3].empty?)
+        @hash['NAME'] = adapter.get_field(1)
+        @hash['ROTATION'] = adapter.get_field(2)
+        if (adapter.get_field(3).to_s.empty?)
           @hash['TERRAIN'] = "SUBURBS"  # Show default value when blank
         else
-          @hash['TERRAIN'] = @input_object.fields[3].upcase
+          @hash['TERRAIN'] = adapter.get_field(3).upcase
         end
-        @hash['LOADS_TOLERANCE'] = @input_object.fields[4]
-        @hash['TEMPERATURE_TOLERANCE'] = @input_object.fields[5]
-        if (@input_object.fields[6].empty?)
+        @hash['LOADS_TOLERANCE'] = adapter.get_field(4)
+        @hash['TEMPERATURE_TOLERANCE'] = adapter.get_field(5)
+        if (adapter.get_field(6).to_s.empty?)
           @hash['SOLAR_DISTRIBUTION'] = "FULLEXTERIOR"  # Show default value when blank
         else
-          @hash['SOLAR_DISTRIBUTION'] = @input_object.fields[6].upcase
+          @hash['SOLAR_DISTRIBUTION'] = adapter.get_field(6).upcase
         end
-        @hash['MAX_WARMUP_DAYS'] = @input_object.fields[7]
+        @hash['MAX_WARMUP_DAYS'] = adapter.get_field(7)
 
         zones = Plugin.model_manager.zones
         @hash['ZONES'] = zones.count
@@ -78,14 +80,15 @@ module LegacyOpenStudio
 
     def report
       input_object_copy = @input_object.copy
+      adapter = InputObjectAdapter.new(@input_object)
 
-      @input_object.fields[1] = @hash['NAME'].strip
-      @input_object.fields[2] = @hash['ROTATION'].strip
-      @input_object.fields[3] = @input_object.class_definition.field_definitions[3].get_choice_key(@hash['TERRAIN'])
-      @input_object.fields[4] = @hash['LOADS_TOLERANCE'].strip
-      @input_object.fields[5] = @hash['TEMPERATURE_TOLERANCE'].strip
-      @input_object.fields[6] = @input_object.class_definition.field_definitions[6].get_choice_key(@hash['SOLAR_DISTRIBUTION'])
-      @input_object.fields[7] = @hash['MAX_WARMUP_DAYS'].strip
+      adapter.set_field(1, @hash['NAME'].strip)
+      adapter.set_field(2, @hash['ROTATION'].strip)
+      adapter.set_field(3, @input_object.class_definition.field_definitions[3].get_choice_key(@hash['TERRAIN']))
+      adapter.set_field(4, @hash['LOADS_TOLERANCE'].strip)
+      adapter.set_field(5, @hash['TEMPERATURE_TOLERANCE'].strip)
+      adapter.set_field(6, @input_object.class_definition.field_definitions[6].get_choice_key(@hash['SOLAR_DISTRIBUTION']))
+      adapter.set_field(7, @hash['MAX_WARMUP_DAYS'].strip)
 
       # Update object text with changes
       @hash['OBJECT_TEXT'] = @input_object.to_idf

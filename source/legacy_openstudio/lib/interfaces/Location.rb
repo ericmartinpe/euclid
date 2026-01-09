@@ -3,6 +3,7 @@
 # See the file "License.txt" for additional terms and conditions.
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingInterface")
+require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 require("euclid/lib/legacy_openstudio/lib/observers/ShadowInfoObserver")
 
 
@@ -27,11 +28,11 @@ module LegacyOpenStudio
       super
 
       if (valid_entity?)
-        @input_object.fields[1] = @entity["City"]
-        @input_object.fields[2] = @entity["Latitude"].to_s
-        @input_object.fields[3] = @entity["Longitude"].to_s
-        @input_object.fields[4] = @entity["TZOffset"].to_s
-        #@input_object.fields[5] = ?  # Elevation is not handled by shadow info
+        adapter.set_field(1, @entity["City"])
+        adapter.set_field(2, @entity["Latitude"].to_s)
+        adapter.set_field(3, @entity["Longitude"].to_s)
+        adapter.set_field(4, @entity["TZOffset"].to_s)
+        #adapter.set_field(5, ?)  # Elevation is not handled by shadow info
       end
     end
 
@@ -52,15 +53,19 @@ module LegacyOpenStudio
       return(false)
     end
 
+    # Adapter for unified IDF/epJSON access
+    def adapter
+      @adapter ||= InputObjectAdapter.new(@input_object)
+    end
 
     # Updates the entity with the current state of the input object.
     def update_entity
       if (valid_entity?)
-        @entity["City"] = @input_object.fields[1]
-        @entity["Latitude"] = @input_object.fields[2].to_f
-        @entity["Longitude"] = @input_object.fields[3].to_f
-        @entity["TZOffset"] = @input_object.fields[4].to_f
-        # ? = @input_object.fields[5].to_f   Elevation is not handled by shadow info
+        @entity["City"] = adapter.get_field(1)
+        @entity["Latitude"] = adapter.get_field(2).to_f
+        @entity["Longitude"] = adapter.get_field(3).to_f
+        @entity["TZOffset"] = adapter.get_field(4).to_f
+        # ? = adapter.get_field(5).to_f   Elevation is not handled by shadow info
       end
     end
 

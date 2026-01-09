@@ -3,6 +3,7 @@
 # See the file "License.txt" for additional terms and conditions.
 
 require("euclid/lib/legacy_openstudio/lib/dialogs/Dialogs")
+require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 
 
 module LegacyOpenStudio
@@ -99,8 +100,9 @@ module LegacyOpenStudio
     def on_change_base_surface
       base_surface = Plugin.model_manager.input_file.find_object_by_class_and_name("BUILDINGSURFACE:DETAILED", @hash['BASE_SURFACE'])
       if (base_surface)
+        base_adapter = InputObjectAdapter.new(base_surface)
 
-        case (base_surface.fields[5].upcase)
+        case (base_adapter.get_field(5).upcase)
 
         when "OUTDOORS"
           enable_element("VIEW_FACTOR_TO_GROUND")

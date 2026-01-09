@@ -3,6 +3,7 @@
 # See the file "License.txt" for additional terms and conditions.
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/SurfaceGroup")
+require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 
 
 module LegacyOpenStudio
@@ -16,6 +17,11 @@ module LegacyOpenStudio
 
     def name
       return @input_object.fields[1]
+    end
+
+    # Adapter for unified IDF/epJSON access
+    def adapter
+      @adapter ||= InputObjectAdapter.new(@input_object)
     end
 
 ##### Begin override methods for the input object #####
@@ -369,21 +375,25 @@ module LegacyOpenStudio
 
 
     def origin
-      if (@input_object.fields[3].nil?)
+      x_field = adapter.get_field(3)
+      y_field = adapter.get_field(4)
+      z_field = adapter.get_field(5)
+      
+      if (x_field.nil?)
         puts "Zone.origin:  missing x coordinate"
       end
 
-      if (@input_object.fields[4].nil?)
+      if (y_field.nil?)
         puts "Zone.origin:  missing y coordinate"
       end
 
-      if (@input_object.fields[5].nil?)
+      if (z_field.nil?)
         puts "Zone.origin:  missing z coordinate"
       end
 
-      x = @input_object.fields[3].to_f.m
-      y = @input_object.fields[4].to_f.m
-      z = @input_object.fields[5].to_f.m
+      x = x_field.to_f.m
+      y = y_field.to_f.m
+      z = z_field.to_f.m
 
       return(Geom::Point3d.new(x,y,z))
     end
@@ -399,15 +409,15 @@ module LegacyOpenStudio
         # NOTE:  Comment above applies more for surfaces than zones.
       end
 
-      @input_object.fields[3] = point.x.to_m.round_to(decimal_places).to_s
-      @input_object.fields[4] = point.y.to_m.round_to(decimal_places).to_s
-      @input_object.fields[5] = point.z.to_m.round_to(decimal_places).to_s
+      adapter.set_field(3, point.x.to_m.round_to(decimal_places).to_s)
+      adapter.set_field(4, point.y.to_m.round_to(decimal_places).to_s)
+      adapter.set_field(5, point.z.to_m.round_to(decimal_places).to_s)
     end
 
 
     def azimuth
 # April'10 - this is being pulled from the building.rb rotation angle
-      field = @input_object.fields[2]
+      field = adapter.get_field(2)
 
       if (field.nil?)
         # post an error log item, ZONE object is missing some fields

@@ -124,6 +124,22 @@ module LegacyOpenStudio
       @objects.find { |obj| obj.class_name == class_name && obj.name == name }
     end
     
+    def find_objects_by_class_name(*args)
+      found_objects = Collection.new
+      for arg in args
+        found_objects += @objects.find_all { |object| object.is_class_name?(arg) }
+      end
+      return found_objects
+    end
+    
+    def find_object_by_class_and_name(class_name, object_name)
+      return @objects.find { |object| object.is_class_name?(class_name) && object.name == object_name }
+    end
+    
+    def object_exists?(this_object)
+      return @objects.contains?(this_object)
+    end
+    
     def find_object_by_id(object_id)
       @objects.find { |obj| obj.object_id == object_id }
     end
@@ -140,8 +156,9 @@ module LegacyOpenStudio
       json_string = File.read(path)
       json_data = JSON.parse(json_string)
       
-      # Track object counts for progress reporting
-      total_objects = json_data.values.sum { |instances| instances.is_a?(Hash) ? instances.size : 0 }
+      # Track object counts for progress reporting (Ruby 2.2 compatible)
+      total_objects = 0
+      json_data.values.each { |instances| total_objects += instances.size if instances.is_a?(Hash) }
       count = 0
       
       # Iterate through object types

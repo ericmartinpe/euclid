@@ -5,6 +5,7 @@
 require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingUtils")
 require("euclid/lib/legacy_openstudio/lib/interfaces/Surface")
 require("euclid/lib/legacy_openstudio/lib/inputfile/InputObject")
+require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 
 
 module LegacyOpenStudio
@@ -16,23 +17,27 @@ module LegacyOpenStudio
       @first_vertex_field = 10
     end
 
+    def adapter
+      @adapter ||= InputObjectAdapter.new(@input_object)
+    end
 
     def create_input_object
       @input_object = InputObject.new("FENESTRATIONSURFACE:DETAILED")
-      @input_object.fields[1] = Plugin.model_manager.input_file.new_unique_object_name
-      @input_object.fields[2] = default_surface_type
-      @input_object.fields[3] = ""
-      @input_object.fields[4] = ""  # Base Surface
-      @input_object.fields[5] = ""
-      @input_object.fields[6] = ""
-      @input_object.fields[7] = ""
-      @input_object.fields[8] = ""
+      @adapter = nil  # Reset adapter
+      adapter.set_field(1, Plugin.model_manager.input_file.new_unique_object_name)
+      adapter.set_field(2, default_surface_type)
+      adapter.set_field(3, "")
+      adapter.set_field(4, "")  # Base Surface
+      adapter.set_field(5, "")
+      adapter.set_field(6, "")
+      adapter.set_field(7, "")
+      adapter.set_field(8, "")
       # Removed input field for "WINDOWPROPERTY:SHADINGCONTROL" in "FENESTRATIONSURFACE:DETAILED" object for EnergyPlus v9.0
-      # @input_object.fields[9] = ""
+      # adapter.set_field(9, "")
 
-      @input_object.fields[3] = default_construction # do after setting boundary conditions
+      adapter.set_field(3, default_construction) # do after setting boundary conditions
 
-      @input_object.fields[11] = 0  # kludge to make fields list long enough for call below
+      adapter.set_field(11, 0)  # kludge to make fields list long enough for call below
 
       super
     end
@@ -56,7 +61,7 @@ module LegacyOpenStudio
         parent = @parent
         if (parent.class != BaseSurface)
           Plugin.model_manager.add_error("Error:  " + @input_object.key + "\n")
-          Plugin.model_manager.add_error("This sub surface is missing its base surface: " + @input_object.fields[4].to_s + "\n")
+          Plugin.model_manager.add_error("This sub surface is missing its base surface: " + adapter.get_field(4).to_s + "\n")
           Plugin.model_manager.add_error("A new zone object has been automatically created for this surface.\n")
           Plugin.model_manager.add_error("However it is still missing a base surface.\n")
 
@@ -94,8 +99,8 @@ module LegacyOpenStudio
 
 
           # Check if the sub surface is inside-out
-          if ((Plugin.model_manager.surface_geometry.input_object.fields[2].upcase == "COUNTERCLOCKWISE" and not surface_polygon.normal.samedirection?(parent.entity.normal)) \
-            or (Plugin.model_manager.surface_geometry.input_object.fields[2].upcase == "CLOCKWISE" and surface_polygon.normal.samedirection?(parent.entity.normal)))
+          if ((Plugin.model_manager.surface_geometry.adapter.get_field(2).upcase == "COUNTERCLOCKWISE" and not surface_polygon.normal.samedirection?(parent.entity.normal)) \
+            or (Plugin.model_manager.surface_geometry.adapter.get_field(2).upcase == "CLOCKWISE" and surface_polygon.normal.samedirection?(parent.entity.normal)))
             Plugin.model_manager.add_error("Warning:  " + @input_object.key + "\n")
             Plugin.model_manager.add_error("This sub surface is inside-out; outward normal does not match its base surface.\n")
             Plugin.model_manager.add_error("It has been automatically fixed.\n\n")
@@ -136,9 +141,9 @@ module LegacyOpenStudio
 
       if (valid_entity?)
         if (@parent.class == BaseSurface)
-          @input_object.fields[4] = @parent.input_object  # Parent should already have been updated.
+          adapter.set_field(4, @parent.input_object)  # Parent should already have been updated.
         else
-          @input_object.fields[4] = ""
+          adapter.set_field(4, "")
         end
       end
     end
@@ -148,7 +153,7 @@ module LegacyOpenStudio
     def parent_from_input_object
       parent = nil
       if (@input_object)
-        parent = Plugin.model_manager.base_surfaces.find { |object| object.input_object.equal?(@input_object.fields[4]) }
+        parent = Plugin.model_manager.base_surfaces.find { |object| object.input_object.equal?(adapter.get_field(4)) }
       end
       return(parent)
     end
@@ -200,7 +205,7 @@ module LegacyOpenStudio
 
 
     def surface_type
-      return(@input_object.fields[2])
+      return(adapter.get_field(2))
     end
 
 
@@ -252,7 +257,7 @@ module LegacyOpenStudio
     end
 
     def exterior?
-      return (@input_object.fields[5].nil? or @input_object.fields[5].to_s.empty?)
+      return (adapter.get_field(5).nil? or adapter.get_field(5).to_s.empty?)
     end
 
     def default_construction
@@ -279,7 +284,7 @@ module LegacyOpenStudio
     end
 
     def multiplier
-      value = @input_object.fields[8].to_i
+      value = adapter.get_field(8).to_i
       if (value > 0)
         return(value)
       else

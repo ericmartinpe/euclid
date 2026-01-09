@@ -94,7 +94,8 @@ task :compile, [:architecture] do |t, args|
   FileUtils.cp("#{root_dir}/releases.md", "#{root_dir}/build/output/extension/euclid")
   FileUtils.cp("#{root_dir}/readme.md", "#{root_dir}/build/output/extension/euclid")
 
-  set_read_only(build_dir)  # Set read-only to prevent accidental editing
+  # Commented out for development to allow SketchUp to write cache files
+  # set_read_only(build_dir)  # Set read-only to prevent accidental editing
 
   puts "Compiling completed."
 end
@@ -151,7 +152,8 @@ task :package, [:architecture] => [:compile] do |t, args|
     puts "  Writing zip at: #{package_path}..."
   end
 
-  set_read_only(build_dir)  # Set read-only to prevent accidental editing
+  # Commented out for development to allow SketchUp to write cache files
+  # set_read_only(build_dir)  # Set read-only to prevent accidental editing
 
   puts "  Packaging complete."
 end

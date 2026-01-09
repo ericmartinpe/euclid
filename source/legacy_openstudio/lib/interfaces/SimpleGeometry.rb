@@ -2,6 +2,8 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
+require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
+require("euclid/lib/legacy_openstudio/lib/inputfile/EpJsonFile")
 
 module LegacyOpenStudio
 
@@ -17,6 +19,11 @@ module LegacyOpenStudio
     # Convert simple rectangular geometry surfaces to detailed ones.
     # Because of dependencies, surfaces must be processed in this order: shading, sub surfaces, base surfaces.
     def SimpleGeometry.convert_to_detailed(input_file)
+      
+      # Skip simple geometry conversion for epJSON files - they only support detailed geometry
+      if input_file.is_a?(EpJsonFile)
+        return
+      end
 
       # Reconcile the coordinate systems for simple geometry.
       # If the normal system and the simple one are different, the simple objects
@@ -24,15 +31,19 @@ module LegacyOpenStudio
       # NOTE:  GlobalGeometryRules has not been parsed into a SurfaceGeometry object yet.
       if (surface_geometry = input_file.find_objects_by_class_name("GlobalGeometryRules").to_a.first)
 
-        case (surface_geometry.fields[3].upcase)
+        # Use adapter to handle both IDF and epJSON objects
+        adapter = InputObjectAdapter.new(surface_geometry)
+        
+        case (adapter.get_field(3).to_s.upcase)
         when "ABSOLUTE", "WORLD", "WORLDCOORDINATESYSTEM", "WCS"
           normal_coord_sys = "World" # as of EnergyPlus v9.3, "Absolute" is not a viable input o
         else
           normal_coord_sys = "Relative"
         end
 
-        if (surface_geometry.fields[5])
-          case (surface_geometry.fields[5].upcase)
+        simple_field = adapter.get_field(5)
+        if (simple_field && !simple_field.to_s.empty?)
+          case (simple_field.to_s.upcase)
           when "ABSOLUTE", "WORLD", "WORLDCOORDINATESYSTEM", "WCS"
             simple_coord_sys = "World" # as of EnergyPlus v9.3, "Absolute" is not a viable input option
           else
@@ -58,9 +69,10 @@ module LegacyOpenStudio
 
       # Get the building transformation.
       if (building = input_file.find_objects_by_class_name("Building").to_a.first)
+        building_adapter = InputObjectAdapter.new(building)
         origin = Geom::Point3d.new(0, 0, 0)
         z_axis = Geom::Vector3d.new(0, 0, 1)
-        rotation_angle = (-building.fields[2].to_f).degrees
+        rotation_angle = (-building_adapter.get_field(2).to_f).degrees
         building_rotation = Geom::Transformation.rotation(origin, z_axis, rotation_angle)
       else
         building_rotation = Geom::Transformation.new  # Identity transformation

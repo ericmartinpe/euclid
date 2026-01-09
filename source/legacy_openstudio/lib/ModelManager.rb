@@ -9,6 +9,10 @@ require("euclid/lib/legacy_openstudio/lib/ResultsManager")
 require("euclid/lib/legacy_openstudio/lib/dialogs/ProgressDialog")
 
 require("euclid/lib/legacy_openstudio/lib/inputfile/InputFile")
+require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
+require("euclid/lib/legacy_openstudio/lib/inputfile/FieldMapper")
+require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
+require("euclid/lib/legacy_openstudio/lib/inputfile/EpJsonFile")
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/ModelInterface")
 
@@ -139,7 +143,8 @@ module LegacyOpenStudio
       if (input_file_attached?)
         name = File.basename(@input_file.path)
       else
-        name = File.basename(model_name) + ".idf"
+        # Default to epJSON for new files
+        name = File.basename(model_name) + ".epJSON"
       end
       return(name)
     end
@@ -154,6 +159,14 @@ module LegacyOpenStudio
         dir = Plugin.read_pref("Last Input File Dir")
       end
       return(dir)
+    end
+
+
+    # Check if file is epJSON format based on extension
+    def is_epjson_file?(path)
+      return false if path.nil?
+      ext = File.extname(path).downcase
+      return ext == '.epjson' || ext == '.json'
     end
 
 
@@ -178,7 +191,14 @@ module LegacyOpenStudio
         progress_dialog = ProgressDialog.new
 
         begin
-          @input_file = InputFile.open(Plugin.data_dictionary, path, Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
+          # Detect file type from extension
+          if is_epjson_file?(path)
+            # Open as epJSON file
+            @input_file = EpJsonFile.open(path, Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
+          else
+            # Open as IDF file
+            @input_file = InputFile.open(Plugin.data_dictionary, path, Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
+          end
 
           if (@input_file)
             @model_interface = ModelInterface.new(@input_file)
@@ -220,6 +240,15 @@ module LegacyOpenStudio
       elsif (not File.exist?(path))
         puts "ModelManager.merge_input_file:  bad path"
       else
+        # Check if merging compatible file types
+        if @input_file.is_a?(EpJsonFile) && !is_epjson_file?(path)
+          UI.messagebox("Cannot merge IDF file into epJSON file. Please convert the file first.")
+          return
+        elsif @input_file.is_a?(InputFile) && is_epjson_file?(path)
+          UI.messagebox("Cannot merge epJSON file into IDF file. Please convert the file first.")
+          return
+        end
+        
         @input_file.merge(path)
         @model_interface.draw_model
         Sketchup.active_model.active_view.zoom_extents
@@ -485,7 +514,8 @@ module LegacyOpenStudio
 
     def relative_coordinates?
       if (drawing_interface = surface_geometry)
-        return(drawing_interface.input_object.fields[3] == "Relative")
+        adapter = InputObjectAdapter.new(drawing_interface.input_object)
+        return(adapter.get_field(3) == "Relative")
       else
         puts "ModelManager.relative_coordinates?:  GlobalGeometryRules is missing"
         return(false)
@@ -494,8 +524,9 @@ module LegacyOpenStudio
 
     def relative_daylighting_coordinates?
       if (drawing_interface = surface_geometry)
-        if (drawing_interface.input_object.fields[4])
-          return(drawing_interface.input_object.fields[4] == "Relative")
+        adapter = InputObjectAdapter.new(drawing_interface.input_object)
+        if (adapter.get_field(4))
+          return(adapter.get_field(4) == "Relative")
         else
           return(true) # default
         end

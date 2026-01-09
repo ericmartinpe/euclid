@@ -10,6 +10,48 @@ module LegacyOpenStudio
   class JsonInputObject
     attr_accessor :name, :properties, :deleted, :dependents
     
+    # Define which properties reference other objects for each object type
+    REFERENCE_PROPERTIES = {
+      "BuildingSurface:Detailed" => {
+        "zone_name" => ["Zone"],
+        "space_name" => ["Space"],
+        "construction_name" => ["Construction", "Construction:AirBoundary"],
+        "outside_boundary_condition_object" => ["BuildingSurface:Detailed", "Zone", "Space", 
+                                                 "SurfaceProperty:OtherSideCoefficients", 
+                                                 "SurfaceProperty:OtherSideConditionsModel",
+                                                 "Foundation:Kiva"]
+      },
+      
+      "FenestrationSurface:Detailed" => {
+        "building_surface_name" => ["BuildingSurface:Detailed"],
+        "construction_name" => ["Construction"],
+        "outside_boundary_condition_object" => ["FenestrationSurface:Detailed"],
+        "frame_and_divider_name" => ["WindowProperty:FrameAndDivider"]
+      },
+      
+      "Shading:Zone:Detailed" => {
+        "base_surface_name" => ["BuildingSurface:Detailed"],
+        "transmittance_schedule_name" => ["Schedule:Compact", "Schedule:File", "Schedule:Constant"]
+      },
+      
+      "Shading:Site:Detailed" => {
+        "transmittance_schedule_name" => ["Schedule:Compact", "Schedule:File", "Schedule:Constant"]
+      },
+      
+      "Shading:Building:Detailed" => {
+        "transmittance_schedule_name" => ["Schedule:Compact", "Schedule:File", "Schedule:Constant"]
+      },
+      
+      "Daylighting:Controls" => {
+        "zone_name" => ["Zone"],
+        "availability_schedule_name" => ["Schedule:Compact", "Schedule:File", "Schedule:Constant"]
+      },
+      
+      "Output:IlluminanceMap" => {
+        "zone_name" => ["Zone"]
+      }
+    }
+    
     def initialize(object_type, name, properties = {})
       @object_type = object_type
       @name = name
@@ -20,6 +62,11 @@ module LegacyOpenStudio
     
     def class_name
       @object_type
+    end
+    
+    # Check if this object is of a given class name (case-insensitive)
+    def is_class_name?(name)
+      return name.upcase == @object_type.upcase
     end
     
     def deleted?
@@ -87,48 +134,6 @@ module LegacyOpenStudio
     # Resolve object references
     # Replace name strings with object references where appropriate
     def resolve_references(object_lookup)
-      # Define which properties reference other objects for each object type
-      REFERENCE_PROPERTIES = {
-        "BuildingSurface:Detailed" => {
-          "zone_name" => ["Zone"],
-          "space_name" => ["Space"],
-          "construction_name" => ["Construction", "Construction:AirBoundary"],
-          "outside_boundary_condition_object" => ["BuildingSurface:Detailed", "Zone", "Space", 
-                                                   "SurfaceProperty:OtherSideCoefficients", 
-                                                   "SurfaceProperty:OtherSideConditionsModel",
-                                                   "Foundation:Kiva"]
-        },
-        
-        "FenestrationSurface:Detailed" => {
-          "building_surface_name" => ["BuildingSurface:Detailed"],
-          "construction_name" => ["Construction"],
-          "outside_boundary_condition_object" => ["FenestrationSurface:Detailed"],
-          "frame_and_divider_name" => ["WindowProperty:FrameAndDivider"]
-        },
-        
-        "Shading:Zone:Detailed" => {
-          "base_surface_name" => ["BuildingSurface:Detailed"],
-          "transmittance_schedule_name" => ["Schedule:Compact", "Schedule:File", "Schedule:Constant"]
-        },
-        
-        "Shading:Site:Detailed" => {
-          "transmittance_schedule_name" => ["Schedule:Compact", "Schedule:File", "Schedule:Constant"]
-        },
-        
-        "Shading:Building:Detailed" => {
-          "transmittance_schedule_name" => ["Schedule:Compact", "Schedule:File", "Schedule:Constant"]
-        },
-        
-        "Daylighting:Controls" => {
-          "zone_name" => ["Zone"],
-          "availability_schedule_name" => ["Schedule:Compact", "Schedule:File", "Schedule:Constant"]
-        },
-        
-        "Output:IlluminanceMap" => {
-          "zone_name" => ["Zone"]
-        }
-      }
-      
       ref_props = REFERENCE_PROPERTIES[@object_type]
       return unless ref_props
       
@@ -151,6 +156,38 @@ module LegacyOpenStudio
         
         # If reference not found, leave as string (will be flagged as error elsewhere)
       end
+    end
+    
+    # Convert to IDF format text for display
+    # This is a simplified version that shows the JSON structure
+    def to_idf
+      lines = []
+      lines << "!- ========== epJSON Object =========="
+      lines << "!- Class: #{@object_type}"
+      lines << "!- Name: #{@name}"
+      lines << ""
+      
+      @properties.each do |key, value|
+        # Format value for display
+        display_value = if value.is_a?(JsonInputObject) || value.is_a?(InputObject)
+          value.to_s  # Show object name
+        elsif value.is_a?(Array)
+          if value.first.is_a?(Hash)
+            # Vertices array - show count
+            "#{value.length} vertices"
+          else
+            value.inspect
+          end
+        elsif value.is_a?(Hash)
+          value.inspect
+        else
+          value.to_s
+        end
+        
+        lines << "  #{key}: #{display_value}"
+      end
+      
+      lines.join("\n")
     end
   end
 

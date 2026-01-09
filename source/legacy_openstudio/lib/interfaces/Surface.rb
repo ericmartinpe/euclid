@@ -4,6 +4,7 @@
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingInterface")
 require("euclid/lib/legacy_openstudio/lib/inputfile/InputObject")
+require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 require("euclid/lib/legacy_openstudio/lib/observers/FaceObserver")
 
 
@@ -135,7 +136,8 @@ module LegacyOpenStudio
       end
 
       # Apply vertex order rule (Clockwise or Counterclockwise)
-      if (Plugin.model_manager.surface_geometry.input_object.fields[2].upcase == "CLOCKWISE")
+      surface_geom_adapter = InputObjectAdapter.new(Plugin.model_manager.surface_geometry.input_object)
+      if (surface_geom_adapter.get_field(2).upcase == "CLOCKWISE")
         points = surface_polygon.points.reverse
       else
         points = surface_polygon.points
@@ -169,13 +171,20 @@ module LegacyOpenStudio
     end
 
 
+    # Adapter for unified IDF/epJSON access
+    def adapter
+      @adapter ||= InputObjectAdapter.new(@input_object)
+    end
+
+
     # Error checks, finalization, or cleanup needed after the entity is drawn.
     def confirm_entity
       if (super)
 
         # Even though the vertex order is correct in the input object, SketchUp will sometimes draw a face
         # upside-down because of its relationship to surrounding geometry.
-        if (Plugin.model_manager.surface_geometry.input_object.fields[2].upcase == "CLOCKWISE")
+        surface_geom_adapter = InputObjectAdapter.new(Plugin.model_manager.surface_geometry.input_object)
+        if (surface_geom_adapter.get_field(2).upcase == "CLOCKWISE")
           if (@entity.normal.samedirection?(surface_polygon.normal))
             puts "Clockwise:  Fix unintended reversed face"
             # Fix unintended reversed face.
@@ -266,16 +275,16 @@ module LegacyOpenStudio
 
 
     def input_object_polygon
-      number_of_vertices = ((@input_object.fields.length - @first_vertex_field) / 3).floor
-
+      # Use adapter to get vertices in a unified way for both IDF and epJSON
+      # get_vertices returns a flat array [x1, y1, z1, x2, y2, z2, ...]
+      vertices = adapter.get_vertices
+      
       points = []
-      for i in 0..number_of_vertices-1
-        # Input File API should take of error checking of fields before the input object gets here
-        x = @input_object.fields[@first_vertex_field + i*3].to_f.m
-        y = @input_object.fields[@first_vertex_field + i*3 + 1].to_f.m
-        z = @input_object.fields[@first_vertex_field + i*3 + 2].to_f.m
-
-        points[i] = Geom::Point3d.new(x, y, z)
+      (0...vertices.length).step(3) do |i|
+        x = vertices[i].to_f.m
+        y = vertices[i+1].to_f.m
+        z = vertices[i+2].to_f.m
+        points << Geom::Point3d.new(x, y, z)
       end
 
       return(Geom::Polygon.new(points))
@@ -296,22 +305,22 @@ module LegacyOpenStudio
       #end
       format_string = "%0." + decimal_places.to_s + "f"  # This could be stored in a more central place
 
-      # Truncate old vertex fields in case the number of vertices is less than before
-      @input_object.fields[@first_vertex_field..-1] = nil
-
       points = polygon.points
-      number_of_vertices = points.length
-      @input_object.fields[@first_vertex_field - 1] = number_of_vertices  # slightly kludgy
-
-      for i in 0...number_of_vertices
-        x = points[i].x.to_m.round_to(decimal_places)
-        y = points[i].y.to_m.round_to(decimal_places)
-        z = points[i].z.to_m.round_to(decimal_places)
-
-        @input_object.fields[@first_vertex_field + i*3] = format(format_string, x)
-        @input_object.fields[@first_vertex_field + i*3 + 1] = format(format_string, y)
-        @input_object.fields[@first_vertex_field + i*3 + 2] = format(format_string, z)
+      
+      # Convert points to flat array of formatted coordinates
+      vertices = []
+      points.each do |point|
+        x = point.x.to_m.round_to(decimal_places)
+        y = point.y.to_m.round_to(decimal_places)
+        z = point.z.to_m.round_to(decimal_places)
+        
+        vertices << format(format_string, x)
+        vertices << format(format_string, y)
+        vertices << format(format_string, z)
       end
+      
+      # Use adapter to set vertices in a unified way for both IDF and epJSON
+      adapter.set_vertices(vertices)
     end
 
 
@@ -454,7 +463,8 @@ module LegacyOpenStudio
       temp_points = points
 
       # Apply vertex order rule (Clockwise or Counterclockwise)
-      if (Plugin.model_manager.surface_geometry.input_object.fields[2].upcase == "CLOCKWISE")
+      surface_geom_adapter = InputObjectAdapter.new(Plugin.model_manager.surface_geometry.input_object)
+      if (surface_geom_adapter.get_field(2).upcase == "CLOCKWISE")
         temp_points.reverse!
       end
 
@@ -508,7 +518,8 @@ module LegacyOpenStudio
         end
       end
 
-      case (Plugin.model_manager.surface_geometry.input_object.fields[1].upcase)
+      surface_geom_adapter = InputObjectAdapter.new(Plugin.model_manager.surface_geometry.input_object)
+      case (surface_geom_adapter.get_field(1).upcase)
 
       when "UPPERLEFTCORNER"
         corner = centroid + x_axis.scale(x_min) + y_axis.scale(y_max)  # ULC
@@ -520,6 +531,8 @@ module LegacyOpenStudio
         corner = centroid + x_axis.scale(x_max) + y_axis.scale(y_min)  # LRC
       else
         puts "Surface.apply_surface_geometry:  bad first vertex"
+        # Default to UpperLeftCorner
+        corner = centroid + x_axis.scale(x_min) + y_axis.scale(y_max)  # ULC
       end
 
       #cp1 = Sketchup.active_model.entities.add_cpoint(Geom::Point3d.new(cn1.x, cn1.y, cn1.z))

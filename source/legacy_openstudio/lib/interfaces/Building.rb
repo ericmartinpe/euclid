@@ -3,6 +3,7 @@
 # See the file "License.txt" for additional terms and conditions.
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingInterface")
+require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 require("euclid/lib/legacy_openstudio/lib/observers/ShadowInfoObserver")
 
 module LegacyOpenStudio
@@ -88,8 +89,13 @@ module LegacyOpenStudio
       end
     end
 
+    # Adapter for unified IDF/epJSON access
+    def adapter
+      @adapter ||= InputObjectAdapter.new(@input_object)
+    end
+
     def azimuth
-      return(@input_object.fields[2].to_f)
+      return(adapter.get_field(2).to_f)
     end
 
     def transformation   # coordinate_transformation?  that's what Zone and Surface uses

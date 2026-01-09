@@ -100,7 +100,9 @@ module LegacyOpenStudio
       "GLOBALGEOMETRYRULES" => {
         1 => "starting_vertex_position",
         2 => "vertex_entry_direction",
-        3 => "coordinate_system"
+        3 => "coordinate_system",
+        4 => "daylighting_reference_point_coordinate_system",
+        5 => "rectangular_surface_coordinate_system"
       },
       
       "DAYLIGHTING:CONTROLS" => {
@@ -137,7 +139,9 @@ module LegacyOpenStudio
     
     # Convert IDF field index to epJSON property name
     def self.to_property(object_type, field_index)
-      MAPPINGS[object_type.upcase]&.[](field_index)
+      mapping = MAPPINGS[object_type.upcase]
+      return nil unless mapping
+      mapping[field_index]
     end
     
     # Convert epJSON property name to IDF field index

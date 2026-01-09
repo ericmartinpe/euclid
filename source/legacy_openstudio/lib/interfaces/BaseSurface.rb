@@ -4,6 +4,7 @@
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/Surface")
 require("euclid/lib/legacy_openstudio/lib/inputfile/InputObject")
+require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 require("euclid/lib/legacy_openstudio/lib/dialogs/ProgressDialog")
 
 
@@ -51,10 +52,18 @@ module LegacyOpenStudio
     def check_input_object
       if (super)
         # Check for upside-down floors, roofs, or ceilings
-        dot_product = input_object_polygon.normal % Geom::Vector3d.new(0, 0, 1)
+        polygon_normal = input_object_polygon.normal
+        if polygon_normal.nil?
+          Plugin.model_manager.add_error("Error:  " + @input_object.key + "\n")
+          Plugin.model_manager.add_error("Unable to calculate surface normal (polygon may be invalid).\n\n")
+          return(false)
+        end
+        
+        dot_product = polygon_normal % Geom::Vector3d.new(0, 0, 1)
         if (surface_type.upcase == "FLOOR")
-          if ((Plugin.model_manager.surface_geometry.input_object.fields[2].upcase == "COUNTERCLOCKWISE" and dot_product > 0.000001))  \
-            or ((Plugin.model_manager.surface_geometry.input_object.fields[2].upcase == "CLOCKWISE" and dot_product < -0.000001))
+          surface_geom_adapter = InputObjectAdapter.new(Plugin.model_manager.surface_geometry.input_object)
+          if ((surface_geom_adapter.get_field(2).upcase == "COUNTERCLOCKWISE" and dot_product > 0.000001))  \
+            or ((surface_geom_adapter.get_field(2).upcase == "CLOCKWISE" and dot_product < -0.000001))
 
             Plugin.model_manager.add_error("Warning:  " + @input_object.key + "\n")
             Plugin.model_manager.add_error("This Floor surface is upside-down.\nIt has been automatically fixed.\n\n")
@@ -63,8 +72,9 @@ module LegacyOpenStudio
             self.input_object_polygon = self.input_object_polygon.reverse
           end
         elsif (surface_type.upcase == "ROOF" or surface_type.upcase == "CEILING")
-          if ((Plugin.model_manager.surface_geometry.input_object.fields[2].upcase == "COUNTERCLOCKWISE" and dot_product < -0.000001))  \
-            or ((Plugin.model_manager.surface_geometry.input_object.fields[2].upcase == "CLOCKWISE" and dot_product > 0.000001))
+          surface_geom_adapter = InputObjectAdapter.new(Plugin.model_manager.surface_geometry.input_object)
+          if ((surface_geom_adapter.get_field(2).upcase == "COUNTERCLOCKWISE" and dot_product < -0.000001))  \
+            or ((surface_geom_adapter.get_field(2).upcase == "CLOCKWISE" and dot_product > 0.000001))
 
             Plugin.model_manager.add_error("Warning:  " + @input_object.key + "\n")
             Plugin.model_manager.add_error("This Roof or Ceiling surface is upside-down.\nIt has been automatically fixed.\n\n")
@@ -93,7 +103,7 @@ module LegacyOpenStudio
       super  # Surface superclass updates the vertices
 
       if (valid_entity?)
-        @input_object.fields[4] = @parent.input_object  # Parent should already have been updated.
+        adapter.set_field(4, @parent.input_object)  # Parent should already have been updated.
 
         # This is some extra (redundant?) error checking that was added because Zone objects were disappearing.
 
@@ -118,7 +128,7 @@ module LegacyOpenStudio
     def parent_from_input_object
       parent = nil
       if (@input_object)
-        parent = Plugin.model_manager.zones.find { |object| object.input_object.equal?(@input_object.fields[4]) }
+        parent = Plugin.model_manager.zones.find { |object| object.input_object.equal?(adapter.get_field(4)) }
       end
       return(parent)
     end
@@ -141,7 +151,7 @@ module LegacyOpenStudio
 
 
     def surface_type
-      return(@input_object.fields[2])
+      return(adapter.get_field(2))
     end
 
 
