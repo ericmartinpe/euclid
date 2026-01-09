@@ -13,6 +13,7 @@ require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
 require("euclid/lib/legacy_openstudio/lib/inputfile/FieldMapper")
 require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 require("euclid/lib/legacy_openstudio/lib/inputfile/EpJsonFile")
+require("euclid/lib/legacy_openstudio/lib/inputfile/IdfToEpjsonConverter")
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/ModelInterface")
 
@@ -191,13 +192,37 @@ module LegacyOpenStudio
         progress_dialog = ProgressDialog.new
 
         begin
-          # Detect file type from extension
+          # Detect file type and convert IDF to epJSON if needed
           if is_epjson_file?(path)
-            # Open as epJSON file
-            @input_file = EpJsonFile.open(path, Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
+            # Already epJSON - open directly
+            epjson_path = path
           else
-            # Open as IDF file
-            @input_file = InputFile.open(Plugin.data_dictionary, path, Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
+            # IDF file - convert to epJSON first
+            progress_dialog.update_progress(0, "Converting IDF to epJSON...")
+            
+            # Convert in temp directory
+            require 'tmpdir'
+            temp_dir = Dir.mktmpdir
+            epjson_path = File.join(temp_dir, File.basename(path, ".*") + ".epJSON")
+            
+            converted_path = IdfToEpjsonConverter.convert(path, epjson_path)
+            
+            unless converted_path
+              add_error("Failed to convert IDF file to epJSON format.\n")
+              add_error("Please ensure EnergyPlus is installed.\n")
+              progress_dialog.destroy
+              return false
+            end
+            
+            epjson_path = converted_path
+          end
+          
+          # Open the epJSON file
+          @input_file = EpJsonFile.open(epjson_path, Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
+          
+          # Store original path if it was an IDF file
+          if !is_epjson_file?(path)
+            @input_file.original_idf_path = path
           end
 
           if (@input_file)

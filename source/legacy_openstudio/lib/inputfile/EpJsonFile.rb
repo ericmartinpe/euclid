@@ -11,7 +11,7 @@ require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
 module LegacyOpenStudio
 
   class EpJsonFile
-    attr_accessor :path, :modified, :objects, :deleted_objects, :new_objects, :context
+    attr_accessor :path, :modified, :objects, :deleted_objects, :new_objects, :context, :original_idf_path, :energyplus_version
     
     def self.open(path, update_progress = nil)
       file = new(update_progress)
@@ -27,6 +27,8 @@ module LegacyOpenStudio
       @deleted_objects = Collection.new
       @update_progress = update_progress
       @context = ""  # For compatibility with InputFile
+      @original_idf_path = nil  # Track original IDF file if converted
+      @energyplus_version = "25-1-0"  # Default to 25.1.0
     end
     
     def open(path)
@@ -155,6 +157,11 @@ module LegacyOpenStudio
       # Read and parse JSON file
       json_string = File.read(path)
       json_data = JSON.parse(json_string)
+      
+      # Detect EnergyPlus version from file
+      require_relative 'IdfToEpjsonConverter'
+      @energyplus_version = IdfToEpjsonConverter.detect_version_from_epjson(json_data)
+      puts "Detected EnergyPlus version: #{@energyplus_version.gsub('-', '.')}"
       
       # Track object counts for progress reporting (Ruby 2.2 compatible)
       total_objects = 0
