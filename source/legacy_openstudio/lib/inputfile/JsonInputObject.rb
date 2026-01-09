@@ -91,6 +91,24 @@ module LegacyOpenStudio
       @properties[property_name] = value
     end
     
+    # Convenience methods with defaults
+    def get_property(property_name, default = nil)
+      @properties.fetch(property_name, default)
+    end
+    
+    def set_property(property_name, value)
+      @properties[property_name] = value
+    end
+    
+    def has_property?(property_name)
+      @properties.key?(property_name)
+    end
+    
+    # Get all property names
+    def property_names
+      @properties.keys
+    end
+    
     # Convert to JSON hash for writing
     def to_json_hash
       @properties.dup
