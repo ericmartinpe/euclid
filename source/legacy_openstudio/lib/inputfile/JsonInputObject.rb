@@ -97,6 +97,19 @@ module LegacyOpenStudio
     end
     
     def set_property(property_name, value)
+      # Convert string numbers to actual numeric types for proper JSON serialization
+      # EnergyPlus expects numbers, not strings for numeric fields
+      if value.is_a?(String) && !value.empty?
+        # Check if it's a number (integer or float)
+        if value =~ /^-?\d+$/
+          # Integer
+          value = value.to_i
+        elsif value =~ /^-?\d*\.?\d+([eE][-+]?\d+)?$/
+          # Float (including scientific notation)
+          value = value.to_f
+        end
+        # Otherwise keep as string (it's a name, schedule, etc.)
+      end
       @properties[property_name] = value
     end
     
@@ -111,7 +124,31 @@ module LegacyOpenStudio
     
     # Convert to JSON hash for writing
     def to_json_hash
-      @properties.dup
+      # Convert string numbers to actual numeric types for proper JSON serialization
+      result = {}
+      @properties.each do |key, value|
+        if value.is_a?(String) && !value.empty?
+          # Special case: version_identifier should always remain a string
+          if key == 'version_identifier'
+            result[key] = value
+          # Check if it's a pure number (integer or float with single decimal point)
+          # Don't convert strings with multiple dots (like version numbers "25.1.0")
+          elsif value =~ /^-?\d+$/ && value.count('.') == 0
+            # Integer
+            result[key] = value.to_i
+          elsif value =~ /^-?\d*\.\d+$/ && value.count('.') == 1
+            # Float with exactly one decimal point
+            result[key] = value.to_f
+          else
+            # Keep as string (names, schedules, version numbers, etc.)
+            result[key] = value
+          end
+        else
+          # Keep other types as-is (numbers, arrays, hashes, etc.)
+          result[key] = value
+        end
+      end
+      result
     end
     
     # String conversion (for object references)

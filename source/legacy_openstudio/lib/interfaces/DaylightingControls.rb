@@ -141,10 +141,10 @@ module LegacyOpenStudio
         control_data = @input_object.get_property('control_data', [])
         if control_data.is_a?(Array)
           if control_data.length >= 1 && @reference_point1
-            control_data[0]['daylighting_reference_point_name'] = @reference_point1.get_property('name')
+            control_data[0]['daylighting_reference_point_name'] = @reference_point1.name
           end
           if control_data.length >= 2 && @reference_point2
-            control_data[1]['daylighting_reference_point_name'] = @reference_point2.get_property('name')
+            control_data[1]['daylighting_reference_point_name'] = @reference_point2.name
           end
           @input_object.set_property('control_data', control_data)
         end
