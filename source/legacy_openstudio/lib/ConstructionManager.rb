@@ -140,25 +140,99 @@ module LegacyOpenStudio
 
     def reset_defaults
 
-      # These default construction names are just suggestions, the user can change them in preferences
+      # Analyze the model to find the most commonly used constructions
+      # If none found, fall back to generic names
+      auto_defaults = detect_common_constructions
+      
+      @default_floor_ext = auto_defaults[:floor_ext] || "Exterior Floor"
+      @default_floor_int = auto_defaults[:floor_int] || "Interior Floor"
 
-      @default_floor_ext = "Exterior Floor"
-      @default_floor_int = "Interior Floor"
+      @default_wall_ext = auto_defaults[:wall_ext] || "Exterior Wall"
+      @default_wall_int = auto_defaults[:wall_int] || "Interior Wall"
 
-      @default_wall_ext = "Exterior Wall"
-      @default_wall_int = "Interior Wall"
+      @default_roof_ext = auto_defaults[:roof_ext] || "Exterior Roof"
+      @default_roof_int = auto_defaults[:roof_int] || "Interior Ceiling"
 
-      @default_roof_ext = "Exterior Roof"
-      @default_roof_int = "Interior Ceiling"
+      @default_window_ext = auto_defaults[:window] || "Exterior Window"
+      @default_window_int = auto_defaults[:window] || "Interior Window"
 
-      @default_window_ext = "Exterior Window"
-      @default_window_int = "Interior Window"
-
-      @default_door_ext = "Exterior Door"
-      @default_door_int = "Interior Door"
+      @default_door_ext = auto_defaults[:door] || "Exterior Door"
+      @default_door_int = auto_defaults[:door] || "Interior Door"
 
       @default_save_path = ""
 
+    end
+
+    # Detect the most commonly used constructions in the model
+    def detect_common_constructions
+      # Return empty hash if no input file loaded yet
+      return {} unless Plugin.model_manager.input_file
+      
+      # Count construction usage by surface type and boundary condition
+      counts = Hash.new { |h, k| h[k] = Hash.new(0) }
+      
+      # Analyze all BuildingSurface:Detailed objects
+      Plugin.model_manager.input_file.find_objects_by_class_name("BuildingSurface:Detailed").each do |surface|
+        surface_type = surface.get_property('surface_type', '').upcase
+        boundary = surface.get_property('outside_boundary_condition', '').upcase
+        construction = surface.get_property('construction_name', '')
+        
+        # Convert construction object to string name if needed
+        construction = construction.to_s if construction.respond_to?(:to_s)
+        
+        next if construction.nil? || construction.to_s.empty?
+        
+        # Categorize by surface type and boundary
+        if surface_type == 'WALL'
+          if boundary == 'OUTDOORS' || boundary == 'GROUND'
+            counts[:wall_ext][construction] += 1
+          elsif boundary == 'SURFACE' || boundary == 'ZONE'
+            counts[:wall_int][construction] += 1
+          end
+        elsif surface_type == 'FLOOR'
+          if boundary == 'OUTDOORS' || boundary == 'GROUND'
+            counts[:floor_ext][construction] += 1
+          elsif boundary == 'SURFACE' || boundary == 'ZONE'
+            counts[:floor_int][construction] += 1
+          end
+        elsif surface_type == 'ROOF' || surface_type == 'CEILING'
+          if boundary == 'OUTDOORS'
+            counts[:roof_ext][construction] += 1
+          elsif boundary == 'SURFACE' || boundary == 'ZONE'
+            counts[:roof_int][construction] += 1
+          end
+        end
+      end
+      
+      # Analyze all FenestrationSurface:Detailed objects
+      Plugin.model_manager.input_file.find_objects_by_class_name("FenestrationSurface:Detailed").each do |surface|
+        surface_type = surface.get_property('surface_type', '').upcase
+        construction = surface.get_property('construction_name', '')
+        
+        # Convert construction object to string name if needed
+        construction = construction.to_s if construction.respond_to?(:to_s)
+        
+        next if construction.nil? || construction.to_s.empty?
+        
+        # Count all windows together, all doors together
+        if surface_type == 'WINDOW' || surface_type == 'GLAZEDOOR'
+          counts[:window][construction] += 1
+        elsif surface_type == 'DOOR'
+          counts[:door][construction] += 1
+        end
+      end
+      
+      # Find the most common construction for each category
+      defaults = {}
+      counts.each do |category, construction_counts|
+        unless construction_counts.empty?
+          # Simply use the construction with the highest count
+          most_common = construction_counts.max_by { |name, count| count }
+          defaults[category] = most_common[0] if most_common
+        end
+      end
+      
+      defaults
     end
 
 
