@@ -4,6 +4,7 @@
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingInterface")
 require("euclid/lib/legacy_openstudio/lib/interfaces/Zone")
+require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
 require("euclid/lib/legacy_openstudio/lib/observers/ComponentObserver")
 
 module LegacyOpenStudio
@@ -19,38 +20,95 @@ module LegacyOpenStudio
       @observer = ComponentObserver.new(self)
       @observer_child0 = ComponentObserver.new(self)
       @observer_child1 = ComponentObserver.new(self)
+      @reference_point1 = nil
+      @reference_point2 = nil
     end
 
 ##### Begin override methods for the input object #####
 
     def create_input_object
-
-      @input_object = InputObject.new("DAYLIGHTING:CONTROLS")
-      @input_object.fields[1] = # Zone
-      @input_object.fields[2] = "1" # Total Daylighting Reference Points
-      @input_object.fields[3] = "" # X-Coordinate of First Reference Point
-      @input_object.fields[4] = "" # Y-Coordinate of First Reference Point
-      @input_object.fields[5] = "" # Z-Coordinate of First Reference Point
-      @input_object.fields[6] = "" # X-Coordinate of Second Reference Point
-      @input_object.fields[7] = "" # Y-Coordinate of Second Reference Point
-      @input_object.fields[8] = "" # Z-Coordinate of Second Reference Point
-      @input_object.fields[9] = "1" # Fraction of Zone Controlled by First Reference Point
-      @input_object.fields[10] = "0" # Fraction of Zone Controlled by Second Reference Point
-      @input_object.fields[11] = "500" # Illuminance Setpoint at First Reference Point
-      @input_object.fields[12] = "500" # Illuminance Setpoint at Second Reference Point
-      @input_object.fields[13] = "1" # Lighting Control Type, 1=continuous,2=stepped,3=continuous/off
-      @input_object.fields[14] = "0" # Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis
-      @input_object.fields[15] = "22" # Maximum Allowable Discomfort Glare Index
-      @input_object.fields[16] = "0.3" # Minimum Input Power Fraction for Continuous Dimming Control
-      @input_object.fields[17] = "0.2" # Minimum Light Output Fraction for Continuous Dimming Control
-      @input_object.fields[18] = "1" # Number of Stepped Control Steps
-      @input_object.fields[19] = "1" # Probability Lighting will be Reset When Needed in Manual Stepped Control
+      # EnergyPlus 25.1+ uses separate ReferencePoint objects
+      name = Plugin.model_manager.input_file.new_unique_object_name
+      @input_object = JsonInputObject.new("Daylighting:Controls", name)
+      
+      # Create two reference point objects
+      @reference_point1 = JsonInputObject.new("Daylighting:ReferencePoint", name + "_RefPt1")
+      @reference_point2 = JsonInputObject.new("Daylighting:ReferencePoint", name + "_RefPt2")
+      
+      # Add reference points to input file
+      Plugin.model_manager.input_file.add_object(@reference_point1)
+      Plugin.model_manager.input_file.add_object(@reference_point2)
+      
+      # Set basic properties for controls object
+      @input_object.set_property('zone_or_space_name', '')
+      @input_object.set_property('daylighting_method', 'SplitFlux')
+      @input_object.set_property('lighting_control_type', 'Continuous')
+      @input_object.set_property('minimum_input_power_fraction_for_continuous_or_continuousoff_dimming_control', '0.3')
+      @input_object.set_property('minimum_light_output_fraction_for_continuous_or_continuousoff_dimming_control', '0.2')
+      @input_object.set_property('number_of_stepped_control_steps', '1')
+      @input_object.set_property('probability_lighting_will_be_reset_when_needed_in_manual_stepped_control', '1')
+      @input_object.set_property('glare_calculation_daylighting_reference_point_name', @reference_point1.name)
+      @input_object.set_property('glare_calculation_azimuth_angle_of_view_direction_clockwise_from_zone_y_axis', '0')
+      @input_object.set_property('maximum_allowable_discomfort_glare_index', '22')
+      
+      # Create control_data array with both reference points
+      control_data = [
+        {
+          'daylighting_reference_point_name' => @reference_point1.name,
+          'fraction_of_lights_controlled_by_reference_point' => 1.0,
+          'illuminance_setpoint_at_reference_point' => 500
+        },
+        {
+          'daylighting_reference_point_name' => @reference_point2.name,
+          'fraction_of_lights_controlled_by_reference_point' => 0.0,
+          'illuminance_setpoint_at_reference_point' => 500
+        }
+      ]
+      @input_object.set_property('control_data', control_data)
+      
+      # Set reference point zone (will be updated when zone is assigned)
+      @reference_point1.set_property('zone_or_space_name', '')
+      @reference_point2.set_property('zone_or_space_name', '')
+      
+      # Initialize coordinates to empty (will be set when placed)
+      @reference_point1.set_property('x_coordinate_of_reference_point', '')
+      @reference_point1.set_property('y_coordinate_of_reference_point', '')
+      @reference_point1.set_property('z_coordinate_of_reference_point', '')
+      @reference_point2.set_property('x_coordinate_of_reference_point', '')
+      @reference_point2.set_property('y_coordinate_of_reference_point', '')
+      @reference_point2.set_property('z_coordinate_of_reference_point', '')
 
       super
     end
 
     def check_input_object
+      # When loading from file, find and link existing reference points
+      if @reference_point1.nil? && @reference_point2.nil?
+        link_reference_points
+      end
       return(super)
+    end
+    
+    # Find and link existing reference points when loading from file
+    def link_reference_points
+      # Get control_data array to find reference point names
+      control_data = @input_object.get_property('control_data', [])
+      
+      if control_data.is_a?(Array) && control_data.length > 0
+        # Find first reference point
+        ref_pt1_name = control_data[0]['daylighting_reference_point_name']
+        if ref_pt1_name
+          @reference_point1 = Plugin.model_manager.input_file.find_object_by_class_and_name("DAYLIGHTING:REFERENCEPOINT", ref_pt1_name)
+        end
+        
+        # Find second reference point if exists
+        if control_data.length > 1
+          ref_pt2_name = control_data[1]['daylighting_reference_point_name']
+          if ref_pt2_name
+            @reference_point2 = Plugin.model_manager.input_file.find_object_by_class_and_name("DAYLIGHTING:REFERENCEPOINT", ref_pt2_name)
+          end
+        end
+      end
     end
 
 
@@ -70,8 +128,26 @@ module LegacyOpenStudio
           @parent = parent_from_input_object
         end
 
-        # zone
-        @input_object.fields[1] = @parent.input_object  # Parent should already have been updated.
+        # zone - update both controls and reference points
+        @input_object.set_property('zone_or_space_name', @parent.input_object.name)
+        if @reference_point1
+          @reference_point1.set_property('zone_or_space_name', @parent.input_object.name)
+        end
+        if @reference_point2
+          @reference_point2.set_property('zone_or_space_name', @parent.input_object.name)
+        end
+
+        # Update control_data array with current reference point names
+        control_data = @input_object.get_property('control_data', [])
+        if control_data.is_a?(Array)
+          if control_data.length >= 1 && @reference_point1
+            control_data[0]['daylighting_reference_point_name'] = @reference_point1.get_property('name')
+          end
+          if control_data.length >= 2 && @reference_point2
+            control_data[1]['daylighting_reference_point_name'] = @reference_point2.get_property('name')
+          end
+          @input_object.set_property('control_data', control_data)
+        end
 
         decimal_places = Plugin.model_manager.length_precision
         if (decimal_places < 6)
@@ -96,9 +172,13 @@ module LegacyOpenStudio
         sensor1_position = (parent_transformation*entity_transformation*sensor1_transformation).origin
         self.sketchup_sensor1 = sensor1_position
 
-        # sensor 2 position has been updated if it was blank before
-        if @input_object.fields[2].to_i == 2
-          if (@input_object.fields[6].to_s.empty? or @input_object.fields[7].to_s.empty? or @input_object.fields[8].to_s.empty?)
+        # sensor 2 - check if second reference point exists and has coordinates
+        if @reference_point2
+          x2 = @reference_point2.get_property('x_coordinate_of_reference_point', '').to_s
+          y2 = @reference_point2.get_property('y_coordinate_of_reference_point', '').to_s
+          z2 = @reference_point2.get_property('z_coordinate_of_reference_point', '').to_s
+          
+          if (x2.empty? or y2.empty? or z2.empty?)
             reset_lengths
             update_entity
           else
@@ -118,7 +198,10 @@ module LegacyOpenStudio
     def parent_from_input_object
       parent = nil
       if (@input_object)
-        parent = Plugin.model_manager.zones.find { |object| object.input_object.equal?(@input_object.fields[1]) }
+        zone_name = @input_object.get_property('zone_or_space_name', '')
+        if zone_name && !zone_name.empty?
+          parent = Plugin.model_manager.zones.find { |zone| zone.name.to_s.upcase == zone_name.to_s.upcase }
+        end
       end
       return(parent)
     end
@@ -182,7 +265,7 @@ module LegacyOpenStudio
         entity_transformation = @entity.transformation
 
         # the fixed rotation angle
-        glare_angle = -@input_object.fields[14].to_f
+        glare_angle = -@input_object.get_property('glare_calculation_azimuth_angle_of_view_direction_clockwise_from_zone_y_axis', '0').to_f
         rotation_angle = 0
         if (Plugin.model_manager.relative_daylighting_coordinates?)
           # for some reason building azimuth is in EnergyPlus system and zone azimuth is in SketchUp system
@@ -205,9 +288,11 @@ module LegacyOpenStudio
           #puts "reset to sensor1, sensor2_transformation = #{sensor2_transformation.origin}"
           @entity.definition.entities[1].transformation = sensor2_transformation
           @entity.definition.entities[1].hidden = true
-          @input_object.fields[6] = ""
-          @input_object.fields[7] = ""
-          @input_object.fields[8] = ""
+          if @reference_point2
+            @reference_point2.set_property('x_coordinate_of_reference_point', '')
+            @reference_point2.set_property('y_coordinate_of_reference_point', '')
+            @reference_point2.set_property('z_coordinate_of_reference_point', '')
+          end
         end
 
         add_observers if had_observers
@@ -277,84 +362,81 @@ module LegacyOpenStudio
 ##### Begin new methods for the interface #####
 
     def zone
-      return(@input_object.fields[1])
+      zone_name = @input_object.get_property('zone_or_space_name', '')
+      return Plugin.model_manager.zones.find { |z| z.name.to_s.upcase == zone_name.to_s.upcase }
     end
 
     def zone=(zone)
-      @input_object.fields[1] = zone.input_object
+      @input_object.set_property('zone_or_space_name', zone.input_object.name)
       @parent = zone
     end
 
     # Gets the sensor1 point of the InputObject as it literally appears in the input fields.
     def input_object_sensor1
-      x = @input_object.fields[3].to_f.m
-      y = @input_object.fields[4].to_f.m
-      z = @input_object.fields[5].to_f.m
+      return nil unless @reference_point1
+      
+      x = @reference_point1.get_property('x_coordinate_of_reference_point', '0').to_f.m
+      y = @reference_point1.get_property('y_coordinate_of_reference_point', '0').to_f.m
+      z = @reference_point1.get_property('z_coordinate_of_reference_point', '0').to_f.m
 
       return(Geom::Point3d.new(x, y, z))
     end
 
     # Sets the sensor1 point of the InputObject as it literally appears in the input fields.
     def input_object_sensor1=(point)
+      return unless @reference_point1
 
       decimal_places = Plugin.model_manager.length_precision
       if (decimal_places < 6)
-        decimal_places = 6  # = 4
-        # Always keep at least 4 places for now, until I figure out how to keep the actual saved in the idf from being reduced upon loading
-        # There's nothing in the API that prevents from drawing at finer precision than the option settings.
-        # Just have to figure out how to keep this routine from messing it up...
-
-        # UPDATE:  Looks like more than 4 is necesssary to get the solar shading right in EnergyPlus, otherwise surfaces can be positioned
-        # incorrectly, e.g., one wall could overlap another because of the less accurate coordinates.
+        decimal_places = 6
       end
-      format_string = "%0." + decimal_places.to_s + "f"  # This could be stored in a more central place
+      format_string = "%0." + decimal_places.to_s + "f"
 
       x = point.x.to_m.round_to(decimal_places)
       y = point.y.to_m.round_to(decimal_places)
       z = point.z.to_m.round_to(decimal_places)
 
-      @input_object.fields[3] = format(format_string, x)
-      @input_object.fields[4] = format(format_string, y)
-      @input_object.fields[5] = format(format_string, z)
+      @reference_point1.set_property('x_coordinate_of_reference_point', format(format_string, x))
+      @reference_point1.set_property('y_coordinate_of_reference_point', format(format_string, y))
+      @reference_point1.set_property('z_coordinate_of_reference_point', format(format_string, z))
     end
 
     # Gets the sensor2 point of the InputObject as it literally appears in the input fields.
     def input_object_sensor2
+      return nil unless @reference_point2
 
-      result = nil
-
-      if @input_object.fields[2].to_i == 2 and not (@input_object.fields[6].to_s.empty? or @input_object.fields[7].to_s.empty? or @input_object.fields[8].to_s.empty?)
-        x = @input_object.fields[6].to_f.m
-        y = @input_object.fields[7].to_f.m
-        z = @input_object.fields[8].to_f.m
-        result = Geom::Point3d.new(x,y,z)
+      x_str = @reference_point2.get_property('x_coordinate_of_reference_point', '').to_s
+      y_str = @reference_point2.get_property('y_coordinate_of_reference_point', '').to_s
+      z_str = @reference_point2.get_property('z_coordinate_of_reference_point', '').to_s
+      
+      if x_str.empty? or y_str.empty? or z_str.empty?
+        return nil
       end
-
-      return(result)
+      
+      x = x_str.to_f.m
+      y = y_str.to_f.m
+      z = z_str.to_f.m
+      
+      return Geom::Point3d.new(x, y, z)
     end
 
     # Sets the sensor2 point of the InputObject as it literally appears in the input fields.
     def input_object_sensor2=(point)
+      return unless @reference_point2
 
       decimal_places = Plugin.model_manager.length_precision
       if (decimal_places < 6)
-        decimal_places = 6  # = 4
-        # Always keep at least 4 places for now, until I figure out how to keep the actual saved in the idf from being reduced upon loading
-        # There's nothing in the API that prevents from drawing at finer precision than the option settings.
-        # Just have to figure out how to keep this routine from messing it up...
-
-        # UPDATE:  Looks like more than 4 is necesssary to get the solar shading right in EnergyPlus, otherwise surfaces can be positioned
-        # incorrectly, e.g., one wall could overlap another because of the less accurate coordinates.
+        decimal_places = 6
       end
-      format_string = "%0." + decimal_places.to_s + "f"  # This could be stored in a more central place
+      format_string = "%0." + decimal_places.to_s + "f"
 
       x = point.x.to_m.round_to(decimal_places)
       y = point.y.to_m.round_to(decimal_places)
       z = point.z.to_m.round_to(decimal_places)
 
-      @input_object.fields[6] = format(format_string, x)
-      @input_object.fields[7] = format(format_string, y)
-      @input_object.fields[8] = format(format_string, z)
+      @reference_point2.set_property('x_coordinate_of_reference_point', format(format_string, x))
+      @reference_point2.set_property('y_coordinate_of_reference_point', format(format_string, y))
+      @reference_point2.set_property('z_coordinate_of_reference_point', format(format_string, z))
     end
 
     # Returns the general coordinate transformation from absolute to relative.
@@ -422,14 +504,16 @@ module LegacyOpenStudio
 
     # set sensor2 somewhere reasonable once sensor1 is placed
     def reset_lengths
-
-      # set number of sensors to 2
-      @input_object.fields[2] = "2"
-
-      @input_object.fields[6] = (@input_object.fields[3].to_f + 1).to_s
-      @input_object.fields[7] = @input_object.fields[4].to_s
-      @input_object.fields[8] = @input_object.fields[5].to_s
-
+      # In EnergyPlus 25.1, just copy sensor1 position and offset by 1m in x
+      if @reference_point1 && @reference_point2
+        x1 = @reference_point1.get_property('x_coordinate_of_reference_point', '0').to_f
+        y1 = @reference_point1.get_property('y_coordinate_of_reference_point', '0').to_s
+        z1 = @reference_point1.get_property('z_coordinate_of_reference_point', '0').to_s
+        
+        @reference_point2.set_property('x_coordinate_of_reference_point', (x1 + 1).to_s)
+        @reference_point2.set_property('y_coordinate_of_reference_point', y1)
+        @reference_point2.set_property('z_coordinate_of_reference_point', z1)
+      end
     end
 
   end

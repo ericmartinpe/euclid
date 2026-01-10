@@ -542,9 +542,18 @@ module LegacyOpenStudio
     def spaces_assigned_to_surfaces_count
       spaces = []
       for child in @children
-        space_name = child.input_object.get_property('space_name', '')
-        if (child.class == BaseSurface and space_name != "")
-          spaces << space_name
+        if child.class == BaseSurface
+          # Handle both JsonInputObject and legacy InputObject
+          if child.input_object.respond_to?(:get_property)
+            space_name = child.input_object.get_property('space_name', '')
+          else
+            # Legacy InputObject - field[5] is space_name
+            space_name = child.input_object.fields[5].to_s
+          end
+          
+          if space_name && !space_name.empty?
+            spaces << space_name
+          end
         end
       end
       return(spaces.uniq.length())

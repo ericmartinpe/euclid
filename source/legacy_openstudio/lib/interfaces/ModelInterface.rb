@@ -54,7 +54,7 @@ module LegacyOpenStudio
       #@class_hash['MATERIAL'] = Material
       #@class_hash['CONSTRUCTION'] = Construction
       #@class_hash['DAYLIGHTING:DETAILED'] = DaylightingDetailed
-      #@class_hash['DAYLIGHTING:CONTROLS'] = DaylightingControls  # Temporarily disable until new (v 8.6) daylighting objects are handled in the UI
+      @class_hash['DAYLIGHTING:CONTROLS'] = DaylightingControls
       @class_hash['OUTPUT:ILLUMINANCEMAP'] = OutputIlluminanceMap
 
       # Setup the order in which interfaces are drawn in the model.

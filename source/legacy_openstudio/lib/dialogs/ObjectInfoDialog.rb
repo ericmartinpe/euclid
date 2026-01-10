@@ -27,7 +27,7 @@ module LegacyOpenStudio
       super
 
       if (container.nil?)
-        @container = WindowContainer.new("Object Info", 480, 600, 150, 150)
+        @container = WindowContainer.new("Object Info", 600, 600, 150, 150)
       else
         @container = container  # will never happen
       end
