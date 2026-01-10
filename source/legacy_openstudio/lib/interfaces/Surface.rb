@@ -4,6 +4,7 @@
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingInterface")
 require("euclid/lib/legacy_openstudio/lib/inputfile/InputObject")
+require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
 require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 require("euclid/lib/legacy_openstudio/lib/observers/FaceObserver")
 
@@ -136,8 +137,9 @@ module LegacyOpenStudio
       end
 
       # Apply vertex order rule (Clockwise or Counterclockwise)
-      surface_geom_adapter = InputObjectAdapter.new(Plugin.model_manager.surface_geometry.input_object)
-      if (surface_geom_adapter.get_field(2).upcase == "CLOCKWISE")
+      surface_geom = Plugin.model_manager.surface_geometry.input_object
+      vertex_direction = surface_geom.get_property('vertex_entry_direction', '').upcase
+      if (vertex_direction == "CLOCKWISE")
         points = surface_polygon.points.reverse
       else
         points = surface_polygon.points

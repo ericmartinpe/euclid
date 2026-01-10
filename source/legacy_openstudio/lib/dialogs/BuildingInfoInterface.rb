@@ -16,23 +16,24 @@ module LegacyOpenStudio
 
       if (not @drawing_interface.nil?)
         @input_object = @drawing_interface.input_object
-        adapter = InputObjectAdapter.new(@input_object)
 
-        @hash['NAME'] = adapter.get_field(1)
-        @hash['ROTATION'] = adapter.get_field(2)
-        if (adapter.get_field(3).to_s.empty?)
+        @hash['NAME'] = @input_object.name
+        @hash['ROTATION'] = @input_object.get_property('north_axis', '')
+        terrain = @input_object.get_property('terrain', '').to_s
+        if (terrain.empty?)
           @hash['TERRAIN'] = "SUBURBS"  # Show default value when blank
         else
-          @hash['TERRAIN'] = adapter.get_field(3).upcase
+          @hash['TERRAIN'] = terrain.upcase
         end
-        @hash['LOADS_TOLERANCE'] = adapter.get_field(4)
-        @hash['TEMPERATURE_TOLERANCE'] = adapter.get_field(5)
-        if (adapter.get_field(6).to_s.empty?)
+        @hash['LOADS_TOLERANCE'] = @input_object.get_property('loads_convergence_tolerance_value', '')
+        @hash['TEMPERATURE_TOLERANCE'] = @input_object.get_property('temperature_convergence_tolerance_value', '')
+        solar_dist = @input_object.get_property('solar_distribution', '').to_s
+        if (solar_dist.empty?)
           @hash['SOLAR_DISTRIBUTION'] = "FULLEXTERIOR"  # Show default value when blank
         else
-          @hash['SOLAR_DISTRIBUTION'] = adapter.get_field(6).upcase
+          @hash['SOLAR_DISTRIBUTION'] = solar_dist.upcase
         end
-        @hash['MAX_WARMUP_DAYS'] = adapter.get_field(7)
+        @hash['MAX_WARMUP_DAYS'] = @input_object.get_property('maximum_number_of_warmup_days', '')
 
         zones = Plugin.model_manager.zones
         @hash['ZONES'] = zones.count
@@ -80,15 +81,14 @@ module LegacyOpenStudio
 
     def report
       input_object_copy = @input_object.copy
-      adapter = InputObjectAdapter.new(@input_object)
 
-      adapter.set_field(1, @hash['NAME'].strip)
-      adapter.set_field(2, @hash['ROTATION'].strip)
-      adapter.set_field(3, @input_object.class_definition.field_definitions[3].get_choice_key(@hash['TERRAIN']))
-      adapter.set_field(4, @hash['LOADS_TOLERANCE'].strip)
-      adapter.set_field(5, @hash['TEMPERATURE_TOLERANCE'].strip)
-      adapter.set_field(6, @input_object.class_definition.field_definitions[6].get_choice_key(@hash['SOLAR_DISTRIBUTION']))
-      adapter.set_field(7, @hash['MAX_WARMUP_DAYS'].strip)
+      @input_object.set_property('name', @hash['NAME'].strip)
+      @input_object.set_property('north_axis', @hash['ROTATION'].strip)
+      @input_object.set_property('terrain', @hash['TERRAIN'])
+      @input_object.set_property('loads_convergence_tolerance_value', @hash['LOADS_TOLERANCE'].strip)
+      @input_object.set_property('temperature_convergence_tolerance_value', @hash['TEMPERATURE_TOLERANCE'].strip)
+      @input_object.set_property('solar_distribution', @hash['SOLAR_DISTRIBUTION'])
+      @input_object.set_property('maximum_number_of_warmup_days', @hash['MAX_WARMUP_DAYS'].strip)
 
       # Update object text with changes
       @hash['OBJECT_TEXT'] = @input_object.to_idf

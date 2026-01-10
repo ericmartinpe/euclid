@@ -4,8 +4,7 @@
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingUtils")
 require("euclid/lib/legacy_openstudio/lib/interfaces/Surface")
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObject")
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
+require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
 
 
 module LegacyOpenStudio
@@ -17,27 +16,16 @@ module LegacyOpenStudio
       @first_vertex_field = 10
     end
 
-    def adapter
-      @adapter ||= InputObjectAdapter.new(@input_object)
-    end
-
     def create_input_object
-      @input_object = InputObject.new("FENESTRATIONSURFACE:DETAILED")
-      @adapter = nil  # Reset adapter
-      adapter.set_field(1, Plugin.model_manager.input_file.new_unique_object_name)
-      adapter.set_field(2, default_surface_type)
-      adapter.set_field(3, "")
-      adapter.set_field(4, "")  # Base Surface
-      adapter.set_field(5, "")
-      adapter.set_field(6, "")
-      adapter.set_field(7, "")
-      adapter.set_field(8, "")
-      # Removed input field for "WINDOWPROPERTY:SHADINGCONTROL" in "FENESTRATIONSURFACE:DETAILED" object for EnergyPlus v9.0
-      # adapter.set_field(9, "")
-
-      adapter.set_field(3, default_construction) # do after setting boundary conditions
-
-      adapter.set_field(11, 0)  # kludge to make fields list long enough for call below
+      @input_object = JsonInputObject.new("FenestrationSurface:Detailed", Plugin.model_manager.input_file.new_unique_object_name)
+      @input_object.set_property('surface_type', default_surface_type)
+      @input_object.set_property('construction_name', default_construction)
+      @input_object.set_property('building_surface_name', '')
+      @input_object.set_property('outside_boundary_condition_object', '')
+      @input_object.set_property('view_factor_to_ground', '')
+      @input_object.set_property('frame_and_divider_name', '')
+      @input_object.set_property('multiplier', '')
+      # vertices will be set by update_input_object
 
       super
     end

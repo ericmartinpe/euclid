@@ -3,7 +3,7 @@
 # See the file "License.txt" for additional terms and conditions.
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/Surface")
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObject")
+require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
 require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 require("euclid/lib/legacy_openstudio/lib/dialogs/ProgressDialog")
 
@@ -22,29 +22,29 @@ module LegacyOpenStudio
 
 
     def create_input_object
-      @input_object = InputObject.new("BUILDINGSURFACE:DETAILED")
-      @input_object.fields[1] = Plugin.model_manager.input_file.new_unique_object_name
-      @input_object.fields[2] = default_surface_type   # infer_surface_type
-      @input_object.fields[3] = ""
-      @input_object.fields[4] = ""  # Zone
-      @input_object.fields[5] = ""  # Space
+      name = Plugin.model_manager.input_file.new_unique_object_name
+      @input_object = JsonInputObject.new("BuildingSurface:Detailed", name)
+      @input_object.set_property('surface_type', default_surface_type)
+      @input_object.set_property('construction_name', '')
+      @input_object.set_property('zone_name', '')
+      @input_object.set_property('space_name', '')
 
-      if (@input_object.fields[2] == "Floor")
-        @input_object.fields[6] = "Ground"
-        @input_object.fields[7] = ""
-        @input_object.fields[8] = "NoSun"
-        @input_object.fields[9] = "NoWind"
+      surface_type = @input_object.get_property('surface_type', '')
+      if (surface_type == "Floor")
+        @input_object.set_property('outside_boundary_condition', 'Ground')
+        @input_object.set_property('outside_boundary_condition_object', '')
+        @input_object.set_property('sun_exposure', 'NoSun')
+        @input_object.set_property('wind_exposure', 'NoWind')
       else
-        @input_object.fields[6] = "Outdoors"
-        @input_object.fields[7] = ""
-        @input_object.fields[8] = "SunExposed"
-        @input_object.fields[9] = "WindExposed"
+        @input_object.set_property('outside_boundary_condition', 'Outdoors')
+        @input_object.set_property('outside_boundary_condition_object', '')
+        @input_object.set_property('sun_exposure', 'SunExposed')
+        @input_object.set_property('wind_exposure', 'WindExposed')
       end
 
-      @input_object.fields[3] = default_construction # do after setting boundary conditions
+      @input_object.set_property('construction_name', default_construction) # do after setting boundary conditions
 
-      @input_object.fields[10] = ""
-      @input_object.fields[13] = 0  # kludge to make fields list long enough for call below
+      @input_object.set_property('view_factor_to_ground', '')
 
       super
     end
@@ -61,9 +61,10 @@ module LegacyOpenStudio
         
         dot_product = polygon_normal % Geom::Vector3d.new(0, 0, 1)
         if (surface_type.upcase == "FLOOR")
-          surface_geom_adapter = InputObjectAdapter.new(Plugin.model_manager.surface_geometry.input_object)
-          if ((surface_geom_adapter.get_field(2).upcase == "COUNTERCLOCKWISE" and dot_product > 0.000001))  \
-            or ((surface_geom_adapter.get_field(2).upcase == "CLOCKWISE" and dot_product < -0.000001))
+          surface_geom = Plugin.model_manager.surface_geometry.input_object
+          vertex_direction = surface_geom.get_property('vertex_entry_direction', '').upcase
+          if ((vertex_direction == "COUNTERCLOCKWISE" and dot_product > 0.000001))  \
+            or ((vertex_direction == "CLOCKWISE" and dot_product < -0.000001))
 
             Plugin.model_manager.add_error("Warning:  " + @input_object.key + "\n")
             Plugin.model_manager.add_error("This Floor surface is upside-down.\nIt has been automatically fixed.\n\n")
@@ -72,9 +73,10 @@ module LegacyOpenStudio
             self.input_object_polygon = self.input_object_polygon.reverse
           end
         elsif (surface_type.upcase == "ROOF" or surface_type.upcase == "CEILING")
-          surface_geom_adapter = InputObjectAdapter.new(Plugin.model_manager.surface_geometry.input_object)
-          if ((surface_geom_adapter.get_field(2).upcase == "COUNTERCLOCKWISE" and dot_product < -0.000001))  \
-            or ((surface_geom_adapter.get_field(2).upcase == "CLOCKWISE" and dot_product > 0.000001))
+          surface_geom = Plugin.model_manager.surface_geometry.input_object
+          vertex_direction = surface_geom.get_property('vertex_entry_direction', '').upcase
+          if ((vertex_direction == "COUNTERCLOCKWISE" and dot_product < -0.000001))  \
+            or ((vertex_direction == "CLOCKWISE" and dot_product > 0.000001))
 
             Plugin.model_manager.add_error("Warning:  " + @input_object.key + "\n")
             Plugin.model_manager.add_error("This Roof or Ceiling surface is upside-down.\nIt has been automatically fixed.\n\n")
@@ -103,7 +105,7 @@ module LegacyOpenStudio
       super  # Surface superclass updates the vertices
 
       if (valid_entity?)
-        adapter.set_field(4, @parent.input_object)  # Parent should already have been updated.
+        @input_object.set_property('zone_name', @parent.input_object.name)  # Parent should already have been updated.
 
         # This is some extra (redundant?) error checking that was added because Zone objects were disappearing.
 
@@ -128,7 +130,20 @@ module LegacyOpenStudio
     def parent_from_input_object
       parent = nil
       if (@input_object)
-        parent = Plugin.model_manager.zones.find { |object| object.input_object.equal?(adapter.get_field(4)) }
+        zone_ref = @input_object.get_property('zone_name', '')
+        
+        # Handle both object references and string names
+        if zone_ref.respond_to?(:name)
+          # It's an object reference (InputObject or JsonInputObject)
+          zone_name = zone_ref.name
+        else
+          # It's a string
+          zone_name = zone_ref.to_s
+        end
+        
+        if zone_name && !zone_name.empty?
+          parent = Plugin.model_manager.zones.find { |zone| zone.name.to_s.upcase == zone_name.to_s.upcase }
+        end
       end
       return(parent)
     end
@@ -151,7 +166,7 @@ module LegacyOpenStudio
 
 
     def surface_type
-      return(adapter.get_field(2))
+      return(@input_object.get_property('surface_type', ''))
     end
 
 
@@ -172,15 +187,15 @@ module LegacyOpenStudio
 
     def boundary
       # field 8 is sun, 9 is wind
-      return(@input_object.fields[6])
+      return(@input_object.get_property('outside_boundary_condition', ''))
     end
 
     def sun
-      return(@input_object.fields[8])
+      return(@input_object.get_property('sun_exposure', ''))
     end
 
     def wind
-      return(@input_object.fields[9])
+      return(@input_object.get_property('wind_exposure', ''))
     end
 
 
@@ -321,7 +336,8 @@ module LegacyOpenStudio
     end
 
     def exterior?
-      return (@input_object.fields[6] == "Ground" or @input_object.fields[6] == "Outdoors")
+      boundary_condition = @input_object.get_property('outside_boundary_condition', '')
+      return (boundary_condition == "Ground" or boundary_condition == "Outdoors")
     end
 
     def default_construction
