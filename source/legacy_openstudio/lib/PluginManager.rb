@@ -96,7 +96,9 @@ module LegacyOpenStudio
 
     def open_data_dictionary
       success = false
-      idd_path = Plugin.dir + "/Energy+.idd"
+      # Use default EnergyPlus version 25.1.0 for startup
+      # (Files will use their own version when loaded)
+      idd_path = Plugin.dir + "/energyplus/25-1-0/Energy+.idd"
 
       if (File.exists?(idd_path))
         @data_dictionary = DataDictionary.open(idd_path)

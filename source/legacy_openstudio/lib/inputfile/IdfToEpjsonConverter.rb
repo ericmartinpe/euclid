@@ -97,14 +97,17 @@ module LegacyOpenStudio
       schema = load_schema(version)
       return nil unless schema
       
-      object_schema = schema.dig('properties', object_type)
+      # Ruby 2.2 compatible - no dig method
+      object_schema = schema['properties'] && schema['properties'][object_type]
       return nil unless object_schema
       
       # Get the field order from legacy_idd section
-      field_order = object_schema.dig('legacy_idd', 'fields')
+      legacy_idd = object_schema['legacy_idd']
+      field_order = legacy_idd && legacy_idd['fields']
       
       # Handle extensible fields (like vertices)
-      if extensions = object_schema.dig('legacy_idd', 'numerics', 'extensions')
+      numerics = legacy_idd && legacy_idd['numerics']
+      if numerics && (extensions = numerics['extensions'])
         # For extensible objects, fields array doesn't include the repeated fields
         # We'll handle this specially during conversion
         return {fields: field_order || [], extensions: extensions}
@@ -173,7 +176,7 @@ module LegacyOpenStudio
         
       else
         # Schema not available - use FieldMapper as fallback
-        require_relative 'FieldMapper'
+        require("euclid/lib/legacy_openstudio/lib/inputfile/FieldMapper")
         
         # This is the old adapter approach
         # Convert using best-effort field mapping
@@ -213,8 +216,9 @@ module LegacyOpenStudio
       epjson_path ||= idf_path.sub(/\.idf$/i, '.epJSON')
       
       # Load the IDF file using existing InputFile parser
-      require_relative 'InputFile'
-      require_relative '../DataDictionary'
+      # Use SketchUp-compatible require paths
+      require("euclid/lib/legacy_openstudio/lib/inputfile/InputFile")
+      require("euclid/lib/legacy_openstudio/lib/inputfile/DataDictionary")
       
       puts "Parsing IDF file..."
       

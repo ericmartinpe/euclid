@@ -144,7 +144,7 @@ module LegacyOpenStudio
 
 
     def prompt_for_save
-      if (Plugin.model_manager.input_file.modified?)
+      if (Plugin.model_manager.input_file && Plugin.model_manager.input_file.modified?)
         button = UI.messagebox("Save changes to the EnergyPlus input file " + Plugin.model_manager.input_file_name + "?", MB_YESNOCANCEL )
 
         if (button == 6)  # YES

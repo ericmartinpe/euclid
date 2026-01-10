@@ -136,7 +136,7 @@ module LegacyOpenStudio
 
 
     def input_file_attached?
-      return(not @input_file.path.nil?)
+      return(@input_file && !@input_file.path.nil?)
     end
 
 
@@ -172,12 +172,19 @@ module LegacyOpenStudio
 
 
     def new_input_file
-      open_input_file(Plugin.dir + "/NewFileTemplate.idf")
-      @input_file.path = nil
-      @input_file.modified = false
-      @model_interface.on_change_input_file_path
-      @construction_manager.reset_defaults
-      @construction_manager.check_defaults
+      # Use default EnergyPlus 25.1.0 template
+      template_path = Plugin.dir + "/energyplus/25-1-0/NewFileTemplate.idf"
+      success = open_input_file(template_path)
+      
+      if success && @input_file
+        @input_file.path = nil
+        @input_file.modified = false
+        @model_interface.on_change_input_file_path
+        @construction_manager.reset_defaults
+        @construction_manager.check_defaults
+      else
+        puts "ERROR: Failed to load new file template"
+      end
     end
 
 
@@ -486,41 +493,49 @@ module LegacyOpenStudio
 
 
     def surface_geometry
+      return nil unless @model_interface
       return(@model_interface.children.find { |child| child.class == SurfaceGeometry })
     end
 
 
     def building
+      return nil unless @model_interface
       return(@model_interface.children.find { |child| child.class == Building })
     end
 
 
     def location
+      return nil unless @model_interface
       return(@model_interface.children.find { |child| child.class == Location })
     end
 
 
     def zones
+      return [] unless @model_interface
       return(@model_interface.children.find_all { |child| child.class == Zone })
     end
 
 
     def shading_groups
+      return [] unless @model_interface
       return(@model_interface.children.find_all { |child| child.class == DetachedShadingGroup })
     end
 
 
     def base_surfaces
+      return [] unless @model_interface
       return(@model_interface.recurse_children.find_all { |child| child.class == BaseSurface })
     end
 
 
     def sub_surfaces
+      return [] unless @model_interface
       return(@model_interface.recurse_children.find_all { |child| child.class == SubSurface })
     end
 
 
     def shading_surfaces
+      return [] unless @model_interface
       return(@model_interface.recurse_children.find_all { |child| child.class == AttachedShadingSurface or child.class == DetachedShadingSurface })
     end
 
