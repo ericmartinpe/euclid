@@ -1,6 +1,6 @@
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,25.1;
+  Version,9.6;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -8,7 +8,7 @@
     Untitled,                !- Name
     0.0,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value {W}
+    0.04,                    !- Loads Convergence Tolerance Value
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -558,4 +558,3 @@
  !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
 
   Output:VariableDictionary,IDF;
-

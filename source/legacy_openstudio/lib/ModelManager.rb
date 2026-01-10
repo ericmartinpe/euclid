@@ -172,8 +172,8 @@ module LegacyOpenStudio
 
 
     def new_input_file
-      # Use default EnergyPlus 25.1.0 template
-      template_path = Plugin.dir + "/energyplus/25-1-0/NewFileTemplate.idf"
+      # Use default EnergyPlus 25.1.0 epJSON template (faster than converting IDF)
+      template_path = Plugin.dir + "/energyplus/25-1-0/NewFileTemplate.epJSON"
       success = open_input_file(template_path)
       
       if success && @input_file

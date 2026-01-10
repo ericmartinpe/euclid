@@ -98,11 +98,11 @@ module LegacyOpenStudio
 
 
     def on_change_base_surface
-      base_surface = Plugin.model_manager.input_file.find_object_by_class_and_name("BUILDINGSURFACE:DETAILED", @hash['BASE_SURFACE'])
+      base_surface = Plugin.model_manager.input_file.find_object_by_class_and_name("BuildingSurface:Detailed", @hash['BASE_SURFACE'])
       if (base_surface)
-        base_adapter = InputObjectAdapter.new(base_surface)
+        outside_bc = base_surface.get_property('outside_boundary_condition', '').to_s.upcase
 
-        case (base_adapter.get_field(5).upcase)
+        case (outside_bc)
 
         when "OUTDOORS"
           enable_element("VIEW_FACTOR_TO_GROUND")
@@ -112,7 +112,7 @@ module LegacyOpenStudio
           disable_element("VIEW_FACTOR_TO_GROUND")
           enable_element("OUTSIDE_BOUNDARY_OBJECT")
 
-          object_names = Plugin.model_manager.input_file.find_objects_by_class_name("FENESTRATIONSURFACE:DETAILED").collect { |object| object.name }
+          object_names = Plugin.model_manager.input_file.find_objects_by_class_name("FenestrationSurface:Detailed").collect { |object| object.name }
           set_select_options("OUTSIDE_BOUNDARY_OBJECT", object_names.sort)
 
         when "OTHERSIDECOEFFICIENTS"

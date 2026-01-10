@@ -16,13 +16,14 @@ module LegacyOpenStudio
       if (not @drawing_interface.nil?)
         @input_object = @drawing_interface.input_object
 
-        @hash['NAME'] = @input_object.fields[1]
-        @hash['ROTATION'] = @input_object.fields[2]
-        @hash['MULTIPLIER'] = @input_object.fields[7]
+        @hash['NAME'] = @input_object.name
+        @hash['ROTATION'] = @input_object.get_property('direction_of_relative_north', '0.0')
+        @hash['MULTIPLIER'] = @input_object.get_property('multiplier', '1')
 
-        if (@input_object.fields[13].nil?)
+        part_of_floor = @input_object.get_property('part_of_total_floor_area')
+        if (part_of_floor.nil?)
           @hash['INCLUDE_FLOOR_AREA'] = true
-        elsif (@input_object.fields[13].upcase == 'YES')
+        elsif (part_of_floor.to_s.upcase == 'YES')
           @hash['INCLUDE_FLOOR_AREA'] = true
         else
           @hash['INCLUDE_FLOOR_AREA'] = false
@@ -60,21 +61,22 @@ module LegacyOpenStudio
     def report
       input_object_copy = @input_object.copy
 
-      @input_object.fields[1] = @hash['NAME'].strip
-      @input_object.fields[2] = @hash['ROTATION'].strip if (@hash['ROTATION'])
-      @input_object.fields[7] = @hash['MULTIPLIER'].strip if (@hash['MULTIPLIER'])
+      @input_object.name = @hash['NAME'].strip
+      @input_object.set_property('direction_of_relative_north', @hash['ROTATION'].strip) if (@hash['ROTATION'])
+      @input_object.set_property('multiplier', @hash['MULTIPLIER'].strip) if (@hash['MULTIPLIER'])
 
-      if (@input_object.fields[13].nil?)
+      current_value = @input_object.get_property('part_of_total_floor_area')
+      if (current_value.nil?)
         if (@hash['INCLUDE_FLOOR_AREA'])
-          # Do nothing, leave blank as before
+          # Do nothing, leave blank as before (defaults to Yes)
         else
-          @input_object.fields[13] = 'No'
+          @input_object.set_property('part_of_total_floor_area', 'No')
         end
       else
         if (@hash['INCLUDE_FLOOR_AREA'])
-          @input_object.fields[13] = 'Yes'
+          @input_object.set_property('part_of_total_floor_area', 'Yes')
         else
-          @input_object.fields[13] = 'No'
+          @input_object.set_property('part_of_total_floor_area', 'No')
         end
       end
 

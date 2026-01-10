@@ -3,7 +3,7 @@
 # See the file "License.txt" for additional terms and conditions.
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/SurfaceGroup")
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
+require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
 
 
 module LegacyOpenStudio
@@ -16,26 +16,20 @@ module LegacyOpenStudio
     end
 
     def name
-      return @input_object.fields[1]
-    end
-
-    # Adapter for unified IDF/epJSON access
-    def adapter
-      @adapter ||= InputObjectAdapter.new(@input_object)
+      return @input_object.name
     end
 
 ##### Begin override methods for the input object #####
 
 
     def create_input_object
-      @input_object = InputObject.new("ZONE")
-      @input_object.fields[1] = Plugin.model_manager.input_file.new_unique_object_name
-      @input_object.fields[2] = "0.0"  # Relative North
-      @input_object.fields[3] = "0.0"  # X Origin
-      @input_object.fields[4] = "0.0"  # Y Origin
-      @input_object.fields[5] = "0.0"  # Z Origin
-      @input_object.fields[6] = ""  # Type
-      @input_object.fields[7] = "1"  # Multiplier
+      @input_object = JsonInputObject.new("Zone", Plugin.model_manager.input_file.new_unique_object_name)
+      @input_object.set_property('direction_of_relative_north', 0.0)
+      @input_object.set_property('x_origin', 0.0)
+      @input_object.set_property('y_origin', 0.0)
+      @input_object.set_property('z_origin', 0.0)
+      @input_object.set_property('type', '')
+      @input_object.set_property('multiplier', 1)
 
       super
     end
@@ -375,9 +369,9 @@ module LegacyOpenStudio
 
 
     def origin
-      x_field = adapter.get_field(3)
-      y_field = adapter.get_field(4)
-      z_field = adapter.get_field(5)
+      x_field = @input_object.get_property('x_origin', '0.0')
+      y_field = @input_object.get_property('y_origin', '0.0')
+      z_field = @input_object.get_property('z_origin', '0.0')
       
       if (x_field.nil?)
         puts "Zone.origin:  missing x coordinate"
@@ -409,15 +403,15 @@ module LegacyOpenStudio
         # NOTE:  Comment above applies more for surfaces than zones.
       end
 
-      adapter.set_field(3, point.x.to_m.round_to(decimal_places).to_s)
-      adapter.set_field(4, point.y.to_m.round_to(decimal_places).to_s)
-      adapter.set_field(5, point.z.to_m.round_to(decimal_places).to_s)
+      @input_object.set_property('x_origin', point.x.to_m.round_to(decimal_places).to_s)
+      @input_object.set_property('y_origin', point.y.to_m.round_to(decimal_places).to_s)
+      @input_object.set_property('z_origin', point.z.to_m.round_to(decimal_places).to_s)
     end
 
 
     def azimuth
 # April'10 - this is being pulled from the building.rb rotation angle
-      field = adapter.get_field(2)
+      field = @input_object.get_property('direction_of_relative_north', '0.0')
 
       if (field.nil?)
         # post an error log item, ZONE object is missing some fields
@@ -439,7 +433,8 @@ module LegacyOpenStudio
 
 
     def include_in_building_floor_area?
-      if (@input_object.fields[13].nil? or @input_object.fields[13].upcase == "YES")
+      value = @input_object.get_property('part_of_total_floor_area')
+      if (value.nil? or value.to_s.upcase == "YES")
         return(true)
       else
         return(false)
@@ -448,7 +443,7 @@ module LegacyOpenStudio
 
 
     def multiplier
-      value = @input_object.fields[7].to_i
+      value = @input_object.get_property('multiplier', '1').to_i
       if (value > 0)
         return(value)
       else
@@ -480,7 +475,7 @@ module LegacyOpenStudio
     def unit_exterior_area
       area = 0.0
       for child in @children
-        if (child.class == BaseSurface and child.input_object.fields[6].upcase == "OUTDOORS")
+        if (child.class == BaseSurface and child.input_object.get_property('outside_boundary_condition', '').upcase == "OUTDOORS")
           area += child.gross_area
         end
       end
@@ -498,7 +493,7 @@ module LegacyOpenStudio
       # "Total" area, includes multiplier
       area = 0.0
       for child in @children
-        if (child.class == BaseSurface and child.input_object.fields[6].upcase == "OUTDOORS")
+        if (child.class == BaseSurface and child.input_object.get_property('outside_boundary_condition', '').upcase == "OUTDOORS")
           area += child.glazing_area
         end
       end
@@ -531,9 +526,12 @@ module LegacyOpenStudio
     # Counts all spaces assigned directly to zone.
     def spaces_assigned_to_zone_count
       spaces = 0
-      objects = Plugin.model_manager.input_file.find_objects_by_class_name("SPACE").collect { |object| object }
+      objects = Plugin.model_manager.input_file.find_objects_by_class_name("Space").collect { |object| object }
       for object in objects
-        if object.fields[2].name == @input_object.name
+        zone_ref = object.get_property('zone_name')
+        # Handle both object references and string names
+        zone_name = zone_ref.respond_to?(:name) ? zone_ref.name : zone_ref.to_s
+        if zone_name == @input_object.name
           spaces += 1
         end
       end
@@ -544,8 +542,9 @@ module LegacyOpenStudio
     def spaces_assigned_to_surfaces_count
       spaces = []
       for child in @children
-        if (child.class == BaseSurface and child.input_object.fields[5] != "")
-          spaces << child.input_object.fields[5]
+        space_name = child.input_object.get_property('space_name', '')
+        if (child.class == BaseSurface and space_name != "")
+          spaces << space_name
         end
       end
       return(spaces.uniq.length())
