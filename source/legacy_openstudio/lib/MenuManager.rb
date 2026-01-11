@@ -563,8 +563,6 @@ module LegacyOpenStudio
       @command_toolbar.add_item(@set_default_constructions_cmd)
       @command_toolbar.add_separator
       @command_toolbar.add_item(@run_cmd)
-      @command_toolbar.add_separator
-      @command_toolbar.add_item(@help_cmd)
       @command_toolbar.restore
 
       # Add the EnergyPlus Rendering toolbar
@@ -581,20 +579,11 @@ module LegacyOpenStudio
       @rendering_toolbar.add_item(@data_settings_cmd)
       @rendering_toolbar.add_item(@color_scale_cmd)
       @rendering_toolbar.add_item(@data_tool_cmd)
+      @rendering_toolbar.restore
       #@rendering_toolbar.show
 
 
-      # Add the EnergyPlus Animation toolbar
-
-      #@animation_toolbar = UI::Toolbar.new(Plugin.name + " Animation")
-      @rendering_toolbar.add_separator
-      @rendering_toolbar.add_item(@anim_settings_cmd)
-      @rendering_toolbar.add_item(@rwd_to_start_cmd)
-      @rendering_toolbar.add_item(@rwd_anim_cmd)
-      @rendering_toolbar.add_item(@play_anim_cmd)
-      @rendering_toolbar.add_item(@fwd_anim_cmd)
-      @rendering_toolbar.add_item(@fwd_to_end_cmd)
-      @rendering_toolbar.restore
+      # Animation toolbar removed - not useful
 
     end
 
