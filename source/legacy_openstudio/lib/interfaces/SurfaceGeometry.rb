@@ -11,10 +11,11 @@ module LegacyOpenStudio
   class SurfaceGeometry < DrawingInterface
 
     def create_input_object
-      @input_object = InputObject.new("GLOBALGEOMETRYRULES")
-      @input_object.fields[1] = "UpperLeftCorner"
-      @input_object.fields[2] = "Counterclockwise"
-      @input_object.fields[3] = "World"
+      @input_object = JsonInputObject.new("GlobalGeometryRules", "GlobalGeometryRules 1", {
+        "starting_vertex_position" => "UpperLeftCorner",
+        "vertex_entry_direction" => "Counterclockwise",
+        "coordinate_system" => "World"
+      })
 
       super
     end
@@ -51,75 +52,75 @@ module LegacyOpenStudio
     def check_input_object
       if (super)
 
-        # Check "First Vertex" field (field 1 = starting_vertex_position)
-        if (adapter.get_field(1).nil? || adapter.get_field(1).to_s.empty?)
+        # Check "First Vertex" field (starting_vertex_position)
+        if (@input_object.get_property("starting_vertex_position").nil? || @input_object.get_property("starting_vertex_position").to_s.empty?)
           puts "SurfaceGeometry.first_vertex:  missing input for starting vertex"
-          adapter.set_field(1, "UpperLeftCorner")
+          @input_object.set_property("starting_vertex_position", "UpperLeftCorner")
         else
-          case(adapter.get_field(1).to_s.upcase)
+          case(@input_object.get_property("starting_vertex_position").to_s.upcase)
 
           when "UPPERLEFTCORNER", "ULC"
-            adapter.set_field(1, "UpperLeftCorner")
+            @input_object.set_property("starting_vertex_position", "UpperLeftCorner")
 
           when "LOWERLEFTCORNER", "LLC"
-            adapter.set_field(1, "LowerLeftCorner")
+            @input_object.set_property("starting_vertex_position", "LowerLeftCorner")
 
           when "UPPERRIGHTCORNER", "URC"
-            adapter.set_field(1, "UpperRightCorner")
+            @input_object.set_property("starting_vertex_position", "UpperRightCorner")
 
           when "LOWERRIGHTCORNER", "LRC"
-            adapter.set_field(1, "LowerRightCorner")
+            @input_object.set_property("starting_vertex_position", "LowerRightCorner")
 
           else
             puts "SurfaceGeometry.vertex_order:  bad input for starting vertex"
             Plugin.model_manager.add_error("Error:  Bad input for starting vertex in GlobalGeometryRules object.\n")
             Plugin.model_manager.add_error("Starting vertex order has been reset to UpperLeftCorner.\n\n")
 
-            adapter.set_field(1, "UpperLeftCorner")
+            @input_object.set_property("starting_vertex_position", "UpperLeftCorner")
           end
         end
 
-        # Check "Vertex Order" field (field 2 = vertex_entry_direction)
-        if (adapter.get_field(2).nil? || adapter.get_field(2).to_s.empty?)
+        # Check "Vertex Order" field (vertex_entry_direction)
+        if (@input_object.get_property("vertex_entry_direction").nil? || @input_object.get_property("vertex_entry_direction").to_s.empty?)
           puts "SurfaceGeometry.vertex_order:  missing input for vertex order"
-          adapter.set_field(2, "Counterclockwise")
+          @input_object.set_property("vertex_entry_direction", "Counterclockwise")
         else
-          case(adapter.get_field(2).to_s.upcase)
+          case(@input_object.get_property("vertex_entry_direction").to_s.upcase)
 
           when "CLOCKWISE", "CW"
-            adapter.set_field(2, "Clockwise")
+            @input_object.set_property("vertex_entry_direction", "Clockwise")
 
           when "COUNTERCLOCKWISE", "CCW"
-            adapter.set_field(2, "Counterclockwise")
+            @input_object.set_property("vertex_entry_direction", "Counterclockwise")
 
           else
             puts "SurfaceGeometry.vertex_order:  bad input for vertex order"
             Plugin.model_manager.add_error("Error:  Bad input for vertex order in GlobalGeometryRules object.\n")
             Plugin.model_manager.add_error("Vertex order has been reset to Counterclockwise.\n\n")
 
-            adapter.set_field(2, "Counterclockwise")
+            @input_object.set_property("vertex_entry_direction", "Counterclockwise")
           end
         end
 
-        # Check "Coordinate System" field (field 3 = coordinate_system)
-        if (adapter.get_field(3).nil? || adapter.get_field(3).to_s.empty?)
+        # Check "Coordinate System" field (coordinate_system)
+        if (@input_object.get_property("coordinate_system").nil? || @input_object.get_property("coordinate_system").to_s.empty?)
           puts "SurfaceGeometry.coordinate_system:  missing input for coordinate system"
-          adapter.set_field(3, "World")
+          @input_object.set_property("coordinate_system", "World")
         else
-          case(adapter.get_field(3).to_s.upcase)
+          case(@input_object.get_property("coordinate_system").to_s.upcase)
 
           when "RELATIVE"
-            adapter.set_field(3, "Relative")
+            @input_object.set_property("coordinate_system", "Relative")
 
           when "WCS", "WORLDCOORDINATESYSTEM", "WORLD", "ABSOLUTE"
-            adapter.set_field(3, "World")
+            @input_object.set_property("coordinate_system", "World")
 
           else
             puts "SurfaceGeometry.coordinate_system:  bad input for coordinate system"
             Plugin.model_manager.add_error("Error:  Bad input for coordinate system in GlobalGeometryRules object.\n")
             Plugin.model_manager.add_error("Coordinate system has been reset to World.\n\n")
 
-            adapter.set_field(3, "World")
+            @input_object.set_property("coordinate_system", "World")
           end
         end
 

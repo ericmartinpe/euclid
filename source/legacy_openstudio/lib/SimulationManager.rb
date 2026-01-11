@@ -27,8 +27,9 @@ module LegacyOpenStudio
 
       # Read the SimulationControl object
       if (objects = Plugin.model_manager.input_file.find_objects_by_class_name("SimulationControl"))
-        run_control = objects.to_a.first
-        if (run_control.fields[5].upcase == "YES")
+        sim_control = objects.to_a.first
+        run_weather = sim_control.get_property('run_simulation_for_weather_file_run_periods', 'Yes')
+        if (run_weather.to_s.upcase == "YES")
           run_weather_file = true
 
           # Check the weather file
@@ -99,51 +100,106 @@ module LegacyOpenStudio
         units = Plugin.model_manager.get_attribute("ABUPS Units")
 
         if units == "IP"
-          new_input_file.add_object(InputObject.new("OutputControl:Table:Style", ["OutputControl:Table:Style", format, "InchPound"]))
+          new_input_file.add_object(JsonInputObject.new("OutputControl:Table:Style", "OutputControl:Table:Style 1", {
+            "column_separator" => format,
+            "unit_conversion" => "InchPound"
+          }))
         else
-          new_input_file.add_object(InputObject.new("OutputControl:Table:Style", ["OutputControl:Table:Style", format]))
+          new_input_file.add_object(JsonInputObject.new("OutputControl:Table:Style", "OutputControl:Table:Style 1", {
+            "column_separator" => format
+          }))
         end
 
-        new_input_file.add_object(InputObject.new("Output:Table:SummaryReports", ["Output:Table:SummaryReports", "AnnualBuildingUtilityPerformanceSummary"]))
+        new_input_file.add_object(JsonInputObject.new("Output:Table:SummaryReports", "Output:Table:SummaryReports 1", {
+          "reports" => [{"report_name" => "AnnualBuildingUtilityPerformanceSummary"}]
+        }))
       end
 
       if (Plugin.model_manager.get_attribute("Report Sql"))
         # Probably shouldn't be able to access .objects directly!
         new_input_file.objects.remove_if { |object| object.is_class_name?("Output:SQLite")}
-        new_input_file.add_object(InputObject.new("Output:SQLite", ["Output:SQLite", "SimpleAndTabular"]))
+        new_input_file.add_object(JsonInputObject.new("Output:SQLite", "Output:SQLite 1", {
+          "option_type" => "SimpleAndTabular"
+        }))
       end
 
       if (Plugin.model_manager.get_attribute("Report DXF"))
         # Probably shouldn't be able to access .objects directly!
         new_input_file.objects.remove_if { |object| object.is_class_name?("Output:Surfaces:Drawing")}
-        new_input_file.add_object(InputObject.new("Output:Surfaces:Drawing", ["Output:Surfaces:Drawing", "DXF"]))
+        new_input_file.add_object(JsonInputObject.new("Output:Surfaces:Drawing", "Output:Surfaces:Drawing 1", {
+          "report_type" => "DXF"
+        }))
       end
 
       if (Plugin.model_manager.get_attribute("Report Zone Temps"))
-        new_input_file.add_object(InputObject.new("Output:Variable", ["Output:Variable", "*", "Zone Mean Air Temperature", "Hourly"]))
-        new_input_file.add_object(InputObject.new("Output:Variable", ["Output:Variable", "*", "Zone Mean Radiant Temperature", "Hourly"]))
+        new_input_file.add_object(JsonInputObject.new("Output:Variable", "Output:Variable Zone Mean Air Temperature", {
+          "key_value" => "*",
+          "variable_name" => "Zone Mean Air Temperature",
+          "reporting_frequency" => "Hourly"
+        }))
+        new_input_file.add_object(JsonInputObject.new("Output:Variable", "Output:Variable Zone Mean Radiant Temperature", {
+          "key_value" => "*",
+          "variable_name" => "Zone Mean Radiant Temperature",
+          "reporting_frequency" => "Hourly"
+        }))
       end
 
       if (Plugin.model_manager.get_attribute("Report Surface Temps"))
-        new_input_file.add_object(InputObject.new("Output:Variable", ["Output:Variable", "*", "Surface Inside Face Temperature", "Hourly"]))
-        new_input_file.add_object(InputObject.new("Output:Variable", ["Output:Variable", "*", "Surface Outside Face Temperature", "Hourly"]))
+        new_input_file.add_object(JsonInputObject.new("Output:Variable", "Output:Variable Surface Inside Face Temperature", {
+          "key_value" => "*",
+          "variable_name" => "Surface Inside Face Temperature",
+          "reporting_frequency" => "Hourly"
+        }))
+        new_input_file.add_object(JsonInputObject.new("Output:Variable", "Output:Variable Surface Outside Face Temperature", {
+          "key_value" => "*",
+          "variable_name" => "Surface Outside Face Temperature",
+          "reporting_frequency" => "Hourly"
+        }))
       end
 
       if (Plugin.model_manager.get_attribute("Report Daylighting"))
-        new_input_file.add_object(InputObject.new("Output:Variable", ["Output:Variable", "*", "Daylighting Reference Point 1 Illuminance", "Hourly"]))
-        new_input_file.add_object(InputObject.new("Output:Variable", ["Output:Variable", "*", "Daylighting Reference Point 1 Glare Index", "Hourly"]))
-        new_input_file.add_object(InputObject.new("Output:Variable", ["Output:Variable", "*", "Daylighting Reference Point 2 Illuminance", "Hourly"]))
-        new_input_file.add_object(InputObject.new("Output:Variable", ["Output:Variable", "*", "Daylighting Reference Point 2 Glare Index", "Hourly"]))
+        new_input_file.add_object(JsonInputObject.new("Output:Variable", "Output:Variable Daylighting RP1 Illuminance", {
+          "key_value" => "*",
+          "variable_name" => "Daylighting Reference Point 1 Illuminance",
+          "reporting_frequency" => "Hourly"
+        }))
+        new_input_file.add_object(JsonInputObject.new("Output:Variable", "Output:Variable Daylighting RP1 Glare Index", {
+          "key_value" => "*",
+          "variable_name" => "Daylighting Reference Point 1 Glare Index",
+          "reporting_frequency" => "Hourly"
+        }))
+        new_input_file.add_object(JsonInputObject.new("Output:Variable", "Output:Variable Daylighting RP2 Illuminance", {
+          "key_value" => "*",
+          "variable_name" => "Daylighting Reference Point 2 Illuminance",
+          "reporting_frequency" => "Hourly"
+        }))
+        new_input_file.add_object(JsonInputObject.new("Output:Variable", "Output:Variable Daylighting RP2 Glare Index", {
+          "key_value" => "*",
+          "variable_name" => "Daylighting Reference Point 2 Glare Index",
+          "reporting_frequency" => "Hourly"
+        }))
       end
 
       if (Plugin.model_manager.get_attribute("Report Zone Loads"))
-        new_input_file.add_object(InputObject.new("Output:Variable", ["Output:Variable", "*", "Zone Ideal Loads Supply Air Sensible Heating Rate", "Hourly"]))
-        new_input_file.add_object(InputObject.new("Output:Variable", ["Output:Variable", "*", "Zone Ideal Loads Supply Air Sensible Cooling Rate", "Hourly"]))
-        new_input_file.add_object(InputObject.new("Output:Variable", ["Output:Variable", "*", "Zone Ideal Loads Supply Air Total Cooling Rate", "Hourly"]))
+        new_input_file.add_object(JsonInputObject.new("Output:Variable", "Output:Variable Zone Ideal Loads Sensible Heating Rate", {
+          "key_value" => "*",
+          "variable_name" => "Zone Ideal Loads Supply Air Sensible Heating Rate",
+          "reporting_frequency" => "Hourly"
+        }))
+        new_input_file.add_object(JsonInputObject.new("Output:Variable", "Output:Variable Zone Ideal Loads Sensible Cooling Rate", {
+          "key_value" => "*",
+          "variable_name" => "Zone Ideal Loads Supply Air Sensible Cooling Rate",
+          "reporting_frequency" => "Hourly"
+        }))
+        new_input_file.add_object(JsonInputObject.new("Output:Variable", "Output:Variable Zone Ideal Loads Total Cooling Rate", {
+          "key_value" => "*",
+          "variable_name" => "Zone Ideal Loads Supply Air Total Cooling Rate",
+          "reporting_frequency" => "Hourly"
+        }))
       end
 
       # make a temp directory to run in
-      run_dir = Dir.tmpdir + "/OpenStudio/run"
+      run_dir = Dir.tmpdir + "/EuclidSim/run"
       if not File.directory?(run_dir)
         FileUtils.mkdir_p(run_dir)
       end
@@ -174,8 +230,8 @@ module LegacyOpenStudio
       FileUtils.cd(run_dir)
       FileUtils.rm_f(Dir.glob('*.*'))
 
-      # Write idf file to run directory
-      new_input_file.write(run_dir + "/in.idf")
+      # Write epJSON file to run directory
+      new_input_file.write(run_dir + "/in.epJSON")
       if (Plugin.model_manager.get_attribute("Report User Variables") or
           Plugin.model_manager.get_attribute("Report Zone Temps") or
           Plugin.model_manager.get_attribute("Report Surface Temps") or

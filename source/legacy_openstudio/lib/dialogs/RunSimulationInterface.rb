@@ -17,7 +17,7 @@ module LegacyOpenStudio
     end
 
     def populate_hash
-      # Read the RUN CONTROL object
+      # Read the SimulationControl object
       objects = Plugin.model_manager.input_file.find_objects_by_class_name("SimulationControl")
       if (objects.empty?)
         @hash['RUN_DESIGN_DAYS'] = true
@@ -25,26 +25,31 @@ module LegacyOpenStudio
         @hash['DO_HVAC_SIZING'] = false
         @hash['MAX_HVAC_SIZING_PASSES'] = "1"
       else
-        run_control = objects.to_a.first
-        if (run_control.fields[4].upcase == "YES")
+        sim_control = objects.to_a.first
+        
+        run_design_days = sim_control.get_property('run_simulation_for_sizing_periods', 'Yes')
+        if (run_design_days.to_s.upcase == "YES")
           @hash['RUN_DESIGN_DAYS'] = true
         else
           @hash['RUN_DESIGN_DAYS'] = false
         end
 
-        if (run_control.fields[5].upcase == "YES")
+        run_weather = sim_control.get_property('run_simulation_for_weather_file_run_periods', 'Yes')
+        if (run_weather.to_s.upcase == "YES")
           @hash['RUN_WEATHER_FILE'] = true
         else
           @hash['RUN_WEATHER_FILE'] = false
         end
 
-        if (run_control.fields[6].upcase == "YES")
+        do_hvac = sim_control.get_property('do_hvac_sizing_simulation_for_sizing_periods', 'No')
+        if (do_hvac.to_s.upcase == "YES")
           @hash['DO_HVAC_SIZING'] = true
         else
           @hash['DO_HVAC_SIZING'] = false
         end
 
-        @hash['MAX_HVAC_SIZING_PASSES'] = run_control.fields[7]
+        max_passes = sim_control.get_property('maximum_number_of_hvac_sizing_simulation_passes', '1')
+        @hash['MAX_HVAC_SIZING_PASSES'] = max_passes.to_s
       end
 
       @hash['RUN_DIR'] = Dir.tmpdir + "/OpenStudio/run"
@@ -61,25 +66,30 @@ module LegacyOpenStudio
         @hash['END_MONTH'] = "12"
         @hash['END_DATE'] = "31"
         @hash['END_YEAR'] = ""
-        @hash['START_DAY'] = "SUNDAY"
+        @hash['START_DAY'] = "Sunday"
       else
         run_period = objects.to_a.first
         # Only can handle the first run period currently; multiple run periods are actually allowed in EnergyPlus.
 
-        # Check if loaded RunPeriod object has name input field set, cannot be left blank as of EnergyPlus v9.2
-        if (run_period.fields[1].empty?)
+        # Check if loaded RunPeriod object has name - cannot be left blank as of EnergyPlus v9.2
+        period_name = run_period.name
+        if (period_name.to_s.empty?)
           UI.messagebox("RunPeriod object has no name, yet this is a required input field.\nSetting RunPeriod object name to 'Simulation'.")
           @hash['RUN_PERIOD_NAME'] = "Simulation" # name of RunPeriod
         else
-          @hash['RUN_PERIOD_NAME'] = run_period.fields[1] # name of RunPeriod
+          @hash['RUN_PERIOD_NAME'] = period_name.to_s
         end
-        @hash['START_MONTH'] = run_period.fields[2]
-        @hash['START_DATE'] = run_period.fields[3]
-        @hash['START_YEAR'] = run_period.fields[4]
-        @hash['END_MONTH'] = run_period.fields[5]
-        @hash['END_DATE'] = run_period.fields[6]
-        @hash['END_YEAR'] = run_period.fields[7]
-        @hash['START_DAY'] = run_period.fields[8].upcase
+        
+        @hash['START_MONTH'] = run_period.get_property('begin_month', '1').to_s
+        @hash['START_DATE'] = run_period.get_property('begin_day_of_month', '1').to_s
+        @hash['START_YEAR'] = run_period.get_property('begin_year', '').to_s
+        @hash['END_MONTH'] = run_period.get_property('end_month', '12').to_s
+        @hash['END_DATE'] = run_period.get_property('end_day_of_month', '31').to_s
+        @hash['END_YEAR'] = run_period.get_property('end_year', '').to_s
+        
+        # Keep proper case for epJSON (e.g., "Sunday" not "SUNDAY")
+        start_day = run_period.get_property('day_of_week_for_start_day', 'Sunday').to_s
+        @hash['START_DAY'] = start_day
 
         if (@hash['START_MONTH'] == "1" and @hash['START_DATE'] == "1" and @hash['END_MONTH'] == "12" and @hash['END_DATE'] == "31")
           @hash['ANNUAL_SIMULATION'] = true
@@ -143,56 +153,60 @@ module LegacyOpenStudio
       Plugin.model_manager.set_attribute("Show ABUPS", @hash['SHOW_ABUPS'])
       Plugin.model_manager.set_attribute("Show CSV", @hash['SHOW_CSV'])
 
-      # Configure the RUN CONTROL object
+      # Configure the SimulationControl object
       objects = Plugin.model_manager.input_file.find_objects_by_class_name("SimulationControl")
       if (objects.empty?)
-        run_control = InputObject.new("SimulationControl", ["SimulationControl", "No", "No", "No"])
-        Plugin.model_manager.input_file.add_object(run_control)
+        sim_control = JsonInputObject.new("SimulationControl")
+        sim_control.set_property('do_zone_sizing_calculation', 'No')
+        sim_control.set_property('do_system_sizing_calculation', 'No')
+        sim_control.set_property('do_plant_sizing_calculation', 'No')
+        Plugin.model_manager.input_file.add_object(sim_control)
       else
-        run_control = objects.to_a.first
+        sim_control = objects.to_a.first
       end
 
       if (@hash['RUN_DESIGN_DAYS'])
-        run_control.fields[4] = "Yes"
+        sim_control.set_property('run_simulation_for_sizing_periods', 'Yes')
       else
-        run_control.fields[4] = "No"
+        sim_control.set_property('run_simulation_for_sizing_periods', 'No')
       end
 
       if (@hash['RUN_WEATHER_FILE'])
-        run_control.fields[5] = "Yes"
+        sim_control.set_property('run_simulation_for_weather_file_run_periods', 'Yes')
       else
-        run_control.fields[5] = "No"
+        sim_control.set_property('run_simulation_for_weather_file_run_periods', 'No')
       end
 
       if (@hash['DO_HVAC_SIZING'])
-        run_control.fields[6] = "Yes"
+        sim_control.set_property('do_hvac_sizing_simulation_for_sizing_periods', 'Yes')
       else
-        run_control.fields[6] = "No"
+        sim_control.set_property('do_hvac_sizing_simulation_for_sizing_periods', 'No')
       end
 
       if (@hash['MAX_HVAC_SIZING_PASSES'].empty?)
-        run_control.fields[7] = "1"
+        sim_control.set_property('maximum_number_of_hvac_sizing_simulation_passes', '1')
       else
-        run_control.fields[7] = @hash['MAX_HVAC_SIZING_PASSES']
+        sim_control.set_property('maximum_number_of_hvac_sizing_simulation_passes', @hash['MAX_HVAC_SIZING_PASSES'])
       end
 
-      # Configure the RUN PERIOD object
+      # Configure the RunPeriod object
       objects = Plugin.model_manager.input_file.find_objects_by_class_name("RunPeriod")
       if (objects.empty?)
-        run_period = InputObject.new("RunPeriod")
+        run_period = JsonInputObject.new("RunPeriod")
         Plugin.model_manager.input_file.add_object(run_period)
       else
         run_period = objects.to_a.first
       end
 
-      run_period.fields[1] = @hash['RUN_PERIOD_NAME'] # name of RunPeriod cannot be left blank as of EnergyPlus v9.2
-      run_period.fields[2] = @hash['START_MONTH']
-      run_period.fields[3] = @hash['START_DATE']
-      run_period.fields[4] = @hash['START_YEAR']
-      run_period.fields[5] = @hash['END_MONTH']
-      run_period.fields[6] = @hash['END_DATE']
-      run_period.fields[7] = @hash['END_YEAR']
-      run_period.fields[8] = @hash['START_DAY']
+      run_period.name = @hash['RUN_PERIOD_NAME'] # name of RunPeriod cannot be left blank as of EnergyPlus v9.2
+      run_period.set_property('begin_month', @hash['START_MONTH'])
+      run_period.set_property('begin_day_of_month', @hash['START_DATE'])
+      # Only set year if not empty (epJSON expects integer or omission, not empty string)
+      run_period.set_property('begin_year', @hash['START_YEAR'].to_i) unless @hash['START_YEAR'].empty?
+      run_period.set_property('end_month', @hash['END_MONTH'])
+      run_period.set_property('end_day_of_month', @hash['END_DATE'])
+      run_period.set_property('end_year', @hash['END_YEAR'].to_i) unless @hash['END_YEAR'].empty?
+      run_period.set_property('day_of_week_for_start_day', @hash['START_DAY'])
 
       # DLM@20101109: this fix removes a warning in the E+ error file but introduces a fatal error
       # when the last field of the run period object is blank

@@ -2,7 +2,7 @@
 
 cd /
 cd "$run_dir"
-"$engine_path"
+"$engine_path" in.epJSON
 
 echo
 echo

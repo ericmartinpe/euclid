@@ -11,14 +11,14 @@ module LegacyOpenStudio
   class Building < DrawingInterface
 
     def create_input_object
-      @input_object = InputObject.new("BUILDING")
-      @input_object.fields[1] = "Untitled"
-      @input_object.fields[2] = "0.0"
-      @input_object.fields[3] = "Suburbs"
-      @input_object.fields[4] = "0.04"
-      @input_object.fields[5] = "0.4"
-      @input_object.fields[6] = "FullExterior"
-      @input_object.fields[7] = "25"
+      @input_object = JsonInputObject.new("Building", "Building 1", {
+        "north_axis" => 0.0,
+        "terrain" => "Suburbs",
+        "loads_convergence_tolerance_value" => 0.04,
+        "temperature_convergence_tolerance_value" => 0.4,
+        "solar_distribution" => "FullExterior",
+        "maximum_number_of_warmup_days" => 25
+      })
 
       super
     end
@@ -29,7 +29,7 @@ module LegacyOpenStudio
 
       if (valid_entity?)
         # ignore north angle in SketchUp
-        #@input_object.fields[2] = -@entity["NorthAngle"].to_f
+        #@input_object.set_property("north_axis", -@entity["NorthAngle"].to_f)
       end
     end
 
@@ -53,7 +53,7 @@ module LegacyOpenStudio
     def update_entity
       if (valid_entity?)
         # update entity
-        #@entity["NorthAngle"] = -@input_object.fields[2].to_f
+        #@entity["NorthAngle"] = -@input_object.get_property("north_axis").to_f
 
         # we will always draw detailed surfaces with true North = y
         # we want shadows to look right so synch up NorthAngle in SketchUp with detailed surface system
@@ -95,7 +95,7 @@ module LegacyOpenStudio
     end
 
     def azimuth
-      return(adapter.get_field(2).to_f)
+      return(@input_object.get_property("north_axis", 0.0).to_f)
     end
 
     def transformation   # coordinate_transformation?  that's what Zone and Surface uses
