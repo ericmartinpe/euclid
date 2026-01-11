@@ -4,7 +4,7 @@
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingUtils")
 require("euclid/lib/legacy_openstudio/lib/interfaces/Surface")
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObject")
+require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
 
 
 module LegacyOpenStudio
@@ -13,7 +13,6 @@ module LegacyOpenStudio
 
     def initialize
       super
-      @first_vertex_field = 5
     end
 
 
@@ -21,12 +20,11 @@ module LegacyOpenStudio
 
 
     def create_input_object
-      @input_object = InputObject.new("SHADING:ZONE:DETAILED")
-      @input_object.fields[1] = Plugin.model_manager.input_file.new_unique_object_name
-      @input_object.fields[2] = ""  # Base Surface
-      @input_object.fields[3] = ""  # Transmittance
-
-      @input_object.fields[6] = 0  # kludge to make fields long enough @input_object.fields[@first_vertex_field..-1] = nil
+      @input_object = JsonInputObject.new("Shading:Zone:Detailed")
+      @input_object.name = Plugin.model_manager.input_file.new_unique_object_name
+      @input_object.set_property('base_surface_name', "")  # Base Surface
+      @input_object.set_property('transmittance_schedule_name', "")  # Transmittance
+      @input_object.set_property('vertices', [])  # Will be populated by update_input_object
 
       super
     end
@@ -37,8 +35,8 @@ module LegacyOpenStudio
         # Check the base surface.
         parent = parent_from_input_object
         if (parent.class != BaseSurface)
-          Plugin.model_manager.add_error("Warning:  " + @input_object.key + "\n")
-          Plugin.model_manager.add_error("This attached shading surface is missing its base surface: " + @input_object.fields[2].to_s + "\n")
+          Plugin.model_manager.add_error("Warning:  " + @input_object.name + "\n")
+          Plugin.model_manager.add_error("This attached shading surface is missing its base surface: " + @input_object.get_property('base_surface_name').to_s + "\n")
           Plugin.model_manager.add_error("A new zone object has been automatically created for this surface.\n\n")
         end
 
@@ -55,9 +53,9 @@ module LegacyOpenStudio
 
       if (valid_entity?)
         if (@parent.class == BaseSurface)
-          @input_object.fields[2] = @parent.input_object  # Parent should already have been updated.
+          @input_object.set_property('base_surface_name', @parent.input_object.name)  # Parent should already have been updated.
         else
-          @input_object.fields[2] = ""
+          @input_object.set_property('base_surface_name', "")
         end
       end
     end
@@ -67,7 +65,8 @@ module LegacyOpenStudio
     def parent_from_input_object
       parent = nil
       if (@input_object)
-        parent = Plugin.model_manager.base_surfaces.find { |object| object.input_object.equal?(@input_object.fields[2]) }
+        base_surface_name = @input_object.get_property('base_surface_name', '')
+        parent = Plugin.model_manager.base_surfaces.find { |object| object.input_object.name == base_surface_name }
       end
       return(parent)
     end
