@@ -32,7 +32,29 @@ module LegacyOpenStudio
       @hash['ON_COORD_SYSTEM_CHANGE'] = Plugin.read_pref("On Coordinate System Change")
       @hash['SERVER_TIMEOUT'] = Plugin.read_pref("Server Timeout")
       @hash['TEXT_EDITOR_PATH'] = Plugin.read_pref("Text Editor Path")
-      @hash['EXE_PATH'] = Plugin.read_pref("EnergyPlus Path")
+      
+      # Auto-detect EnergyPlus path based on input file version
+      exe_path = Plugin.read_pref("EnergyPlus Path")
+      if Plugin.model_manager.input_file
+        file_version = Plugin.model_manager.input_file.energyplus_version
+        if file_version
+          # Try to find version-specific installation
+          if (RUBY_PLATFORM =~ /mswin|mingw/)
+            version_specific_path = "C:/EnergyPlusV#{file_version}/EnergyPlus.exe"
+          elsif (RUBY_PLATFORM =~ /darwin/)
+            version_specific_path = "/Applications/EnergyPlus-#{file_version}/energyplus"
+          else
+            version_specific_path = "/usr/local/EnergyPlus-#{file_version}/energyplus"
+          end
+          
+          # Use version-specific path if it exists, otherwise use saved preference
+          if File.exist?(version_specific_path)
+            exe_path = version_specific_path
+          end
+        end
+      end
+      @hash['EXE_PATH'] = exe_path
+      
       @hash['SAVE_FORMAT'] = Plugin.read_pref("Save Format") || "epJSON"
 
     end
