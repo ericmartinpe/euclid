@@ -22,8 +22,11 @@ module LegacyOpenStudio
         version_obj = epjson_data["Version"].values.first
         if version_obj && version_obj["version_identifier"]
           version = version_obj["version_identifier"]
-          # Convert "25.1.0" to "25-1-0"
-          return version.gsub('.', '-')
+          # Convert "25.1.0" to "25-1-0" or "25.1" to "25-1-0"
+          parts = version.split('.')
+          # Ensure we have major, minor, and patch (default patch to 0)
+          parts[2] ||= '0'
+          return parts.join('-')
         end
       end
       
@@ -41,7 +44,11 @@ module LegacyOpenStudio
       # Look for Version object: Version,\n  25.1.0;
       if content.match(/Version,\s*[\r\n]+\s*([\d\.]+)\s*;/i)
         version = $1
-        return version.gsub('.', '-')
+        # Convert "25.1.0" to "25-1-0" or "25.1" to "25-1-0"
+        parts = version.split('.')
+        # Ensure we have major, minor, and patch (default patch to 0)
+        parts[2] ||= '0'
+        return parts.join('-')
       end
       
       # Default to 25.1.0 if no version found
@@ -277,6 +284,71 @@ module LegacyOpenStudio
       nil
     end
     
+    # Convert epJSON file to IDF format using EnergyPlus converter
+    # @param epjson_path [String] Path to source epJSON file
+    # @param idf_path [String] Path where IDF file should be saved
+    # @return [String, nil] Path to created IDF file, or nil on failure
+    def self.convert_to_idf(epjson_path, idf_path)
+      return nil unless File.exist?(epjson_path)
+      
+      # Get EnergyPlus path from plugin
+      energyplus_exe = nil
+      if defined?(Plugin) && Plugin.respond_to?(:energyplus_path)
+        energyplus_exe = Plugin.energyplus_path
+      end
+      
+      unless energyplus_exe && File.exist?(energyplus_exe)
+        puts "ERROR: EnergyPlus executable not found at: #{energyplus_exe}"
+        return nil
+      end
+      
+      puts "Converting epJSON to IDF using EnergyPlus..."
+      puts "  Input: #{epjson_path}"
+      puts "  Output: #{idf_path}"
+      
+      # Create temp directory for conversion
+      require 'tmpdir'
+      Dir.mktmpdir do |tmpdir|
+        # Copy epJSON to temp directory with standard name
+        temp_input = File.join(tmpdir, "in.epJSON")
+        FileUtils.cp(epjson_path, temp_input)
+        
+        # Run EnergyPlus with --convert-only flag
+        # This converts the file without running simulation
+        original_dir = Dir.pwd
+        begin
+          Dir.chdir(tmpdir)
+          
+          # Use --convert-only to just convert format
+          cmd = "\"#{energyplus_exe}\" --convert-only in.epJSON"
+          puts "Running: #{cmd}"
+          
+          result = system(cmd)
+          
+          # EnergyPlus creates in.idf in the same directory
+          converted_file = File.join(tmpdir, "in.idf")
+          
+          if result && File.exist?(converted_file)
+            # Copy to destination
+            FileUtils.cp(converted_file, idf_path)
+            puts "Successfully converted to IDF format"
+            return idf_path
+          else
+            puts "ERROR: Conversion failed or output file not created"
+            return nil
+          end
+          
+        ensure
+          Dir.chdir(original_dir)
+        end
+      end
+      
+    rescue => e
+      puts "ERROR during epJSON to IDF conversion: #{e.message}"
+      puts e.backtrace.first(5).join("\n")
+      nil
+    end
+    
     # Convert IDF file to epJSON and return the content as a hash
     # @param idf_path [String] Path to IDF file
     # @return [Hash, nil] Parsed epJSON data, or nil on failure
@@ -315,6 +387,212 @@ module LegacyOpenStudio
       has_idf_comments && has_idf_objects
     rescue
       false
+    end
+    
+    # Sort and format IDF file using IDD field definitions
+    # Alphabetizes objects by name within each class and cleans up number formatting
+    # @param idf_path [String] Path to IDF file to sort
+    # @param version [String] EnergyPlus version (e.g., "25-1-0")
+    # @return [Boolean] True if successful
+    def self.sort_idf_file(idf_path, version = nil)
+      return false unless File.exist?(idf_path)
+      
+      # Detect version if not provided
+      version ||= detect_version_from_idf(idf_path)
+      
+      # Get IDD path from repo
+      energyplus_dir = get_energyplus_dir(version)
+      idd_path = File.join(energyplus_dir, "Energy+.idd")
+      
+      unless File.exist?(idd_path)
+        puts "Warning: IDD not found at #{idd_path}, skipping sort"
+        return false
+      end
+      
+      # Parse IDD and IDF
+      idd_classes = parse_idd_for_sorting(idd_path)
+      idf_objects = parse_idf_for_sorting(idf_path)
+      
+      # Sort and format
+      sorted_content = format_sorted_idf(idf_objects, idd_classes)
+      
+      # Write back to file
+      File.write(idf_path, sorted_content, encoding: 'utf-8')
+      
+      true
+    rescue => e
+      puts "Error sorting IDF: #{e.message}"
+      false
+    end
+    
+    private
+    
+    # Parse IDD file to extract class definitions and field names
+    # @param idd_path [String] Path to IDD file
+    # @return [Hash] Hash of class definitions with field info
+    def self.parse_idd_for_sorting(idd_path)
+      content = File.read(idd_path, encoding: 'utf-8')
+      
+      # Remove full-line comments
+      lines = content.split("\n").reject { |line| line.strip.start_with?('!') }
+      content = lines.join("\n")
+      
+      # Split into class blocks
+      class_blocks = content.split(/\n(?=[A-Za-z])/)
+      
+      classes = {}
+      class_blocks.each do |block|
+        next if block.strip.empty?
+        
+        # Extract class name
+        first_line_match = block.match(/^([A-Za-z][A-Za-z0-9:_-]*)/)
+        next unless first_line_match
+        
+        class_name = first_line_match[1].strip
+        
+        # Extract field names
+        fields = []
+        block.scan(/\\field\s+([^\n]+)/i).each do |field_match|
+          fields << field_match[0].strip
+        end
+        
+        # Extract min-fields
+        min_fields_match = block.match(/\\min-fields\s+(\d+)/i)
+        min_fields = min_fields_match ? min_fields_match[1].to_i : fields.length + 1
+        
+        classes[class_name] = {
+          fields: fields,
+          min_fields: min_fields
+        }
+      end
+      
+      classes
+    end
+    
+    # Parse IDF file to extract objects
+    # @param idf_path [String] Path to IDF file
+    # @return [Hash] Hash of objects grouped by class
+    def self.parse_idf_for_sorting(idf_path)
+      content = File.read(idf_path, encoding: 'utf-8')
+      
+      # Remove comments
+      lines = content.split("\n").map do |line|
+        line.include?('!') ? line.split('!')[0] : line
+      end
+      content = lines.join("\n")
+      
+      # Split into objects (separated by semicolons)
+      object_blocks = content.split(';')
+      
+      objects_by_class = Hash.new { |hash, key| hash[key] = [] }
+      
+      object_blocks.each do |block|
+        block = block.strip
+        next if block.empty?
+        
+        # Split by commas to get fields
+        fields = block.split(',').map(&:strip)
+        next if fields.empty?
+        
+        class_name = fields[0]
+        objects_by_class[class_name] << fields
+      end
+      
+      objects_by_class
+    end
+    
+    # Format sorted IDF content
+    # @param objects_by_class [Hash] Objects grouped by class
+    # @param idd_classes [Hash] IDD class definitions
+    # @return [String] Formatted IDF content
+    def self.format_sorted_idf(objects_by_class, idd_classes)
+      text = "\n" # blank line at top
+      indent = "  "
+      rjust_col = 27
+      
+      # Process each class in IDD order (to maintain consistent ordering)
+      idd_classes.keys.each do |class_name|
+        objects = objects_by_class[class_name]
+        next unless objects && !objects.empty?
+        
+        class_def = idd_classes[class_name]
+        field_defs = class_def[:fields]
+        min_fields = class_def[:min_fields]
+        
+        # Alphabetize objects by name (second field)
+        objects.sort_by! { |fields| [fields[1] || '', fields] }
+        
+        objects.each do |fields|
+          # Find last non-blank field
+          last_field_num = nil
+          if fields.length > min_fields
+            (min_fields...fields.length).each do |i|
+              if i < fields.length && !fields[i].strip.empty?
+                last_field_num = i
+              end
+            end
+          end
+          
+          # Write each field
+          fields.each_with_index do |field, num|
+            if num.zero? # class name
+              text += "#{field},\n"
+              next
+            end
+            
+            # Clean up number formatting
+            field = fix_number_string(field)
+            
+            # Determine if last field
+            is_last = (num == fields.length - 1) || (last_field_num && num == last_field_num)
+            field_end = is_last ? ';' : ','
+            line_end = is_last ? "\n\n" : "\n"
+            
+            spaces = field.length < rjust_col - 2 ? '' : '  '
+            
+            # Get field name from IDD
+            field_name = if num - 1 < field_defs.length
+                           field_defs[num - 1]
+                         else
+                           'Extended Field'
+                         end
+            
+            # Format with comment
+            padding = [0, rjust_col - field.length].max
+            comment = padding > 0 ? '!-'.rjust(padding) : ' !-'
+            
+            text += "#{indent}#{field}#{field_end}#{spaces}#{comment} #{field_name}#{line_end}"
+            
+            break if last_field_num && num == last_field_num
+          end
+        end
+      end
+      
+      text
+    end
+    
+    # Convert number string to cleanest representation
+    # @param str [String] String to check and convert
+    # @return [String] Cleaned number string or original string
+    def self.fix_number_string(str)
+      return str if str.nil? || str.empty?
+      
+      # Quick check if it looks like a number before trying to parse
+      # Match optional sign, digits, optional decimal point and more digits, optional scientific notation
+      # Using =~ instead of match? for Ruby 2.2 compatibility
+      return str unless str =~ /^\s*[+-]?(\d+\.?\d*|\d*\.\d+)([eE][+-]?\d+)?\s*$/
+      
+      # Try to parse as float
+      num = Float(str)
+      
+      # Check if it's essentially an integer
+      return num.to_i.to_s if num == num.to_i
+      
+      # Format with up to 12 significant figures, removing trailing zeros
+      format('%.12g', num)
+    rescue ArgumentError, TypeError
+      # Not a number, return as-is
+      str
     end
   end
 
