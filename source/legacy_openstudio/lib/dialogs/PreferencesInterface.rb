@@ -33,6 +33,7 @@ module LegacyOpenStudio
       @hash['SERVER_TIMEOUT'] = Plugin.read_pref("Server Timeout")
       @hash['TEXT_EDITOR_PATH'] = Plugin.read_pref("Text Editor Path")
       @hash['EXE_PATH'] = Plugin.read_pref("EnergyPlus Path")
+      @hash['SAVE_FORMAT'] = Plugin.read_pref("Save Format") || "epJSON"
 
     end
 
@@ -86,6 +87,7 @@ module LegacyOpenStudio
       Plugin.write_pref("Server Timeout", @hash['SERVER_TIMEOUT'])
       Plugin.write_pref("Text Editor Path", @hash['TEXT_EDITOR_PATH'])
       Plugin.write_pref("EnergyPlus Path", @hash['EXE_PATH'])
+      Plugin.write_pref("Save Format", @hash['SAVE_FORMAT'])
 
       return(true)
     end

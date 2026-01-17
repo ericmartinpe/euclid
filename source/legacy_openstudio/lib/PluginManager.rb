@@ -170,6 +170,7 @@ module LegacyOpenStudio
       hash['Server Timeout'] = "120"
       hash['Last Input File Dir'] = Plugin.dir
       hash['Open Dialogs'] = ""
+      hash['Save Format'] = "epJSON"  # Default save format: "epJSON" or "IDF"
 
       if (platform == Platform_Windows)
         hash['Text Editor Path'] = "C:/WINDOWS/system32/notepad.exe"

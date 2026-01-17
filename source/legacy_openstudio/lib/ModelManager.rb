@@ -292,11 +292,27 @@ module LegacyOpenStudio
       @input_file.path = path
       @model_interface.on_change_input_file_path
 
+      # Determine output format based on file extension or preference
+      save_format = Plugin.read_pref("Save Format") || "epJSON"
+      
+      # Override format if user explicitly chose an extension
+      if path.downcase.end_with?('.idf')
+        save_format = "IDF"
+      elsif path.downcase.end_with?('.epjson')
+        save_format = "epJSON"
+      end
+
       if (Sketchup.active_model)
         progress_dialog = ProgressDialog.new
 
         begin
-          @input_file.write(path, Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
+          if save_format == "IDF"
+            # Convert epJSON to IDF format
+            convert_and_save_as_idf(path, Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
+          else
+            # Save as epJSON (default)
+            @input_file.write(path, Proc.new { |percent, message| progress_dialog.update_progress(percent, message) })
+          end
         ensure
           progress_dialog.destroy
         end
@@ -304,8 +320,48 @@ module LegacyOpenStudio
       else
         # SketchUp has already shutdown!
         # Do the write without a progress dialog.
-        @input_file.write(path)
+        if save_format == "IDF"
+          convert_and_save_as_idf(path)
+        else
+          @input_file.write(path)
+        end
       end
+    end
+
+    def convert_and_save_as_idf(path, update_progress = nil)
+      # First save as epJSON to temp file
+      require 'tmpdir'
+      temp_dir = Dir.mktmpdir
+      temp_epjson = File.join(temp_dir, "temp.epJSON")
+      
+      @input_file.write(temp_epjson, update_progress)
+      
+      # Convert to IDF
+      update_progress.call(80, "Converting to IDF format...") if update_progress
+      
+      idf_path = IdfToEpjsonConverter.convert_to_idf(temp_epjson, path)
+      
+      unless idf_path
+        add_error("Failed to convert to IDF format.\n")
+        add_error("Saving as epJSON instead.\n")
+        @input_file.write(path, update_progress)
+        FileUtils.rm_f(temp_epjson)
+        return
+      end
+      
+      # Sort and format the IDF file
+      update_progress.call(90, "Sorting and formatting IDF...") if update_progress
+      
+      # energyplus_version is already in "25-1-0" format
+      version = @input_file.energyplus_version
+      IdfToEpjsonConverter.sort_idf_file(idf_path, version)
+      
+      # Clean up temp file
+      FileUtils.rm_f(temp_epjson)
+    rescue => e
+      add_error("Error converting to IDF: #{e.message}\n")
+      add_error("Saving as epJSON instead.\n")
+      @input_file.write(path, update_progress)
     end
 
 

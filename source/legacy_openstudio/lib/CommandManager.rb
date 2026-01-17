@@ -105,7 +105,20 @@ module LegacyOpenStudio
 
 
     def save_input_file_as
-      if (path = UI.save_panel("Save EnergyPlus Input File", Plugin.model_manager.input_file_dir, Plugin.model_manager.input_file_name))
+      # Determine default extension from preference
+      save_format = Plugin.read_pref("Save Format") || "epJSON"
+      default_ext = save_format == "IDF" ? ".idf" : ".epJSON"
+      
+      # Get current filename and change extension to match format preference
+      current_name = Plugin.model_manager.input_file_name
+      if current_name
+        base_name = File.basename(current_name, ".*")
+        default_name = base_name + default_ext
+      else
+        default_name = "untitled" + default_ext
+      end
+      
+      if (path = UI.save_panel("Save EnergyPlus Input File", Plugin.model_manager.input_file_dir, default_name))
         Plugin.model_manager.save_input_file(path)
       end
     end

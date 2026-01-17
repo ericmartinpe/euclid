@@ -49,6 +49,15 @@ function onBrowseEXE() { window.location='skp:on_browse_exe'; }
 &nbsp;&nbsp;Path:&nbsp;<input id="EXE_PATH" name="EXE_PATH" type="text" class="text" size="69" onchange="onChangeElement(this)">
 &nbsp;<input id="browse" onclick="onBrowseEXE()" type="button" class="button" value="Browse"><br>
 
+<br>
+
+&nbsp;&nbsp;Save Format:&nbsp;
+<select id="SAVE_FORMAT" name="SAVE_FORMAT" onchange="onChangeElement(this)">
+<option value="epJSON">epJSON (recommended)</option>
+<option value="IDF">IDF (legacy)</option>
+</select>
+&nbsp;<span style="color:#666;">(Choose default file format for saving)</span>
+
 <br><br>
 
 </fieldset>
