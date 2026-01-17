@@ -1,12 +1,13 @@
 # *Euclid for SketchUp*
 
-*Euclid for SketchUp* is a free and open-source extension that makes it easy to create and modify the geometry inputs for building energy models. *Euclid* builds on the *Legacy OpenStudio* extension for [*EnergyPlus*](https://energyplus.net). This development version of *Euclid* supports both IDF and epJSON file formats, and is compatible with *EnergyPlus 25.1*.
+*Euclid for SketchUp* is a free and open-source extension that makes it easy to create and modify the geometry inputs for building energy models. *Euclid* builds on the *Legacy OpenStudio* extension for [*EnergyPlus*](https://energyplus.net). This development version of *Euclid* supports both IDF and epJSON file formats, and is compatible with *EnergyPlus* versions **9.6 and later**.
 
 ## Download
 
 **Development Version (epjson_native branch):**
-- Compatible with *EnergyPlus 25.1* and *SketchUp 2017*
+- Compatible with *EnergyPlus 9.6* through *25.2* and *SketchUp 2017*
 - Native epJSON format support with automatic IDF conversion
+- Open and save files in either IDF or epJSON format
 - Requires *SketchUp 2017+* (Ruby 2.2.4+)
 
 Download the [original (IDF-only) *Euclid* here](https://bigladdersoftware.com/projects/euclid/).
