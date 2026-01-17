@@ -274,16 +274,24 @@ module LegacyOpenStudio
         sensor_rotation = Geom::Transformation.rotation([0, 0, 0], [0, 0, 1], rotation_angle.degrees+glare_angle.degrees)
 
         # move sensors, works because we have a unique definition
-        sensor1_transformation = (parent_transformation*entity_transformation).inverse*Geom::Transformation.translation(sketchup_sensor1)*sensor_rotation
-        #puts "sensor1_transformation = #{sensor1_transformation.origin}"
-        @entity.definition.entities[0].transformation = sensor1_transformation
+        # Check if sensor1 exists (reference point might be missing from file)
+        sensor1_transformation = nil
+        if sketchup_sensor1
+          sensor1_transformation = (parent_transformation*entity_transformation).inverse*Geom::Transformation.translation(sketchup_sensor1)*sensor_rotation
+          #puts "sensor1_transformation = #{sensor1_transformation.origin}"
+          @entity.definition.entities[0].transformation = sensor1_transformation
+          @entity.definition.entities[0].hidden = false
+        else
+          # Hide sensor if reference point is missing
+          @entity.definition.entities[0].hidden = true
+        end
 
-        if sketchup_sensor2
+        if sketchup_sensor2 && sensor1_transformation
           sensor2_transformation = (parent_transformation*entity_transformation).inverse*Geom::Transformation.translation(sketchup_sensor2)*sensor_rotation
           #puts "not reset, sensor2_transformation = #{sensor2_transformation.origin}"
           @entity.definition.entities[1].transformation = sensor2_transformation
           @entity.definition.entities[1].hidden = false
-        else
+        elsif sensor1_transformation
           sensor2_transformation = sensor1_transformation
           #puts "reset to sensor1, sensor2_transformation = #{sensor2_transformation.origin}"
           @entity.definition.entities[1].transformation = sensor2_transformation
@@ -293,6 +301,9 @@ module LegacyOpenStudio
             @reference_point2.set_property('y_coordinate_of_reference_point', '')
             @reference_point2.set_property('z_coordinate_of_reference_point', '')
           end
+        else
+          # Both sensors missing, hide sensor2 as well
+          @entity.definition.entities[1].hidden = true
         end
 
         add_observers if had_observers
@@ -457,7 +468,9 @@ module LegacyOpenStudio
 
       result = nil
       if (Plugin.model_manager.relative_daylighting_coordinates?)
-        result = input_object_sensor1.transform(coordinate_transformation)
+        if input_object_sensor1
+          result = input_object_sensor1.transform(coordinate_transformation)
+        end
       else
         result = input_object_sensor1
       end

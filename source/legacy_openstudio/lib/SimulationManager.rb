@@ -44,13 +44,41 @@ module LegacyOpenStudio
         end
       end
 
-      if (!Plugin.energyplus_path || !File.exists?(Plugin.energyplus_path))
+      # Detect the file's version and use the matching EnergyPlus installation
+      file_version = Plugin.model_manager.input_file.energyplus_version
+      if file_version
+        # Try to find EnergyPlus installation matching the file's version
+        if (RUBY_PLATFORM =~ /mswin|mingw/)
+          # Windows
+          energyplus_path_for_version = "C:/EnergyPlusV#{file_version}/EnergyPlus.exe"
+        elsif (RUBY_PLATFORM =~ /darwin/)
+          # Mac
+          energyplus_path_for_version = "/Applications/EnergyPlus-#{file_version}/energyplus"
+        else
+          # Linux
+          energyplus_path_for_version = "/usr/local/EnergyPlus-#{file_version}/energyplus"
+        end
+        
+        # Use version-specific path if it exists, otherwise fall back to preference
+        if File.exists?(energyplus_path_for_version)
+          energyplus_path = energyplus_path_for_version
+          energyplus_dir = File.dirname(energyplus_path)
+        else
+          energyplus_path = Plugin.energyplus_path
+          energyplus_dir = Plugin.energyplus_dir
+        end
+      else
+        energyplus_path = Plugin.energyplus_path
+        energyplus_dir = Plugin.energyplus_dir
+      end
+
+      if (!energyplus_path || !File.exists?(energyplus_path))
         UI.messagebox("Cannot locate the EnergyPlus engine.  Correct the EXE path and try again.")
         Plugin.dialog_manager.show(PreferencesInterface)
         return(false)
       end
 
-      idd_path = Plugin.energyplus_dir + "/Energy+.idd"
+      idd_path = energyplus_dir + "/Energy+.idd"
       if (not File.exists?(idd_path))
         UI.messagebox("Cannot locate the input data dictionary (IDD) in the EnergyPlus directory.  Correct the EXE path and try again.")
         Plugin.dialog_manager.show(PreferencesInterface)
@@ -60,12 +88,11 @@ module LegacyOpenStudio
       version_string = DataDictionary.version(idd_path)
       version = Gem::Version.new(version_string)
       if (not Plugin.energyplus_version.satisfied_by?(version))
-        UI.messagebox("WARNING:  The EnergyPlus engine you have specified in Preferences is version #{version}.  " +
-          "The plugin is designed for EnergyPlus #{Plugin.energyplus_version}.\n\n" +
-          "There might be problems with compatibility. Try changing your EnergyPlus engine if there are simulation errors.")
+        puts "INFO: Using EnergyPlus #{version} (file version: #{file_version}) - Path: #{energyplus_path}"
       end
 
-      energyplus_dir = Plugin.energyplus_dir  #.split("/").join("\\")  # Fix the file separator to work with DOS
+      # Save energyplus_dir as instance variable for use in on_completion
+      @energyplus_dir = energyplus_dir
 
       if (Plugin.model_manager.input_file_dir.nil?)
         output_dir = ""
@@ -279,9 +306,9 @@ module LegacyOpenStudio
       # A better alternative to sending shell commands is to use IO.popen to read and write directly to the process.
       if (Plugin.platform == Platform_Windows)
         if (Plugin.model_manager.get_attribute("Close Shell"))
-          @active_thread = UI.shell_command('call "' + Plugin.energyplus_path + '"')
+          @active_thread = UI.shell_command('call "' + energyplus_path + '"')
         else
-          @active_thread = UI.shell_command('call "' + Plugin.energyplus_path + '" && pause')
+          @active_thread = UI.shell_command('call "' + energyplus_path + '" && pause')
         end
 
       else
@@ -289,14 +316,14 @@ module LegacyOpenStudio
         UI.messagebox("EnergyPlus will be launched in a new instance of the Terminal application.\n\nAfter the simulation is finished, you MUST quit out of the Terminal application before any Actions On Completion will be started.")
 
         if (@readvars_flag)
-          readvars_path = Plugin.energyplus_dir + "/PostProcess/ReadVarsESO"
+          readvars_path = energyplus_dir + "/PostProcess/ReadVarsESO"
         else
           readvars_path = ''
         end
 
         # This shell command MUST have "open -W" in it or thread will die immediately.
         # Environment variables are used to pass arguments to the "open" child process.
-        @active_thread = UI.shell_command("run_dir='" + run_dir + "'\nexport run_dir\nengine_path='" + Plugin.energyplus_path + "'\nexport engine_path\nreadvars_path='" + readvars_path + "'\nexport readvars_path\nopen -W -F -n '" + Plugin.dir + "/run/run_energyplus'")
+        @active_thread = UI.shell_command("run_dir='" + run_dir + "'\nexport run_dir\nengine_path='" + energyplus_path + "'\nexport engine_path\nreadvars_path='" + readvars_path + "'\nexport readvars_path\nopen -W -F -n '" + Plugin.dir + "/run/run_energyplus'")
       end
 
       Sketchup.active_model.active_view.animation = self
@@ -329,12 +356,12 @@ module LegacyOpenStudio
 
         if (@readvars_flag)
           if (Plugin.platform == Platform_Windows)
-            readvars_path = Plugin.energyplus_dir + "/PostProcess/ReadVarsESO.exe"
+            readvars_path = @energyplus_dir + "/PostProcess/ReadVarsESO.exe"
             if not File.exist?(readvars_path)
-              readvars_path = Plugin.energyplus_dir + "/readvars.exe"
+              readvars_path = @energyplus_dir + "/readvars.exe"
             end
           else
-            readvars_path = Plugin.energyplus_dir + "/PostProcess/ReadVarsESO"
+            readvars_path = @energyplus_dir + "/PostProcess/ReadVarsESO"
           end
 
           if (File.exist?(readvars_path))

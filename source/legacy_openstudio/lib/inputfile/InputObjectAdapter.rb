@@ -94,7 +94,7 @@ module LegacyOpenStudio
         
         # For FenestrationSurface:Detailed, vertices are stored as individual properties
         # vertex_1_x_coordinate, vertex_1_y_coordinate, vertex_1_z_coordinate, etc.
-        num_vertices = @object["number_of_vertices"] || 0
+        num_vertices = (@object["number_of_vertices"] || 0).to_i
         result = []
         (1..num_vertices).each do |i|
           x = @object["vertex_#{i}_x_coordinate"]
