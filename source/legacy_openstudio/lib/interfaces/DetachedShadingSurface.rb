@@ -40,9 +40,9 @@ module LegacyOpenStudio
 
     def create_input_object
       if (@surface_type == 0)
-        @input_object = InputObject.new("SHADING:SITE:DETAILED")
+        @input_object = JsonInputObject.new("Shading:Site:Detailed", Plugin.model_manager.input_file.new_unique_object_name)
       else
-        @input_object = InputObject.new("SHADING:BUILDING:DETAILED")
+        @input_object = JsonInputObject.new("Shading:Building:Detailed", Plugin.model_manager.input_file.new_unique_object_name)
       end
       @input_object.fields[1] = Plugin.model_manager.input_file.new_unique_object_name
       @input_object.fields[2] = ""

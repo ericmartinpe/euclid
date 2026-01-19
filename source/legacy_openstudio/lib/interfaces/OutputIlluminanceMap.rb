@@ -24,7 +24,7 @@ module LegacyOpenStudio
     def create_input_object
       #puts "OutputIlluminanceMap.create_input_object"
 
-      @input_object = InputObject.new("OUTPUT:ILLUMINANCEMAP")
+      @input_object = JsonInputObject.new("Output:IlluminanceMap", Plugin.model_manager.input_file.new_unique_object_name)
       @input_object.fields[1] = Plugin.model_manager.input_file.new_unique_object_name
       @input_object.fields[2] = "" # Zone Name
       @input_object.fields[3] = "0.0" # Z height

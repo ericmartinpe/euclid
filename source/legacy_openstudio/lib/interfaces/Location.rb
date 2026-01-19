@@ -12,12 +12,12 @@ module LegacyOpenStudio
   class Location < DrawingInterface
 
     def create_input_object
-      @input_object = InputObject.new("SITE:LOCATION")
-      @input_object.fields[1] = Plugin.model_manager.input_file.new_unique_object_name
-      @input_object.fields[2] = "0.0"
-      @input_object.fields[3] = "0.0"
-      @input_object.fields[4] = "0.0"
-      @input_object.fields[5] = "0.0"
+      @input_object = JsonInputObject.new("Site:Location", Plugin.model_manager.input_file.new_unique_object_name, {
+        "latitude" => 0.0,
+        "longitude" => 0.0,
+        "time_zone" => 0.0,
+        "elevation" => 0.0
+      })
 
       super
     end
