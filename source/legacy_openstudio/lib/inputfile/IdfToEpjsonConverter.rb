@@ -21,7 +21,7 @@ module LegacyOpenStudio
       if epjson_data["Version"]
         version_obj = epjson_data["Version"].values.first
         if version_obj && version_obj["version_identifier"]
-          version = version_obj["version_identifier"]
+          version = version_obj["version_identifier"].to_s
           # Convert "25.1.0" to "25-1-0" or "25.1" to "25-1-0"
           parts = version.split('.')
           # Ensure we have major, minor, and patch (default patch to 0)
@@ -205,7 +205,52 @@ module LegacyOpenStudio
       epjson_obj
     end
     
-    # Convert IDF file to epJSON
+    # Parse IDF file into raw objects (simple text parsing)
+    # @param idf_path [String] Path to IDF file
+    # @return [Array<Hash>] Array of hashes with :class_name, :name, :fields
+    def self.parse_idf_file(idf_path)
+      content = File.read(idf_path)
+      
+      # Remove full-line comments (lines starting with !)
+      content = content.gsub(/^!.*$/, '')
+      
+      # Remove inline comments (everything after ! on each line)
+      content = content.gsub(/!.*$/, '')
+      
+      # Split into objects (separated by semicolons)
+      object_strings = content.split(';')
+      
+      objects = []
+      object_strings.each do |obj_str|
+        # Clean up whitespace
+        obj_str = obj_str.strip
+        next if obj_str.empty?
+        
+        # Split fields by comma
+        fields = obj_str.split(',').map { |f| f.strip }.reject { |f| f.empty? }
+        
+        next if fields.empty?
+        
+        # First field is class name, second is typically name
+        class_name = fields[0]
+        name = fields.length > 1 ? fields[1] : ""
+        
+        # Generate unique name if empty
+        if name.nil? || name.empty?
+          name = "#{class_name} #{objects.length + 1}"
+        end
+        
+        objects << {
+          class_name: class_name,
+          name: name,
+          fields: fields
+        }
+      end
+      
+      objects
+    end
+    
+    # Convert IDF file to epJSON using EnergyPlus's built-in converter
     # @param idf_path [String] Path to IDF file
     # @param epjson_path [String] Optional output path (defaults to same location with .epJSON extension)
     # @return [String, nil] Path to generated epJSON file, or nil on failure
@@ -223,65 +268,51 @@ module LegacyOpenStudio
       epjson_path ||= idf_path.sub(/\.idf$/i, '.epJSON')
       
       # Use EnergyPlus's built-in converter to convert IDF to epJSON
-      # This avoids needing IDD files since EnergyPlus has the schema built-in
-      puts "Converting IDF to epJSON using EnergyPlus converter..."
+      # This is more reliable than parsing ourselves
+      puts "Converting IDF to epJSON using EnergyPlus..."
       
-      # Find EnergyPlus installation for this version
-      if (RUBY_PLATFORM =~ /mswin|mingw/)
-        energyplus_exe = "C:/EnergyPlusV#{version}/energyplus.exe"
-      elsif (RUBY_PLATFORM =~ /darwin/)
-        energyplus_exe = "/Applications/EnergyPlus-#{version}/energyplus"
-      else
-        energyplus_exe = "/usr/local/EnergyPlus-#{version}/energyplus"
+      # Get EnergyPlus executable for this version
+      energyplus_exe = nil
+      if defined?(Plugin) && Plugin.respond_to?(:energyplus_path)
+        energyplus_exe = Plugin.energyplus_path
       end
       
-      # Check if EnergyPlus exists for this version
-      unless File.exist?(energyplus_exe)
-        puts "ERROR: EnergyPlus #{version.gsub('-', '.')} not found at #{energyplus_exe}"
-        puts "Please install EnergyPlus #{version.gsub('-', '.')} to convert IDF files"
+      unless energyplus_exe && File.exist?(energyplus_exe)
+        puts "ERROR: EnergyPlus executable not found"
+        puts "       Please ensure EnergyPlus #{version.gsub('-', '.')} is installed"
         return nil
       end
       
       # Run EnergyPlus converter in a temp directory
       require 'tmpdir'
+      require 'fileutils'
+      
       temp_dir = Dir.mktmpdir
       temp_idf = File.join(temp_dir, File.basename(idf_path))
       FileUtils.cp(idf_path, temp_idf)
       
       # Run converter - EnergyPlus writes output files in the current directory
-      # So we need to run it from the temp directory
       original_dir = Dir.pwd
       begin
         Dir.chdir(temp_dir)
         
         # Run: energyplus --convert-only input.idf
-        # Capture both stdout and stderr
         cmd = "\"#{energyplus_exe}\" --convert-only \"#{File.basename(temp_idf)}\" 2>&1"
-        puts "Running: #{cmd}"
         output = `#{cmd}`
         exit_status = $?.exitstatus
         
-        puts "EnergyPlus output:"
-        puts output
-        
         if exit_status != 0
-          puts "ERROR: EnergyPlus command failed with exit code #{exit_status}"
-          Dir.chdir(original_dir)
-          FileUtils.rm_rf(temp_dir)
+          puts "ERROR: EnergyPlus conversion failed with exit code #{exit_status}"
+          puts output
           return nil
         end
         
         # EnergyPlus creates the epJSON with the same base name
         temp_epjson = temp_idf.sub(/\.idf$/i, '.epJSON')
         
-        # Check for generated epJSON
         unless File.exist?(temp_epjson)
           puts "ERROR: EnergyPlus did not create epJSON file"
           puts "Expected: #{temp_epjson}"
-          puts "Files in temp dir:"
-          Dir.entries(temp_dir).each { |f| puts "  #{f}" }
-          Dir.chdir(original_dir)
-          FileUtils.rm_rf(temp_dir)
           return nil
         end
         
@@ -294,13 +325,135 @@ module LegacyOpenStudio
         FileUtils.rm_rf(temp_dir)
       end
       
-      puts "Successfully converted #{File.basename(idf_path)} to epJSON"
       epjson_path
       
     rescue => e
       puts "ERROR during IDF conversion: #{e.message}"
       puts e.backtrace.first(5).join("\n")
       nil
+    end
+    
+    # Convert a single IDF object to epJSON using schema
+    # @param class_name [String] EnergyPlus class name
+    # @param fields [Array<String>] IDF fields (including class name and name)
+    # @param schema [Hash] epJSON schema
+    # @return [Hash] epJSON object properties
+    def self.convert_idf_object_to_epjson(class_name, fields, schema)
+      epjson_obj = {}
+      
+      # Get object schema
+      object_schema = schema['properties'] && schema['properties'][class_name]
+      unless object_schema
+        puts "Warning: No schema found for #{class_name}, using raw field mapping"
+        # Store fields with generic names
+        fields.each_with_index do |value, index|
+          next if index == 0  # Skip class name
+          next if index == 1  # Skip name
+          next if value.nil? || value.to_s.strip.empty?
+          epjson_obj["field_#{index}"] = parse_field_value(value)
+        end
+        return epjson_obj
+      end
+      
+      # Get the actual object definition (handle pattern properties)
+      obj_def = nil
+      if object_schema['patternProperties']
+        # Most objects use patternProperties with a regex key
+        obj_def = object_schema['patternProperties'].values.first
+      elsif object_schema['properties']
+        obj_def = object_schema
+      end
+      
+      unless obj_def && obj_def['properties']
+        puts "Warning: Cannot find properties for #{class_name}"
+        return epjson_obj
+      end
+      
+      properties = obj_def['properties']
+      property_names = properties.keys
+      
+      # Check if this object has vertices (extensible fields)
+      has_vertices = properties.key?('vertices')
+      
+      if has_vertices
+        # Handle objects with vertices (BuildingSurface:Detailed, FenestrationSurface:Detailed, etc.)
+        # IDF format: ClassName, Name, Field1, Field2, ..., FieldN, X1, Y1, Z1, X2, Y2, Z2, ...
+        
+        # Map non-vertex fields first
+        field_index = 2  # Skip class name (0) and object name (1)
+        property_names.each do |prop_name|
+          next if prop_name == 'vertices'
+          next if prop_name == 'number_of_vertices'
+          
+          if field_index < fields.length
+            field_value = fields[field_index]
+            unless field_value.nil? || field_value.to_s.strip.empty?
+              epjson_obj[prop_name] = parse_field_value(field_value)
+            end
+            field_index += 1
+          end
+        end
+        
+        # Now parse vertices starting from where we left off
+        vertices = []
+        while field_index + 2 < fields.length
+          x = fields[field_index]
+          y = fields[field_index + 1]
+          z = fields[field_index + 2]
+          
+          # Stop if we hit empty fields
+          break if (x.nil? || x.to_s.strip.empty?) && 
+                   (y.nil? || y.to_s.strip.empty?) && 
+                   (z.nil? || z.to_s.strip.empty?)
+          
+          vertices << {
+            "vertex_x_coordinate" => parse_field_value(x),
+            "vertex_y_coordinate" => parse_field_value(y),
+            "vertex_z_coordinate" => parse_field_value(z)
+          }
+          
+          field_index += 3
+        end
+        
+        if vertices.any?
+          epjson_obj["vertices"] = vertices
+          epjson_obj["number_of_vertices"] = vertices.length
+        end
+      else
+        # Regular non-extensible object
+        field_index = 2  # Skip class name (0) and object name (1)
+        property_names.each do |prop_name|
+          if field_index < fields.length
+            field_value = fields[field_index]
+            unless field_value.nil? || field_value.to_s.strip.empty?
+              epjson_obj[prop_name] = parse_field_value(field_value)
+            end
+            field_index += 1
+          end
+        end
+      end
+      
+      epjson_obj
+    end
+    
+    # Parse and convert field value to appropriate type
+    # @param value [String] Field value from IDF
+    # @return [String, Float, Integer] Parsed value
+    def self.parse_field_value(value)
+      return value if value.nil?
+      value = value.to_s.strip
+      return value if value.empty?
+      
+      # Try to parse as number
+      if value =~ /^[+-]?(\d+\.?\d*|\d*\.\d+)([eE][+-]?\d+)?$/
+        num = value.to_f
+        # Return integer if it's a whole number
+        return num.to_i if num == num.to_i
+        return num
+      end
+      
+      # Return as string
+      value
     end
     
     # Convert epJSON file to IDF format using EnergyPlus converter
