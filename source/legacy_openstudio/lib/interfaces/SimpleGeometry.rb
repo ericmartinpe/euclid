@@ -20,10 +20,18 @@ module LegacyOpenStudio
     # Because of dependencies, surfaces must be processed in this order: shading, sub surfaces, base surfaces.
     def SimpleGeometry.convert_to_detailed(input_file)
       
-      # Skip simple geometry conversion for epJSON files - they only support detailed geometry
+      # Simple geometry conversion is only supported for legacy IDF files
+      # epJSON files only support detailed geometry, and IDF files are converted to epJSON
+      # This method is kept for backwards compatibility but should not be called
       if input_file.is_a?(EpJsonFile)
         return
       end
+      
+      # Legacy IDF conversion code below requires InputObject and DataDictionary
+      # which have been removed. If this code is reached, it's an error.
+      puts "WARNING: SimpleGeometry.convert_to_detailed called on legacy IDF file"
+      puts "         IDF files should be converted to epJSON first"
+      return
 
       # Reconcile the coordinate systems for simple geometry.
       # If the normal system and the simple one are different, the simple objects
