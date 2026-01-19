@@ -44,33 +44,9 @@ module LegacyOpenStudio
         end
       end
 
-      # Detect the file's version and use the matching EnergyPlus installation
-      file_version = Plugin.model_manager.input_file.energyplus_version
-      if file_version
-        # Try to find EnergyPlus installation matching the file's version
-        if (RUBY_PLATFORM =~ /mswin|mingw/)
-          # Windows
-          energyplus_path_for_version = "C:/EnergyPlusV#{file_version}/EnergyPlus.exe"
-        elsif (RUBY_PLATFORM =~ /darwin/)
-          # Mac
-          energyplus_path_for_version = "/Applications/EnergyPlus-#{file_version}/energyplus"
-        else
-          # Linux
-          energyplus_path_for_version = "/usr/local/EnergyPlus-#{file_version}/energyplus"
-        end
-        
-        # Use version-specific path if it exists, otherwise fall back to preference
-        if File.exists?(energyplus_path_for_version)
-          energyplus_path = energyplus_path_for_version
-          energyplus_dir = File.dirname(energyplus_path)
-        else
-          energyplus_path = Plugin.energyplus_path
-          energyplus_dir = Plugin.energyplus_dir
-        end
-      else
-        energyplus_path = Plugin.energyplus_path
-        energyplus_dir = Plugin.energyplus_dir
-      end
+      # Use the default EnergyPlus path (which should have been set when file was opened)
+      energyplus_path = Plugin.energyplus_path
+      energyplus_dir = Plugin.energyplus_dir
 
       if (!energyplus_path || !File.exists?(energyplus_path))
         UI.messagebox("Cannot locate the EnergyPlus engine.  Correct the EXE path and try again.")

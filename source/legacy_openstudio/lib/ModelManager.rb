@@ -231,6 +231,11 @@ module LegacyOpenStudio
           if !is_epjson_file?(path)
             @input_file.original_idf_path = path
           end
+          
+          # Set EnergyPlus path based on file version
+          if @input_file && @input_file.energyplus_version
+            Plugin.set_energyplus_path_for_version(@input_file.energyplus_version)
+          end
 
           if (@input_file)
             @model_interface = ModelInterface.new(@input_file)

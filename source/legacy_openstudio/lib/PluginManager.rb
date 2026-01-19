@@ -95,20 +95,11 @@ module LegacyOpenStudio
 
 
     def open_data_dictionary
-      success = false
-      # Use default EnergyPlus version 25.1.0 for startup
-      # (Files will use their own version when loaded)
-      idd_path = Plugin.dir + "/energyplus/25-1-0/Energy+.idd"
-
-      if (File.exists?(idd_path))
-        @data_dictionary = DataDictionary.open(idd_path)
-        success = true
-      else
-        UI.messagebox("Cannot locate the Data Dictionary file Energy+.idd.\nEuclid will not be loaded.")
-        puts "Bad IDD path=" + idd_path
-      end
-
-      return(success)
+      # Data dictionary is no longer required at startup
+      # It will be loaded on-demand only when converting IDF files
+      # epJSON files use the schema files instead
+      @data_dictionary = nil
+      return(true)
     end
 
 
@@ -211,6 +202,36 @@ module LegacyOpenStudio
 
     def energyplus_version
       return(Gem::Requirement.new(">=9.6.0"))  # Supports EnergyPlus 9.6.0 and later
+    end
+
+
+    # Find and set EnergyPlus installation path based on version
+    # @param version [String] Version in format "25-1-0"
+    # @return [Boolean] true if path was found and set, false otherwise
+    def set_energyplus_path_for_version(version)
+      return false unless version
+      
+      # Try to find EnergyPlus installation matching this version
+      if (RUBY_PLATFORM =~ /mswin|mingw/)
+        # Windows
+        energyplus_path_for_version = "C:/EnergyPlusV#{version}/EnergyPlus.exe"
+      elsif (RUBY_PLATFORM =~ /darwin/)
+        # Mac
+        energyplus_path_for_version = "/Applications/EnergyPlus-#{version}/energyplus"
+      else
+        # Linux
+        energyplus_path_for_version = "/usr/local/EnergyPlus-#{version}/energyplus"
+      end
+      
+      # Check if this exact version exists
+      if File.exist?(energyplus_path_for_version)
+        write_pref("EnergyPlus Path", energyplus_path_for_version)
+        puts "Set EnergyPlus path to: #{energyplus_path_for_version}"
+        return true
+      end
+      
+      puts "EnergyPlus #{version.gsub('-', '.')} not found at #{energyplus_path_for_version}"
+      return false
     end
 
   end

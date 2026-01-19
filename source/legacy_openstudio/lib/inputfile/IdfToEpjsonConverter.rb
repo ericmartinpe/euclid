@@ -222,57 +222,76 @@ module LegacyOpenStudio
       # Determine output path
       epjson_path ||= idf_path.sub(/\.idf$/i, '.epJSON')
       
-      # Load the IDF file using existing InputFile parser
-      # Use SketchUp-compatible require paths
-      require("euclid/lib/legacy_openstudio/lib/inputfile/InputFile")
-      require("euclid/lib/legacy_openstudio/lib/inputfile/DataDictionary")
+      # Use EnergyPlus's built-in converter to convert IDF to epJSON
+      # This avoids needing IDD files since EnergyPlus has the schema built-in
+      puts "Converting IDF to epJSON using EnergyPlus converter..."
       
-      puts "Parsing IDF file..."
-      
-      # Get data dictionary
-      if defined?(Plugin) && Plugin.respond_to?(:data_dictionary)
-        data_dict = Plugin.data_dictionary
+      # Find EnergyPlus installation for this version
+      if (RUBY_PLATFORM =~ /mswin|mingw/)
+        energyplus_exe = "C:/EnergyPlusV#{version}/energyplus.exe"
+      elsif (RUBY_PLATFORM =~ /darwin/)
+        energyplus_exe = "/Applications/EnergyPlus-#{version}/energyplus"
       else
-        # For testing: load dictionary from version-specific directory
-        energyplus_dir = get_energyplus_dir(version)
-        idd_path = File.join(energyplus_dir, "Energy+.idd")
+        energyplus_exe = "/usr/local/EnergyPlus-#{version}/energyplus"
+      end
+      
+      # Check if EnergyPlus exists for this version
+      unless File.exist?(energyplus_exe)
+        puts "ERROR: EnergyPlus #{version.gsub('-', '.')} not found at #{energyplus_exe}"
+        puts "Please install EnergyPlus #{version.gsub('-', '.')} to convert IDF files"
+        return nil
+      end
+      
+      # Run EnergyPlus converter in a temp directory
+      require 'tmpdir'
+      temp_dir = Dir.mktmpdir
+      temp_idf = File.join(temp_dir, File.basename(idf_path))
+      FileUtils.cp(idf_path, temp_idf)
+      
+      # Run converter - EnergyPlus writes output files in the current directory
+      # So we need to run it from the temp directory
+      original_dir = Dir.pwd
+      begin
+        Dir.chdir(temp_dir)
         
-        if File.exist?(idd_path)
-          data_dict = DataDictionary.new
-          data_dict.read_idd_file(idd_path)
-        else
-          puts "ERROR: Energy+.idd not found"
+        # Run: energyplus --convert-only input.idf
+        # Capture both stdout and stderr
+        cmd = "\"#{energyplus_exe}\" --convert-only \"#{File.basename(temp_idf)}\" 2>&1"
+        puts "Running: #{cmd}"
+        output = `#{cmd}`
+        exit_status = $?.exitstatus
+        
+        puts "EnergyPlus output:"
+        puts output
+        
+        if exit_status != 0
+          puts "ERROR: EnergyPlus command failed with exit code #{exit_status}"
+          Dir.chdir(original_dir)
+          FileUtils.rm_rf(temp_dir)
           return nil
         end
-      end
-      
-      # Parse IDF
-      input_file = InputFile.new(data_dict)
-      input_file.open(idf_path)
-      
-      puts "Converting #{input_file.objects.length} objects to epJSON..."
-      
-      # Convert to epJSON structure
-      epjson_data = {}
-      
-      input_file.objects.each do |obj|
-        object_type = obj.class_name
-        object_name = obj.name
         
-        # Initialize object type hash if needed
-        epjson_data[object_type] ||= {}
+        # EnergyPlus creates the epJSON with the same base name
+        temp_epjson = temp_idf.sub(/\.idf$/i, '.epJSON')
         
-        # Convert object
-        epjson_obj = convert_object_to_epjson(obj, version)
+        # Check for generated epJSON
+        unless File.exist?(temp_epjson)
+          puts "ERROR: EnergyPlus did not create epJSON file"
+          puts "Expected: #{temp_epjson}"
+          puts "Files in temp dir:"
+          Dir.entries(temp_dir).each { |f| puts "  #{f}" }
+          Dir.chdir(original_dir)
+          FileUtils.rm_rf(temp_dir)
+          return nil
+        end
         
-        # Add to epJSON structure
-        epjson_data[object_type][object_name] = epjson_obj
-      end
-      
-      # Write epJSON file
-      puts "Writing epJSON file: #{epjson_path}"
-      File.open(epjson_path, 'w') do |f|
-        f.write(JSON.pretty_generate(epjson_data))
+        # Copy to final destination
+        FileUtils.cp(temp_epjson, epjson_path)
+        puts "Successfully converted to: #{epjson_path}"
+        
+      ensure
+        Dir.chdir(original_dir)
+        FileUtils.rm_rf(temp_dir)
       end
       
       puts "Successfully converted #{File.basename(idf_path)} to epJSON"
