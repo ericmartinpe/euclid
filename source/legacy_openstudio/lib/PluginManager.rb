@@ -30,7 +30,7 @@ module LegacyOpenStudio
 
     attr_reader :name, :version, :dir, :progress_dialog, :asynch_delay
 
-    attr_accessor :data_dictionary, :model_manager, :command_manager, :menu_manager, :dialog_manager, :animation_manager, :simulation_manager, :preferences
+    attr_accessor :model_manager, :command_manager, :menu_manager, :dialog_manager, :animation_manager, :simulation_manager, :preferences
     attr_accessor :energyplus_path, :update_manager, :load_components
 
     def initialize
@@ -95,10 +95,7 @@ module LegacyOpenStudio
 
 
     def open_data_dictionary
-      # Data dictionary is no longer required at startup
-      # It will be loaded on-demand only when converting IDF files
-      # epJSON files use the schema files instead
-      @data_dictionary = nil
+      # Data dictionary is no longer used - epJSON files use schema, IDF files are converted to epJSON
       return(true)
     end
 
