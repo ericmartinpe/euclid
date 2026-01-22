@@ -207,10 +207,9 @@ module LegacyOpenStudio
             # IDF file - convert to epJSON first
             progress_dialog.update_progress(0, "Converting IDF to epJSON...")
             
-            # Convert in temp directory
-            require 'tmpdir'
-            temp_dir = Dir.mktmpdir
-            epjson_path = File.join(temp_dir, File.basename(path, ".*") + ".epJSON")
+            # Convert in same directory as input file
+            input_dir = File.dirname(path)
+            epjson_path = File.join(input_dir, File.basename(path, ".*") + ".epJSON")
             
             converted_path = IdfToEpjsonConverter.convert(path, epjson_path)
             

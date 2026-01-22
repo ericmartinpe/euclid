@@ -201,14 +201,17 @@ module LegacyOpenStudio
         }))
       end
 
-      # make a temp directory to run in
-      run_dir = Dir.tmpdir + "/EuclidSim/run"
+      # name of current file
+      input_file_path = Plugin.model_manager.input_file.path
+      input_file_name = File.basename(input_file_path)
+
+      # make a run directory in the same location as the input file
+      input_file_path = File.expand_path(input_file_path)
+      input_dir = File.dirname(input_file_path)
+      run_dir = File.join(input_dir, "EuclidSim_run")
       if not File.directory?(run_dir)
         FileUtils.mkdir_p(run_dir)
       end
-
-      # name of current file
-      input_file_name = Plugin.model_manager.input_file_name
 
       # Clean the output directory
       FileUtils.cd(output_dir)
@@ -307,8 +310,11 @@ module LegacyOpenStudio
 
 
     def on_completion
-      base_name = File.basename(Plugin.model_manager.input_file_name, ".*")
-      run_dir = Dir.tmpdir + "/OpenStudio/run/"
+      input_file_path = Plugin.model_manager.input_file.path
+      base_name = File.basename(input_file_path, ".*")
+      input_file_path = File.expand_path(input_file_path)
+      input_dir = File.dirname(input_file_path)
+      run_dir = File.join(input_dir, "EuclidSim_run")
       output_dir = @output_dir
       editor_path = Plugin.read_pref("Text Editor Path")
 

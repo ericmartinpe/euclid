@@ -52,7 +52,11 @@ module LegacyOpenStudio
         @hash['MAX_HVAC_SIZING_PASSES'] = max_passes.to_s
       end
 
-      @hash['RUN_DIR'] = Dir.tmpdir + "/OpenStudio/run"
+      # Set run directory to same location as input file
+      input_file_path = Plugin.model_manager.input_file.path
+      input_file_path = File.expand_path(input_file_path)
+      input_dir = File.dirname(input_file_path)
+      @hash['RUN_DIR'] = File.join(input_dir, "EuclidSim_run")
       @hash['EPW_PATH'] = Plugin.model_manager.get_attribute("Weather File Path")
 
       # Read the RUNPERIOD object
