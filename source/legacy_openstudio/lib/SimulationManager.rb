@@ -256,38 +256,14 @@ module LegacyOpenStudio
         FileUtils.cp(weather_file_path, run_dir + '/in.epw') if (File.exist?(weather_file_path))
       end
 
-      # define where expand objects is
-      expandobjects_path = ''
-      if (Plugin.platform == Platform_Windows)
-        expandobjects_path = energyplus_dir + '/ExpandObjects.exe'
-      else
-        expandobjects_path = energyplus_dir + '/expandobjects'
-      end
-
-      # run expand objects
-      if File.exists?(expandobjects_path)
-        # call command and wait for process to complete
-        system("#{expandobjects_path}")
-
-        if File.exists?(run_dir + "/expanded.idf")
-          # copy the expanded.idf to in.expidf
-          FileUtils.cp(run_dir + "/expanded.idf", run_dir + "/in.expidf")
-
-          # overwrite in.idf with the expanded file
-          if File.exists?(run_dir + "/in.idf")
-            File.rename(run_dir + "/in.idf", run_dir + "/in.idf.original")
-          end
-
-          File.rename(run_dir + "/expanded.idf", run_dir + "/in.idf")
-        end
-      end
-
       # A better alternative to sending shell commands is to use IO.popen to read and write directly to the process.
       if (Plugin.platform == Platform_Windows)
+        # Run EnergyPlus with epJSON input file
+        # Use --help to see all options
         if (Plugin.model_manager.get_attribute("Close Shell"))
-          @active_thread = UI.shell_command('call "' + energyplus_path + '"')
+          @active_thread = UI.shell_command('call "' + energyplus_path + '" -w in.epw -d . in.epJSON')
         else
-          @active_thread = UI.shell_command('call "' + energyplus_path + '" && pause')
+          @active_thread = UI.shell_command('call "' + energyplus_path + '" -w in.epw -d . in.epJSON && pause')
         end
 
       else
