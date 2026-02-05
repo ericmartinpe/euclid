@@ -8,12 +8,9 @@ require("euclid/lib/legacy_openstudio/lib/ResultsManager")
 
 require("euclid/lib/legacy_openstudio/lib/dialogs/ProgressDialog")
 
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputFile")
 require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
 require("euclid/lib/legacy_openstudio/lib/inputfile/FieldMapper")
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 require("euclid/lib/legacy_openstudio/lib/inputfile/EpJsonFile")
-require("euclid/lib/legacy_openstudio/lib/inputfile/IdfToEpjsonConverter")
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/ModelInterface")
 
@@ -204,14 +201,14 @@ module LegacyOpenStudio
             # Already epJSON - open directly
             epjson_path = path
           else
-            # IDF file - convert to epJSON first
+            # IDF file - convert to epJSON first using EnergyPlus --convert-only
             progress_dialog.update_progress(0, "Converting IDF to epJSON...")
             
             # Convert in same directory as input file
             input_dir = File.dirname(path)
             epjson_path = File.join(input_dir, File.basename(path, ".*") + ".epJSON")
             
-            converted_path = IdfToEpjsonConverter.convert(path, epjson_path)
+            converted_path = convert_idf_to_epjson(path, epjson_path)
             
             unless converted_path
               add_error("Failed to convert IDF file to epJSON format.\n")
@@ -614,8 +611,7 @@ module LegacyOpenStudio
 
     def relative_coordinates?
       if (drawing_interface = surface_geometry)
-        adapter = InputObjectAdapter.new(drawing_interface.input_object)
-        return(adapter.get_field(3) == "Relative")
+        return(drawing_interface.input_object.get_property('coordinate_system', '').upcase == "RELATIVE")
       else
         puts "ModelManager.relative_coordinates?:  GlobalGeometryRules is missing"
         return(false)
@@ -624,12 +620,8 @@ module LegacyOpenStudio
 
     def relative_daylighting_coordinates?
       if (drawing_interface = surface_geometry)
-        adapter = InputObjectAdapter.new(drawing_interface.input_object)
-        if (adapter.get_field(4))
-          return(adapter.get_field(4) == "Relative")
-        else
-          return(true) # default
-        end
+        coord_sys = drawing_interface.input_object.get_property('daylighting_reference_point_coordinate_system', 'Relative')
+        return(coord_sys.upcase == "RELATIVE")
       else
         puts "ModelManager.relative_coordinates?:  GlobalGeometryRules is missing"
         return(false)
@@ -894,6 +886,115 @@ module LegacyOpenStudio
        render_mode_value = renderingoptions["RenderMode"] = 2
        #change DisplayColorByLayer to false (so you can see material)
        color_by_layer_value = renderingoptions["DisplayColorByLayer"] = false
+    end
+
+    # Convert IDF file to epJSON using EnergyPlus --convert-only
+    # @param idf_path [String] Path to IDF file
+    # @param epjson_path [String] Output path for epJSON file
+    # @return [String, nil] Path to created epJSON file, or nil on failure
+    def convert_idf_to_epjson(idf_path, epjson_path)
+      return nil unless File.exist?(idf_path)
+      
+      # Detect EnergyPlus version from IDF file
+      require_relative 'inputfile/VersionDetector'
+      idf_version = VersionDetector.detect_version_from_idf(idf_path)
+      unless idf_version
+        error_msg = "ERROR: Unable to detect EnergyPlus version from IDF file.\n\n" +
+                    "The IDF file must contain a Version object.\n\n" +
+                    "File: #{File.basename(idf_path)}"
+        UI.messagebox(error_msg, MB_OK)
+        puts error_msg
+        return nil
+      end
+      puts "Detected EnergyPlus version from IDF: #{idf_version.gsub('-', '.')}"
+      
+      # Check minimum version requirement
+      unless VersionDetector.meets_minimum_version?(idf_version)
+        error_msg = "This version of Euclid supports EnergyPlus versions 9.6 and later.\n\n" +
+                    "Detected version: #{idf_version.gsub('-', '.')}\n\n" +
+                    "File: #{File.basename(idf_path)}"
+        UI.messagebox(error_msg, MB_OK)
+        puts error_msg
+        return nil
+      end
+      
+      # Set EnergyPlus path for the detected version
+      unless Plugin.set_energyplus_path_for_version(idf_version)
+        puts "ERROR: EnergyPlus #{idf_version.gsub('-', '.')} not found"
+        puts "Please install EnergyPlus #{idf_version.gsub('-', '.')} to convert this IDF file"
+        return nil
+      end
+      
+      # Get EnergyPlus executable path (now set for correct version)
+      energyplus_exe = Plugin.energyplus_path
+      unless energyplus_exe && File.exist?(energyplus_exe)
+        puts "ERROR: EnergyPlus executable not found"
+        return nil
+      end
+      
+      puts "Converting IDF to epJSON using EnergyPlus..."
+      puts "  Input: #{idf_path}"
+      puts "  Output: #{epjson_path}"
+      
+      # Create temp directory for conversion
+      require 'tmpdir'
+      require 'fileutils'
+      
+      temp_dir = Dir.mktmpdir
+      temp_idf = File.join(temp_dir, File.basename(idf_path))
+      FileUtils.cp(idf_path, temp_idf)
+      
+      # Run EnergyPlus converter in temp directory
+      original_dir = Dir.pwd
+      begin
+        Dir.chdir(temp_dir)
+        
+        # Run: energyplus --convert-only input.idf
+        cmd = "\"#{energyplus_exe}\" --convert-only \"#{File.basename(temp_idf)}\""
+        output = `#{cmd} 2>&1`
+        exit_status = $?.exitstatus
+        
+        if exit_status != 0
+          puts "ERROR: EnergyPlus conversion failed with exit code #{exit_status}"
+          puts output
+          return nil
+        end
+        
+        # Find the epJSON file created by EnergyPlus
+        # Look for any .epJSON or .epjson file in the temp directory
+        temp_epjson = nil
+        Dir.entries(temp_dir).each do |file|
+          if file =~ /\.epjson$/i
+            temp_epjson = File.join(temp_dir, file)
+            break
+          end
+        end
+        
+        unless temp_epjson
+          # No epJSON file found - list what files are in the directory
+          puts "ERROR: EnergyPlus did not create epJSON file"
+          puts "Files in temp directory:"
+          Dir.entries(temp_dir).each { |f| puts "  #{f}" }
+          puts "\nEnergyPlus output:"
+          puts output
+          return nil
+        end
+        
+        # Copy to final destination
+        FileUtils.cp(temp_epjson, epjson_path)
+        puts "Successfully converted to: #{epjson_path}"
+        
+        return epjson_path
+        
+      ensure
+        Dir.chdir(original_dir)
+        FileUtils.rm_rf(temp_dir)
+      end
+      
+    rescue => e
+      puts "ERROR during IDF conversion: #{e.message}"
+      puts e.backtrace.first(5).join("\n")
+      nil
     end
 
 

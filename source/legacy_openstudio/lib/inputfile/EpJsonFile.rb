@@ -159,9 +159,25 @@ module LegacyOpenStudio
       json_data = JSON.parse(json_string)
       
       # Detect EnergyPlus version from file
-      require_relative 'IdfToEpjsonConverter'
-      @energyplus_version = IdfToEpjsonConverter.detect_version_from_epjson(json_data)
+      require_relative 'VersionDetector'
+      @energyplus_version = VersionDetector.detect_version_from_epjson(json_data)
+      unless @energyplus_version
+        error_msg = "ERROR: Unable to detect EnergyPlus version from epJSON file.\n\n" +
+                    "The file must contain a Version object with a valid version_identifier.\n\n" +
+                    "File: #{File.basename(path)}"
+        UI.messagebox(error_msg, MB_OK)
+        raise error_msg
+      end
       puts "Detected EnergyPlus version: #{@energyplus_version.gsub('-', '.')}"
+      
+      # Check minimum version requirement
+      unless VersionDetector.meets_minimum_version?(@energyplus_version)
+        error_msg = "Euclid for epJSON supports EnergyPlus versions 9.6 and later.\n\n" +
+                    "Detected version: #{@energyplus_version.gsub('-', '.')}\n\n" +
+                    "File: #{File.basename(path)}"
+        UI.messagebox(error_msg, MB_OK)
+        raise error_msg
+      end
       
       # Track object counts for progress reporting (Ruby 2.2 compatible)
       total_objects = 0
