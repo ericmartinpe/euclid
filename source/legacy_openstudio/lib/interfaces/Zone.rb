@@ -543,13 +543,7 @@ module LegacyOpenStudio
       spaces = []
       for child in @children
         if child.class == BaseSurface
-          # Handle both JsonInputObject and legacy InputObject
-          if child.input_object.respond_to?(:get_property)
-            space_name = child.input_object.get_property('space_name', '')
-          else
-            # Legacy InputObject - field[5] is space_name
-            space_name = child.input_object.fields[5].to_s
-          end
+          space_name = child.input_object.get_property('space_name', '')
           
           if space_name && !space_name.empty?
             spaces << space_name

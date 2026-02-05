@@ -4,7 +4,6 @@
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/Surface")
 require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 require("euclid/lib/legacy_openstudio/lib/dialogs/ProgressDialog")
 
 
@@ -370,7 +369,7 @@ module LegacyOpenStudio
     end
 
     def name
-      @input_object.fields[1]
+      @input_object.name
     end
 
 
@@ -419,14 +418,15 @@ module LegacyOpenStudio
 
     # match this base surface to another base surface
     def set_other_side_surface(other)
-      if (@input_object.fields[2].upcase == "ROOF")
-        @input_object.fields[2] = "Ceiling"
+      surface_type = @input_object.get_property('surface_type', '').upcase
+      if (surface_type == "ROOF")
+        @input_object.set_property('surface_type', 'Ceiling')
       end
-      @input_object.fields[6] = 'Surface'
-      @input_object.fields[7] = other.name
-      @input_object.fields[8] = "NoSun"
-      @input_object.fields[9] = "NoWind"
-      @input_object.fields[3] = default_construction # do after making interior
+      @input_object.set_property('outside_boundary_condition', 'Surface')
+      @input_object.set_property('outside_boundary_condition_object', other.name)
+      @input_object.set_property('sun_exposure', 'NoSun')
+      @input_object.set_property('wind_exposure', 'NoWind')
+      @input_object.set_property('construction_name', default_construction) # do after making interior
       #if render set to by boundary then change materials to surface
           if (Plugin.model_manager.rendering_mode == 2)
               #apply material to front and back face
@@ -440,15 +440,15 @@ module LegacyOpenStudio
     # set this base surface to reference no other base surface
     def unset_other_side_surface
 
-      if (@input_object.fields[2].upcase == "CEILING")
-        @input_object.fields[2] = "Roof"
+      if (@input_object.get_property('surface_type', '').upcase == "CEILING")
+        @input_object.set_property('surface_type', 'Roof')
       end
 
-      if (@input_object.fields[2] == "Floor")
-        @input_object.fields[6] = "Ground"
-        @input_object.fields[7] = ""
-        @input_object.fields[8] = "NoSun"
-        @input_object.fields[9] = "NoWind"
+      if (@input_object.get_property('surface_type', '') == "Floor")
+        @input_object.set_property('outside_boundary_condition', 'Ground')
+        @input_object.set_property('outside_boundary_condition_object', '')
+        @input_object.set_property('sun_exposure', 'NoSun')
+        @input_object.set_property('wind_exposure', 'NoWind')
       #if render set to by boundary then change materials to surface
           if (Plugin.model_manager.rendering_mode == 2)
               #apply material to front and back face
@@ -457,10 +457,10 @@ module LegacyOpenStudio
           else
           end
       else
-        @input_object.fields[6] = "Outdoors"
-        @input_object.fields[7] = ""
-        @input_object.fields[8] = "SunExposed"
-        @input_object.fields[9] = "WindExposed"
+        @input_object.set_property('outside_boundary_condition', 'Outdoors')
+        @input_object.set_property('outside_boundary_condition_object', '')
+        @input_object.set_property('sun_exposure', 'SunExposed')
+        @input_object.set_property('wind_exposure', 'WindExposed')
       #if render set to by boundary then change materials to surface
           if (Plugin.model_manager.rendering_mode == 2)
               #apply material to front and back face
@@ -470,7 +470,7 @@ module LegacyOpenStudio
           end
       end
 
-      @input_object.fields[3] = default_construction # do after making exterior
+      @input_object.set_property('construction_name', default_construction) # do after making exterior
 
     end
 
