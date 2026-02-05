@@ -15,28 +15,28 @@ module LegacyOpenStudio
       if (not @drawing_interface.nil?)
         @input_object = @drawing_interface.input_object
 
-        @hash['NAME'] = @input_object.fields[1]
-        @hash['NUMXPOINTS'] = @input_object.fields[6].to_i
-        @hash['NUMYPOINTS'] = @input_object.fields[9].to_i
+        @hash['NAME'] = @input_object.name
+        @hash['NUMXPOINTS'] = @input_object.get_property('number_of_x_grid_points', '10').to_i
+        @hash['NUMYPOINTS'] = @input_object.get_property('number_of_y_grid_points', '10').to_i
 
         # Need better method here
         if (Plugin.model_manager.units_system == "SI")
           i = 0
-          @hash['ZHEIGHT'] = @input_object.fields[3].to_f
-          @hash['XMIN'] = @input_object.fields[4].to_f
-          @hash['XMAX'] = @input_object.fields[5].to_f
-          @hash['YMIN'] = @input_object.fields[7].to_f
-          @hash['YMAX'] = @input_object.fields[8].to_f
+          @hash['ZHEIGHT'] = @input_object.get_property('z_height', '0.0').to_f
+          @hash['XMIN'] = @input_object.get_property('x_minimum_coordinate', '0.0').to_f
+          @hash['XMAX'] = @input_object.get_property('x_maximum_coordinate', '1.0').to_f
+          @hash['YMIN'] = @input_object.get_property('y_minimum_coordinate', '0.0').to_f
+          @hash['YMAX'] = @input_object.get_property('y_maximum_coordinate', '1.0').to_f
           area = @drawing_interface.area.to_m.to_m
         else
           i = 1
           m_to_ft = 3.2808399
           ft_to_m = 1/m_to_ft
-          @hash['ZHEIGHT'] = (m_to_ft*@input_object.fields[3].to_f).round_to(Plugin.model_manager.length_precision)
-          @hash['XMIN'] = (m_to_ft*@input_object.fields[4].to_f).round_to(Plugin.model_manager.length_precision)
-          @hash['XMAX'] = (m_to_ft*@input_object.fields[5].to_f).round_to(Plugin.model_manager.length_precision)
-          @hash['YMIN'] = (m_to_ft*@input_object.fields[7].to_f).round_to(Plugin.model_manager.length_precision)
-          @hash['YMAX'] = (m_to_ft*@input_object.fields[8].to_f).round_to(Plugin.model_manager.length_precision)
+          @hash['ZHEIGHT'] = (m_to_ft*@input_object.get_property('z_height', '0.0').to_f).round_to(Plugin.model_manager.length_precision)
+          @hash['XMIN'] = (m_to_ft*@input_object.get_property('x_minimum_coordinate', '0.0').to_f).round_to(Plugin.model_manager.length_precision)
+          @hash['XMAX'] = (m_to_ft*@input_object.get_property('x_maximum_coordinate', '1.0').to_f).round_to(Plugin.model_manager.length_precision)
+          @hash['YMIN'] = (m_to_ft*@input_object.get_property('y_minimum_coordinate', '0.0').to_f).round_to(Plugin.model_manager.length_precision)
+          @hash['YMAX'] = (m_to_ft*@input_object.get_property('y_maximum_coordinate', '1.0').to_f).round_to(Plugin.model_manager.length_precision)
           area = @drawing_interface.area.to_feet.to_feet
         end
 
@@ -53,27 +53,27 @@ module LegacyOpenStudio
     def report
       input_object_copy = @input_object.copy
 
-      @input_object.fields[1] = @hash['NAME']
-      @input_object.fields[6] = [@hash['NUMXPOINTS'].to_i, 1].max
-      @input_object.fields[9] = [@hash['NUMYPOINTS'].to_i, 1].max
+      @input_object.name = @hash['NAME']
+      @input_object.set_property('number_of_x_grid_points', [@hash['NUMXPOINTS'].to_i, 1].max.to_s)
+      @input_object.set_property('number_of_y_grid_points', [@hash['NUMYPOINTS'].to_i, 1].max.to_s)
 
       # Need better method here
       if (Plugin.model_manager.units_system == "SI")
         i = 0
-        @input_object.fields[3] = @hash['ZHEIGHT'].to_f
-        @input_object.fields[4] = @hash['XMIN'].to_f
-        @input_object.fields[5] = @hash['XMAX'].to_f
-        @input_object.fields[7] = @hash['YMIN'].to_f
-        @input_object.fields[8] = @hash['YMAX'].to_f
+        @input_object.set_property('z_height', @hash['ZHEIGHT'].to_f.to_s)
+        @input_object.set_property('x_minimum_coordinate', @hash['XMIN'].to_f.to_s)
+        @input_object.set_property('x_maximum_coordinate', @hash['XMAX'].to_f.to_s)
+        @input_object.set_property('y_minimum_coordinate', @hash['YMIN'].to_f.to_s)
+        @input_object.set_property('y_maximum_coordinate', @hash['YMAX'].to_f.to_s)
       else
         i = 1
         m_to_ft = 3.2808399
         ft_to_m = 1/m_to_ft
-        @input_object.fields[3] = (ft_to_m*@hash['ZHEIGHT'].to_f).round_to(Plugin.model_manager.length_precision)
-        @input_object.fields[4] = (ft_to_m*@hash['XMIN'].to_f).round_to(Plugin.model_manager.length_precision)
-        @input_object.fields[5] = (ft_to_m*@hash['XMAX'].to_f).round_to(Plugin.model_manager.length_precision)
-        @input_object.fields[7] = (ft_to_m*@hash['YMIN'].to_f).round_to(Plugin.model_manager.length_precision)
-        @input_object.fields[8] = (ft_to_m*@hash['YMAX'].to_f).round_to(Plugin.model_manager.length_precision)
+        @input_object.set_property('z_height', (ft_to_m*@hash['ZHEIGHT'].to_f).round_to(Plugin.model_manager.length_precision).to_s)
+        @input_object.set_property('x_minimum_coordinate', (ft_to_m*@hash['XMIN'].to_f).round_to(Plugin.model_manager.length_precision).to_s)
+        @input_object.set_property('x_maximum_coordinate', (ft_to_m*@hash['XMAX'].to_f).round_to(Plugin.model_manager.length_precision).to_s)
+        @input_object.set_property('y_minimum_coordinate', (ft_to_m*@hash['YMIN'].to_f).round_to(Plugin.model_manager.length_precision).to_s)
+        @input_object.set_property('y_maximum_coordinate', (ft_to_m*@hash['YMAX'].to_f).round_to(Plugin.model_manager.length_precision).to_s)
       end
 
       # Update object text with changes

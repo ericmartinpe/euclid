@@ -37,6 +37,9 @@ module LegacyOpenStudio
           # attributes. Consequently the drawing_interface for the original face was being updated 6 times
           # (or more)--once for each face. The solution is to only update the unique drawing_interfaces.
 
+          # Check if entity still exists before accessing it
+          next if @drawing_interface.entity.deleted?
+
           puts "push-pull surface: update immediate bordering surfaces"
           unique_interfaces = []
           @drawing_interface.entity.edges.each do |edge|

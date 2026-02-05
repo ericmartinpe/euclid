@@ -2,7 +2,7 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObject")
+require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
 require("euclid/lib/legacy_openstudio/lib/interfaces/Surface")
 require("euclid/lib/legacy_openstudio/lib/interfaces/DetachedShadingGroup")
 
@@ -44,10 +44,8 @@ module LegacyOpenStudio
       else
         @input_object = JsonInputObject.new("Shading:Building:Detailed", Plugin.model_manager.input_file.new_unique_object_name)
       end
-      @input_object.fields[1] = Plugin.model_manager.input_file.new_unique_object_name
-      @input_object.fields[2] = ""
-      @input_object.fields[3] = ""
-      @input_object.fields[4] = 0  # kludge to make fields list long enough for call below
+      @input_object.set_property('transmittance_schedule_name', '')
+      @input_object.set_property('number_of_vertices', 0)  # Will be updated when vertices are set
 
       super
     end
@@ -145,10 +143,10 @@ module LegacyOpenStudio
       @surface_type = new_type
       if (@surface_type == 0)
         @input_object.class_definition = Plugin.data_dictionary.get_class_def("SHADING:SITE:DETAILED")
-        @input_object.fields[0] = Plugin.data_dictionary.get_class_def("SHADING:SITE:DETAILED").name  # shouldn't have to do this
+        @input_object.class_name = "Shading:Site:Detailed"
       else
         @input_object.class_definition = Plugin.data_dictionary.get_class_def("SHADING:BUILDING:DETAILED")
-        @input_object.fields[0] = Plugin.data_dictionary.get_class_def("SHADING:BUILDING:DETAILED").name  # shouldn't have to do this
+        @input_object.class_name = "Shading:Building:Detailed"
       end
 
       paint_entity

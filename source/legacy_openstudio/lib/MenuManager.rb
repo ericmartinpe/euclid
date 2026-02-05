@@ -8,14 +8,11 @@ require("euclid/lib/legacy_openstudio/lib/dialogs/ObjectInfoInterface")
 require("euclid/lib/legacy_openstudio/lib/dialogs/RunSimulationInterface")
 require("euclid/lib/legacy_openstudio/lib/dialogs/RenderingSettingsInterface")
 require("euclid/lib/legacy_openstudio/lib/dialogs/ColorScaleInterface")
-require("euclid/lib/legacy_openstudio/lib/dialogs/AnimationSettingsInterface")
 require("euclid/lib/legacy_openstudio/lib/dialogs/PreferencesInterface")
 require("euclid/lib/legacy_openstudio/lib/dialogs/AboutInterface")
 require("euclid/lib/legacy_openstudio/lib/dialogs/SurfaceSearchInterface")
 require("euclid/lib/legacy_openstudio/lib/dialogs/SurfaceMatchingInterface")
 require("euclid/lib/legacy_openstudio/lib/dialogs/DefaultConstructionsInterface")
-require("euclid/lib/legacy_openstudio/lib/dialogs/ZoneLoadsInterface")
-require("euclid/lib/legacy_openstudio/lib/dialogs/ThermostatInterface")
 require("euclid/lib/legacy_openstudio/lib/tools/DataTool")
 require("euclid/lib/legacy_openstudio/lib/tools/InfoTool")
 require("euclid/lib/legacy_openstudio/lib/tools/NewShadingTool")
@@ -32,16 +29,15 @@ module LegacyOpenStudio
     attr_accessor :show_errors_cmd, :file_info_cmd, :sim_info_cmd, :object_info_cmd
     attr_accessor :zone_origin_cmd, :new_zone_cmd, :new_shading_cmd
     attr_accessor :new_daylighting_cmd, :new_illuminance_cmd
-    attr_accessor :surface_matching_cmd, :surface_search_cmd, :zone_loads_cmd, :edit_thermostats_cmd
+    attr_accessor :surface_matching_cmd, :surface_search_cmd
     attr_accessor :run_cmd, :proto_wiz_cmd, :comp_wiz_cmd, :info_tool_cmd
     attr_accessor :surf_mode_cmd, :data_mode_cmd, :data_settings_cmd, :color_scale_cmd, :data_tool_cmd
     attr_accessor :display_color_by_layer_cmd, :render_mode_5_cmd, :set_mode_only_cmd, :boundary_mode_cmd
-    attr_accessor :anim_settings_cmd, :rwd_to_start_cmd, :rwd_anim_cmd, :play_anim_cmd, :fwd_anim_cmd, :fwd_to_end_cmd
     attr_accessor :prefs_cmd, :help_cmd, :about_cmd
     attr_accessor :test_cmd  # for testing only
 
-    attr_accessor :plugin_menu, :rendering_menu, :animation_menu, :help_menu
-    attr_accessor :command_toolbar, :rendering_toolbar, :animation_toolbar
+    attr_accessor :plugin_menu, :rendering_menu, :help_menu
+    attr_accessor :command_toolbar, :rendering_toolbar
 
 
     def initialize
@@ -200,16 +196,6 @@ module LegacyOpenStudio
       @set_default_constructions_cmd.tooltip = "Default Constructions"
       @set_default_constructions_cmd.status_bar_text = "Change the default constructions used for new surfaces and surface matching"
       @set_default_constructions_cmd.set_validation_proc { Plugin.dialog_manager.validate(DefaultConstructionsInterface) if (Plugin.dialog_manager) }
-
-      @zone_loads_cmd = UI::Command.new("Edit Zone Loads") { Plugin.dialog_manager.show(ZoneLoadsInterface) }
-      @zone_loads_cmd.small_icon = Plugin.dir + "/lib/resources/icons/ZoneLoads-16.png"
-      @zone_loads_cmd.large_icon = Plugin.dir + "/lib/resources/icons/ZoneLoads-24.png"
-      @zone_loads_cmd.tooltip = "Zone Loads"
-      @zone_loads_cmd.status_bar_text = "Add Zone Loads"
-      @zone_loads_cmd.set_validation_proc { Plugin.dialog_manager.validate(ZoneLoadsInterface) if (Plugin.dialog_manager) }
-
-      @edit_thermostats_cmd = UI::Command.new("Edit Thermostats") { Plugin.dialog_manager.show(ThermostatInterface) }
-      @edit_thermostats_cmd.set_validation_proc { Plugin.dialog_manager.validate(ThermostatInterface) if (Plugin.dialog_manager) }
 
       @new_construct_cmd = UI::Command.new("New Construction Stub") { Plugin.model_manager.construction_manager.new_construction_stub }
       @new_construct_cmd.set_validation_proc { MF_ENABLED }
@@ -386,47 +372,6 @@ module LegacyOpenStudio
 
   # Animation commands
 
-      @anim_settings_cmd = UI::Command.new("Settings...") { Plugin.dialog_manager.show(AnimationSettingsInterface) }
-      @anim_settings_cmd.small_icon = Plugin.dir + "/lib/resources/icons/AnimationSettings~16.png"
-      @anim_settings_cmd.large_icon = Plugin.dir + "/lib/resources/icons/AnimationSettings~24.png"
-      @anim_settings_cmd.tooltip = "Animation Settings"
-      @anim_settings_cmd.status_bar_text = "Show animation settings"
-      @anim_settings_cmd.set_validation_proc { Plugin.dialog_manager.validate(AnimationSettingsInterface) if (Plugin.dialog_manager) }
-
-      @rwd_to_start_cmd = UI::Command.new("Reverse To Marker") { Plugin.animation_manager.reverse_to_marker }
-      @rwd_to_start_cmd.small_icon = Plugin.dir + "/lib/resources/icons/RewindFull16.png"
-      @rwd_to_start_cmd.large_icon = Plugin.dir + "/lib/resources/icons/RewindFull24.png"
-      @rwd_to_start_cmd.tooltip = "Reverse To Marker"
-      @rwd_to_start_cmd.status_bar_text = "Reverse animation to previous marker"
-
-      @rwd_anim_cmd = UI::Command.new("Reverse") { Plugin.animation_manager.reverse }
-      @rwd_anim_cmd.small_icon = Plugin.dir + "/lib/resources/icons/Rewind16.png"
-      @rwd_anim_cmd.large_icon = Plugin.dir + "/lib/resources/icons/Rewind24.png"
-      @rwd_anim_cmd.tooltip = "Reverse Frame"
-      @rwd_anim_cmd.status_bar_text = "Reverse animation by one frame"
-      @rwd_anim_cmd.set_validation_proc { Plugin.animation_manager.validate_reverse if (Plugin.animation_manager) }
-
-      @play_anim_cmd = UI::Command.new("Play") { Plugin.animation_manager.play }
-      @play_anim_cmd.small_icon = Plugin.dir + "/lib/resources/icons/Play16.png"
-      @play_anim_cmd.large_icon = Plugin.dir + "/lib/resources/icons/Play24.png"
-      @play_anim_cmd.tooltip = "Play"
-      @play_anim_cmd.status_bar_text = "Play animation"
-      @play_anim_cmd.set_validation_proc { Plugin.animation_manager.validate_play_animation if (Plugin.animation_manager) }
-
-      @fwd_anim_cmd = UI::Command.new("Forward") { Plugin.animation_manager.forward }
-      @fwd_anim_cmd.small_icon = Plugin.dir + "/lib/resources/icons/Forward16.png"
-      @fwd_anim_cmd.large_icon = Plugin.dir + "/lib/resources/icons/Forward24.png"
-      @fwd_anim_cmd.tooltip = "Forward Frame"
-      @fwd_anim_cmd.status_bar_text = "Forward animation by one frame"
-      @fwd_anim_cmd.set_validation_proc { Plugin.animation_manager.validate_forward if (Plugin.animation_manager) }
-
-      @fwd_to_end_cmd = UI::Command.new("Forward To Marker") { Plugin.animation_manager.forward_to_marker }
-      @fwd_to_end_cmd.small_icon = Plugin.dir + "/lib/resources/icons/ForwardFull16.png"
-      @fwd_to_end_cmd.large_icon = Plugin.dir + "/lib/resources/icons/ForwardFull24.png"
-      @fwd_to_end_cmd.tooltip = "Forward To Marker"
-      @fwd_to_end_cmd.status_bar_text = "Forward animation to next marker"
-
-
   # Preferences
 
       @prefs_cmd = UI::Command.new("Preferences") { Plugin.dialog_manager.show(PreferencesInterface) }
@@ -490,13 +435,10 @@ module LegacyOpenStudio
       @plugin_menu.add_item(@surface_search_cmd)
       @plugin_menu.add_item(@set_default_constructions_cmd)
       @plugin_menu.add_item(@surface_matching_cmd)
-      @plugin_menu.add_item(@zone_loads_cmd)
-      @plugin_menu.add_item(@edit_thermostats_cmd)
       @plugin_menu.add_item(@new_construct_cmd)
       @plugin_menu.add_item(@new_schedule_cmd)
       @plugin_menu.add_separator
       @rendering_menu = @plugin_menu.add_submenu("Rendering")
-      @animation_menu = @plugin_menu.add_submenu("Animation")
       @plugin_menu.add_separator
       @plugin_menu.add_item(@prefs_cmd)
       @plugin_menu.add_separator
@@ -523,16 +465,6 @@ module LegacyOpenStudio
       @rendering_menu.add_item(@data_settings_cmd)
       @rendering_menu.add_item(@color_scale_cmd)
       @rendering_menu.add_item(@data_tool_cmd)
-
-      # Add the Animation menu
-
-      @animation_menu.add_item(@rwd_to_start_cmd)
-      @animation_menu.add_item(@rwd_anim_cmd)
-      @animation_menu.add_item(@play_anim_cmd)
-      @animation_menu.add_item(@fwd_anim_cmd)
-      @animation_menu.add_item(@fwd_to_end_cmd)
-      @animation_menu.add_separator
-      @animation_menu.add_item(@anim_settings_cmd)
 
     end
 
@@ -698,14 +630,14 @@ module LegacyOpenStudio
 
     def change_type_to(new_type)
       drawing_interface = Plugin.model_manager.selected_drawing_interface
-      drawing_interface.input_object.fields[2] = drawing_interface.input_object.class_definition.field_definitions[2].get_choice_key(new_type)
+      drawing_interface.input_object.set_property('surface_type', drawing_interface.input_object.class_definition.field_definitions[2].get_choice_key(new_type))
       drawing_interface.paint_entity
     end
 
 
     def validate_type(this_type)
       drawing_interface = Plugin.model_manager.selected_drawing_interface
-      if (drawing_interface.input_object.fields[2].upcase == this_type.upcase)
+      if (drawing_interface.input_object.get_property('surface_type', '').upcase == this_type.upcase)
         return(MF_CHECKED)
       else
         return(MF_UNCHECKED)

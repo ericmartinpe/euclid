@@ -25,15 +25,14 @@ module LegacyOpenStudio
       #puts "OutputIlluminanceMap.create_input_object"
 
       @input_object = JsonInputObject.new("Output:IlluminanceMap", Plugin.model_manager.input_file.new_unique_object_name)
-      @input_object.fields[1] = Plugin.model_manager.input_file.new_unique_object_name
-      @input_object.fields[2] = "" # Zone Name
-      @input_object.fields[3] = "0.0" # Z height
-      @input_object.fields[4] = "0.0" # X Minimum Coordinate
-      @input_object.fields[5] = "1.0" # X Maximum Coordinate
-      @input_object.fields[6] = "10" # Number of X Grid Points
-      @input_object.fields[7] = "0.0" # Y Minimum Coordinate
-      @input_object.fields[8] = "1.0" # Y Maximum Coordinate
-      @input_object.fields[9] = "10" # Number of Y Grid Points
+      @input_object.set_property('zone_name', '') # Zone Name
+      @input_object.set_property('z_height', '0.0') # Z height
+      @input_object.set_property('x_minimum_coordinate', '0.0') # X Minimum Coordinate
+      @input_object.set_property('x_maximum_coordinate', '1.0') # X Maximum Coordinate
+      @input_object.set_property('number_of_x_grid_points', '10') # Number of X Grid Points
+      @input_object.set_property('y_minimum_coordinate', '0.0') # Y Minimum Coordinate
+      @input_object.set_property('y_maximum_coordinate', '1.0') # Y Maximum Coordinate
+      @input_object.set_property('number_of_y_grid_points', '10') # Number of Y Grid Points
 
       #puts @input_object.to_idf
 
@@ -60,7 +59,7 @@ module LegacyOpenStudio
           @parent = parent_from_input_object
         end
 
-        @input_object.fields[2] = @parent.input_object  # Parent should already have been updated.
+        @input_object.set_property('zone_name', @parent.input_object.name)  # Parent should already have been updated.
 
         decimal_places = Plugin.model_manager.length_precision
         if (decimal_places < 6)
@@ -95,8 +94,10 @@ module LegacyOpenStudio
         scaley = (entity_rotation.inverse*entity_transformation).to_a[5]
 
         # get lengths
-        @input_object.fields[5] = (@input_object.fields[4].to_f + scalex.to_f).round_to(decimal_places).to_s
-        @input_object.fields[8] = (@input_object.fields[7].to_f + scaley.to_f).round_to(decimal_places).to_s
+        x_min = @input_object.get_property('x_minimum_coordinate', '0.0').to_f
+        y_min = @input_object.get_property('y_minimum_coordinate', '0.0').to_f
+        @input_object.set_property('x_maximum_coordinate', (x_min + scalex.to_f).round_to(decimal_places).to_s)
+        @input_object.set_property('y_maximum_coordinate', (y_min + scaley.to_f).round_to(decimal_places).to_s)
 
     end
   end
@@ -107,7 +108,8 @@ module LegacyOpenStudio
 
       parent = nil
       if (@input_object)
-        parent = Plugin.model_manager.zones.find { |object| object.input_object.equal?(@input_object.fields[2]) }
+        zone_name = @input_object.get_property('zone_name', '')
+        parent = Plugin.model_manager.zones.find { |object| object.input_object.name == zone_name }
       end
       return(parent)
     end
@@ -183,8 +185,12 @@ module LegacyOpenStudio
         set_entity_name
 
         # scale the component to get to desired size, base size is 1mx1m so scaling is easy
-        scalex = (@input_object.fields[5].to_f - @input_object.fields[4].to_f)
-        scaley = (@input_object.fields[8].to_f - @input_object.fields[7].to_f)
+        x_min = @input_object.get_property('x_minimum_coordinate', '0.0').to_f
+        x_max = @input_object.get_property('x_maximum_coordinate', '1.0').to_f
+        y_min = @input_object.get_property('y_minimum_coordinate', '0.0').to_f
+        y_max = @input_object.get_property('y_maximum_coordinate', '1.0').to_f
+        scalex = (x_max - x_min)
+        scaley = (y_max - y_min)
 
         # entity_transformation = entity_translation*entity_rotation*entity_scale
         # total_transformation = parent_transformation*entity_transformation
@@ -207,8 +213,8 @@ module LegacyOpenStudio
         @entity.transformation = transformation
 
         # set number of grid points
-        numx = @input_object.fields[6].to_i
-        numy = @input_object.fields[9].to_i
+        numx = @input_object.get_property('number_of_x_grid_points', '10').to_i
+        numy = @input_object.get_property('number_of_y_grid_points', '10').to_i
         numx_draw = [numx-1, 0.5].max
         numy_draw = [numy-1, 0.5].max
 
@@ -301,7 +307,7 @@ module LegacyOpenStudio
 ##### Begin new methods for the interface #####
 
     def zone
-      return(@input_object.fields[2])
+      return(@input_object.get_property('zone_name', ''))
     end
 
     def set_entity_name
@@ -317,7 +323,7 @@ module LegacyOpenStudio
     def zone=(zone)
       #puts "OutputIlluminanceMap.zone="
 
-      @input_object.fields[2] = zone.input_object
+      @input_object.set_property('zone_name', zone.input_object.name)
       @parent = zone
     end
 
@@ -325,9 +331,9 @@ module LegacyOpenStudio
     def input_object_min
       #puts "OutputIlluminanceMap.input_object_min"
 
-      x = @input_object.fields[4].to_f.m
-      y = @input_object.fields[7].to_f.m
-      z = @input_object.fields[3].to_f.m
+      x = @input_object.get_property('x_minimum_coordinate', '0.0').to_f.m
+      y = @input_object.get_property('y_minimum_coordinate', '0.0').to_f.m
+      z = @input_object.get_property('z_height', '0.0').to_f.m
 
       return(Geom::Point3d.new(x, y, z))
     end
@@ -354,9 +360,9 @@ module LegacyOpenStudio
       y = point.y.to_m.round_to(decimal_places)
       z = point.z.to_m.round_to(decimal_places)
 
-      @input_object.fields[4] = format(format_string, x)
-      @input_object.fields[7] = format(format_string, y)
-      @input_object.fields[3] = format(format_string, z)
+      @input_object.set_property('x_minimum_coordinate', format(format_string, x))
+      @input_object.set_property('y_minimum_coordinate', format(format_string, y))
+      @input_object.set_property('z_height', format(format_string, z))
     end
 
     # Returns the general coordinate transformation from absolute to relative.
@@ -405,15 +411,21 @@ module LegacyOpenStudio
     def reset_lengths
       #puts "OutputIlluminanceMap.reset_lengths"
 
-      @input_object.fields[5] = (@input_object.fields[4].to_f + 1).to_s
-      @input_object.fields[8] = (@input_object.fields[7].to_f + 1).to_s
+      x_min = @input_object.get_property('x_minimum_coordinate', '0.0').to_f
+      y_min = @input_object.get_property('y_minimum_coordinate', '0.0').to_f
+      @input_object.set_property('x_maximum_coordinate', (x_min + 1).to_s)
+      @input_object.set_property('y_maximum_coordinate', (y_min + 1).to_s)
 
       #puts @input_object.to_idf
     end
 
     # return area in square inches
     def area
-      return (@input_object.fields[5].to_f - @input_object.fields[4].to_f).m * (@input_object.fields[8].to_f - @input_object.fields[7].to_f).m
+      x_min = @input_object.get_property('x_minimum_coordinate', '0.0').to_f
+      x_max = @input_object.get_property('x_maximum_coordinate', '1.0').to_f
+      y_min = @input_object.get_property('y_minimum_coordinate', '0.0').to_f
+      y_max = @input_object.get_property('y_maximum_coordinate', '1.0').to_f
+      return (x_max - x_min).m * (y_max - y_min).m
     end
 
   end

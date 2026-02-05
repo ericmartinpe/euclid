@@ -3,7 +3,6 @@
 # See the file "License.txt" for additional terms and conditions.
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingInterface")
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 require("euclid/lib/legacy_openstudio/lib/observers/ShadowInfoObserver")
 
 module LegacyOpenStudio
@@ -87,11 +86,6 @@ module LegacyOpenStudio
         @observer = ShadowInfoObserver.new(self)
         @entity.add_observer(@observer)
       end
-    end
-
-    # Adapter for unified IDF/epJSON access
-    def adapter
-      @adapter ||= InputObjectAdapter.new(@input_object)
     end
 
     def azimuth

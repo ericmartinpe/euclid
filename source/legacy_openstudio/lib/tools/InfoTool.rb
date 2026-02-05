@@ -71,16 +71,18 @@ module LegacyOpenStudio
             if (flags & CONSTRAIN_MODIFIER_MASK > 0)  # Shift key is down
 
               if (input_object.is_class_name?("BUILDINGSURFACE:DETAILED") or input_object.is_class_name?("FENESTRATIONSURFACE:DETAILED"))
-                construction = input_object.fields[3]
+                construction_name = input_object.get_property('construction_name', '')
 
-                if (construction.class == InputObject)
-                  tooltip = construction.to_idf
+                construction = Plugin.model_manager.construction_manager.constructions.find { |c| c.name == construction_name }
+
+                if (construction)
+                  tooltip = format_object_text(construction)
                 else
-                  tooltip = input_object.to_idf
+                  tooltip = format_object_text(input_object)
                 end
 
               else
-                tooltip = input_object.to_idf
+                tooltip = format_object_text(input_object)
               end
 
             #elsif (flags & COPY_MODIFIER_KEY > 0)  # Ctrl key is down

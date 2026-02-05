@@ -83,12 +83,12 @@ module LegacyOpenStudio
       Plugin.model_manager.input_file.find_objects_by_class_name("SizingPeriod:WeatherFileDays").each { |design_day|
         for i in 0...run_periods.length
           run_period = run_periods[i]
-          if (not run_period.nil? and run_period.name == design_day.fields[1].upcase)
+          if (not run_period.nil? and run_period.name == design_day.name.upcase)
 
             run_period.type = RUN_PERIOD_TYPE_DESIGN_DAY
 
-            run_period.start_month = design_day.fields[2].to_i
-            run_period.start_date = design_day.fields[3].to_i
+            run_period.start_month = design_day.get_property('begin_month', '1').to_i
+            run_period.start_date = design_day.get_property('begin_day_of_month', '1').to_i
             run_period.end_month = run_period.start_month
             run_period.end_date = run_period.start_date
 
@@ -113,10 +113,10 @@ module LegacyOpenStudio
 
           run_period.type = RUN_PERIOD_TYPE_WEATHER_FILE
 
-          run_period.start_month = run_period_input_object.fields[2].to_i
-          run_period.start_date = run_period_input_object.fields[3].to_i
-          run_period.end_month = run_period_input_object.fields[5].to_i
-          run_period.end_date = run_period_input_object.fields[6].to_i
+          run_period.start_month = run_period_input_object.get_property('begin_month', '1').to_i
+          run_period.start_date = run_period_input_object.get_property('begin_day_of_month', '1').to_i
+          run_period.end_month = run_period_input_object.get_property('end_month', '12').to_i
+          run_period.end_date = run_period_input_object.get_property('end_day_of_month', '31').to_i
 
           start_time = Time.utc(Time.now.year, run_period.start_month, run_period.start_date)
           end_time = Time.utc(Time.now.year, run_period.end_month, run_period.end_date)

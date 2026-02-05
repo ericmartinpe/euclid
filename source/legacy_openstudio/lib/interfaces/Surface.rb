@@ -3,9 +3,7 @@
 # See the file "License.txt" for additional terms and conditions.
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingInterface")
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObject")
 require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 require("euclid/lib/legacy_openstudio/lib/observers/FaceObserver")
 
 
@@ -174,19 +172,14 @@ module LegacyOpenStudio
 
 
     # Adapter for unified IDF/epJSON access
-    def adapter
-      @adapter ||= InputObjectAdapter.new(@input_object)
-    end
-
-
     # Error checks, finalization, or cleanup needed after the entity is drawn.
     def confirm_entity
       if (super)
 
         # Even though the vertex order is correct in the input object, SketchUp will sometimes draw a face
         # upside-down because of its relationship to surrounding geometry.
-        surface_geom_adapter = InputObjectAdapter.new(Plugin.model_manager.surface_geometry.input_object)
-        if (surface_geom_adapter.get_field(2).upcase == "CLOCKWISE")
+        surface_geom = Plugin.model_manager.surface_geometry.input_object
+        if (surface_geom.get_property('vertex_entry_direction', '').upcase == "CLOCKWISE")
           if (@entity.normal.samedirection?(surface_polygon.normal))
             puts "Clockwise:  Fix unintended reversed face"
             # Fix unintended reversed face.
@@ -277,16 +270,29 @@ module LegacyOpenStudio
 
 
     def input_object_polygon
-      # Use adapter to get vertices in a unified way for both IDF and epJSON
-      # get_vertices returns a flat array [x1, y1, z1, x2, y2, z2, ...]
-      vertices = adapter.get_vertices
-      
       points = []
-      (0...vertices.length).step(3) do |i|
-        x = vertices[i].to_f.m
-        y = vertices[i+1].to_f.m
-        z = vertices[i+2].to_f.m
-        points << Geom::Point3d.new(x, y, z)
+      
+      # Check if vertices are in array format (BuildingSurface:Detailed)
+      vertices = @input_object.get_property('vertices', nil)
+      
+      if vertices && vertices.is_a?(Array) && !vertices.empty?
+        # Array format: vertices is an array of hashes
+        vertices.each do |vertex|
+          x = (vertex['vertex_x_coordinate'] || 0).to_f.m
+          y = (vertex['vertex_y_coordinate'] || 0).to_f.m
+          z = (vertex['vertex_z_coordinate'] || 0).to_f.m
+          points << Geom::Point3d.new(x, y, z)
+        end
+      else
+        # Flat format: individual vertex_N_x_coordinate properties (FenestrationSurface:Detailed)
+        num_vertices = @input_object.get_property('number_of_vertices', 0).to_i
+        
+        (1..num_vertices).each do |i|
+          x = @input_object.get_property("vertex_#{i}_x_coordinate", 0).to_f.m
+          y = @input_object.get_property("vertex_#{i}_y_coordinate", 0).to_f.m
+          z = @input_object.get_property("vertex_#{i}_z_coordinate", 0).to_f.m
+          points << Geom::Point3d.new(x, y, z)
+        end
       end
 
       return(Geom::Polygon.new(points))
@@ -309,20 +315,42 @@ module LegacyOpenStudio
 
       points = polygon.points
       
-      # Convert points to flat array of formatted coordinates
-      vertices = []
-      points.each do |point|
-        x = point.x.to_m.round_to(decimal_places)
-        y = point.y.to_m.round_to(decimal_places)
-        z = point.z.to_m.round_to(decimal_places)
-        
-        vertices << format(format_string, x)
-        vertices << format(format_string, y)
-        vertices << format(format_string, z)
-      end
+      # Check if this object uses array format or flat format
+      # FenestrationSurface:Detailed uses flat format (vertex_1_x_coordinate)
+      # BuildingSurface:Detailed uses array format (vertices array)
+      is_fenestration = @input_object.is_class_name?("FenestrationSurface:Detailed")
       
-      # Use adapter to set vertices in a unified way for both IDF and epJSON
-      adapter.set_vertices(vertices)
+      if is_fenestration
+        # Flat format: individual properties for each vertex
+        points.each_with_index do |point, i|
+          x = point.x.to_m.round_to(decimal_places)
+          y = point.y.to_m.round_to(decimal_places)
+          z = point.z.to_m.round_to(decimal_places)
+          
+          vertex_num = i + 1
+          @input_object.set_property("vertex_#{vertex_num}_x_coordinate", format(format_string, x).to_f)
+          @input_object.set_property("vertex_#{vertex_num}_y_coordinate", format(format_string, y).to_f)
+          @input_object.set_property("vertex_#{vertex_num}_z_coordinate", format(format_string, z).to_f)
+        end
+        @input_object.set_property('number_of_vertices', points.length)
+      else
+        # Array format: vertices is an array of hashes
+        vertices = []
+        points.each do |point|
+          x = point.x.to_m.round_to(decimal_places)
+          y = point.y.to_m.round_to(decimal_places)
+          z = point.z.to_m.round_to(decimal_places)
+          
+          vertices << {
+            'vertex_x_coordinate' => format(format_string, x).to_f,
+            'vertex_y_coordinate' => format(format_string, y).to_f,
+            'vertex_z_coordinate' => format(format_string, z).to_f
+          }
+        end
+        
+        @input_object.set_property('vertices', vertices)
+        @input_object.set_property('number_of_vertices', vertices.length)
+      end
     end
 
 
@@ -465,8 +493,8 @@ module LegacyOpenStudio
       temp_points = points
 
       # Apply vertex order rule (Clockwise or Counterclockwise)
-      surface_geom_adapter = InputObjectAdapter.new(Plugin.model_manager.surface_geometry.input_object)
-      if (surface_geom_adapter.get_field(2).upcase == "CLOCKWISE")
+      surface_geom = Plugin.model_manager.surface_geometry.input_object
+      if (surface_geom.get_property('vertex_entry_direction', '').upcase == "CLOCKWISE")
         temp_points.reverse!
       end
 
@@ -520,8 +548,8 @@ module LegacyOpenStudio
         end
       end
 
-      surface_geom_adapter = InputObjectAdapter.new(Plugin.model_manager.surface_geometry.input_object)
-      case (surface_geom_adapter.get_field(1).upcase)
+      surface_geom = Plugin.model_manager.surface_geometry.input_object
+      case (surface_geom.get_property('starting_vertex_position', '').upcase)
 
       when "UPPERLEFTCORNER"
         corner = centroid + x_axis.scale(x_min) + y_axis.scale(y_max)  # ULC

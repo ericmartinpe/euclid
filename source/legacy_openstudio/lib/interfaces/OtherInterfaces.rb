@@ -65,20 +65,11 @@ module LegacyOpenStudio
 
       @input_object = input_object  # Reference to the EnergyPlus input object:  ZONE, SURFACE, MATERIAL, etc.
 
-      zone_object = @input_object.fields[1]  # check to make sure this is an InputObject, not just a string (meaning the Zone object does not exist)
-      zone_name = ""
-      if (zone_object.class == InputObject)
-
-        # Look up Zone drawing interface
-        #for this_zone in Plugin.model_manager.drawing_manager.zones
-        #  if (this_zone.input_object.object_id == zone_object.object_id)
-        #    @zone = this_zone
-        #    break
-        #  end
-        #end
-      elsif (zone_object.class == String)
-        zone_name = zone_object
-      end
+      zone_name_property = @input_object.get_property('zone_or_zonelist_or_space_or_spacelist_name', '')
+      zone_name = zone_name_property.to_s
+      
+      # For epJSON, zone references are strings, not objects
+      # Look up zone by name if we have one
 
       if (@zone.nil?)
         Plugin.model_manager.add_error("Error:  " + @input_object.key + "\n")
@@ -92,7 +83,7 @@ module LegacyOpenStudio
 
 
     def read_input_object_vertices
-      number_of_points = @input_object.fields[2].to_i
+      number_of_points = @input_object.get_property('number_of_control_points', '1').to_i
 
       points = []
       for i in 0...number_of_points
@@ -100,9 +91,9 @@ module LegacyOpenStudio
         # need some error checking here:
         #   what if field had bogus content and could not be converted to float?
         #   what if some fields are missing?
-        x = @input_object.fields[@first_vertex_field + i*3].to_f.m
-        y = @input_object.fields[@first_vertex_field + i*3 + 1].to_f.m
-        z = @input_object.fields[@first_vertex_field + i*3 + 2].to_f.m
+        x = @input_object.get_property("control_point_#{i+1}_x_coordinate", '0').to_f.m
+        y = @input_object.get_property("control_point_#{i+1}_y_coordinate", '0').to_f.m
+        z = @input_object.get_property("control_point_#{i+1}_z_coordinate", '0').to_f.m
 
         if (false) #not x || not y || not z)
           error += 1

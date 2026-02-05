@@ -26,8 +26,7 @@ module LegacyOpenStudio
           if (schedules.find { |schedule| schedule.name == name })
             UI.messagebox('The name "' + name + '" is already in use by another schedule object.' + "\nNo object was created.")
           else
-            input_object = InputObject.new("Schedule:Compact")
-            input_object.name = name
+            input_object = JsonInputObject.new("Schedule:Compact", name)
 
             Plugin.model_manager.input_file.add_object(input_object)
 

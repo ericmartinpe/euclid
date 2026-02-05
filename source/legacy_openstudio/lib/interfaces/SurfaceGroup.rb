@@ -174,7 +174,7 @@ module LegacyOpenStudio
 
     def clean_entity
       super
-      @entity.name = @input_object.fields[1]
+      @entity.name = @input_object.name
     end
 
 

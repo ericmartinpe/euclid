@@ -196,7 +196,7 @@ module LegacyOpenStudio
         value = @properties[prop_name]
         
         # Skip if value is nil, empty, or already an object reference
-        next if value.nil? || value.to_s.empty? || value.is_a?(JsonInputObject) || value.is_a?(InputObject)
+        next if value.nil? || value.to_s.empty? || value.is_a?(JsonInputObject)
         
         # Try to find referenced object in any of the possible object types
         found = false
@@ -224,7 +224,7 @@ module LegacyOpenStudio
       
       @properties.each do |key, value|
         # Format value for display
-        display_value = if value.is_a?(JsonInputObject) || value.is_a?(InputObject)
+        display_value = if value.is_a?(JsonInputObject)
           value.to_s  # Show object name
         elsif value.is_a?(Array)
           if value.first.is_a?(Hash)

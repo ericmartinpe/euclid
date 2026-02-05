@@ -2,7 +2,6 @@
 # Copyright (c) 2008-2015, Alliance for Sustainable Energy.  All rights reserved.
 # See the file "License.txt" for additional terms and conditions.
 
-require("euclid/lib/legacy_openstudio/lib/AnimationManager")
 require("euclid/lib/legacy_openstudio/lib/AsynchProc")
 require("euclid/lib/legacy_openstudio/lib/CommandManager")
 require("euclid/lib/legacy_openstudio/lib/DialogManager")
@@ -30,7 +29,7 @@ module LegacyOpenStudio
 
     attr_reader :name, :version, :dir, :progress_dialog, :asynch_delay
 
-    attr_accessor :model_manager, :command_manager, :menu_manager, :dialog_manager, :animation_manager, :simulation_manager, :preferences
+    attr_accessor :model_manager, :command_manager, :menu_manager, :dialog_manager, :simulation_manager, :preferences
     attr_accessor :energyplus_path, :update_manager, :load_components
 
     def initialize
@@ -53,7 +52,6 @@ module LegacyOpenStudio
         Sketchup.add_observer(AppObserver.new)  # hopefully can catch creation of model
 
         @simulation_manager = SimulationManager.new  # Should this really be under ModelManager?
-        @animation_manager = AnimationManager.new
 
         # Any object containing validation procs that are called by GUIManager must be created before GUIManager is created
         # otherwise this method will fail on the Mac (but is okay on Windows).

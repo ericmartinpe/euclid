@@ -217,12 +217,12 @@ Do you want to continue?", MB_OKCANCEL)
       Plugin.model_manager.base_surfaces.each do |base_surface|
         if base_surface.in_selection?(selection)
           default_construction = base_surface.default_construction
-          @last_report << "'#{base_surface.name}, #{base_surface.input_object.fields[4]}, #{base_surface.input_object.fields[3]}, #{default_construction}\n"
-          base_surface.input_object.fields[3] = default_construction
+          @last_report << "'#{base_surface.name}, #{base_surface.input_object.get_property('zone_name', '')}, #{base_surface.input_object.get_property('construction_name', '')}, #{default_construction}\n"
+          base_surface.input_object.set_property('construction_name', default_construction)
 
           reset_names << base_surface.name
-          if base_surface.input_object.fields[5].to_s == 'Surface' and not base_surface.input_object.fields[6].nil? and not base_surface.input_object.fields[6].to_s.empty?
-            other_names << base_surface.input_object.fields[6].to_s
+          if base_surface.input_object.get_property('outside_boundary_condition', '').to_s == 'Surface' and not base_surface.input_object.get_property('outside_boundary_condition_object', '').nil? and not base_surface.input_object.get_property('outside_boundary_condition_object', '').to_s.empty?
+            other_names << base_surface.input_object.get_property('outside_boundary_condition_object', '').to_s
           end
         end
       end
@@ -231,8 +231,8 @@ Do you want to continue?", MB_OKCANCEL)
       Plugin.model_manager.base_surfaces.each do |base_surface|
         if not reset_names.include?(base_surface.name) and other_names.include?(base_surface.name)
           default_construction = base_surface.default_construction
-          @last_report << "'#{base_surface.name}, #{base_surface.input_object.fields[4]}, #{base_surface.input_object.fields[3]}, #{default_construction}\n"
-          base_surface.input_object.fields[3] = default_construction
+          @last_report << "'#{base_surface.name}, #{base_surface.input_object.get_property('zone_name', '')}, #{base_surface.input_object.get_property('construction_name', '')}, #{default_construction}\n"
+          base_surface.input_object.set_property('construction_name', default_construction)
         end
       end
 
@@ -243,12 +243,12 @@ Do you want to continue?", MB_OKCANCEL)
       Plugin.model_manager.sub_surfaces.each do |sub_surface|
         if sub_surface.in_selection?(selection)
           default_construction = sub_surface.default_construction
-          @last_report << "'#{sub_surface.name}, #{sub_surface.input_object.fields[4]}, #{sub_surface.input_object.fields[3]}, #{default_construction}\n"
-          sub_surface.input_object.fields[3] = default_construction
+          @last_report << "'#{sub_surface.name}, #{sub_surface.input_object.get_property('building_surface_name', '')}, #{sub_surface.input_object.get_property('construction_name', '')}, #{default_construction}\n"
+          sub_surface.input_object.set_property('construction_name', default_construction)
 
           reset_names << sub_surface.name
-          if not sub_surface.input_object.fields[5].nil? and not sub_surface.input_object.fields[5].to_s.empty?
-            other_names << sub_surface.input_object.fields[5].to_s
+          if not sub_surface.input_object.get_property('outside_boundary_condition_object', '').nil? and not sub_surface.input_object.get_property('outside_boundary_condition_object', '').to_s.empty?
+            other_names << sub_surface.input_object.get_property('outside_boundary_condition_object', '').to_s
           end
         end
       end
@@ -257,8 +257,8 @@ Do you want to continue?", MB_OKCANCEL)
       Plugin.model_manager.sub_surfaces.each do |sub_surface|
         if not reset_names.include?(sub_surface.name) and other_names.include?(sub_surface.name)
           default_construction = sub_surface.default_construction
-          @last_report << "'#{sub_surface.name}, #{sub_surface.input_object.fields[4]}, #{sub_surface.input_object.fields[3]}, #{default_construction}\n"
-          sub_surface.input_object.fields[3] = default_construction
+          @last_report << "'#{sub_surface.name}, #{sub_surface.input_object.get_property('building_surface_name', '')}, #{sub_surface.input_object.get_property('construction_name', '')}, #{default_construction}\n"
+          sub_surface.input_object.set_property('construction_name', default_construction)
         end
       end
 

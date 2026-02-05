@@ -3,7 +3,6 @@
 # See the file "License.txt" for additional terms and conditions.
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingInterface")
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 require("euclid/lib/legacy_openstudio/lib/observers/ShadowInfoObserver")
 
 
@@ -28,11 +27,10 @@ module LegacyOpenStudio
       super
 
       if (valid_entity?)
-        adapter.set_field(1, @entity["City"])
-        adapter.set_field(2, @entity["Latitude"].to_s)
-        adapter.set_field(3, @entity["Longitude"].to_s)
-        adapter.set_field(4, @entity["TZOffset"].to_s)
-        #adapter.set_field(5, ?)  # Elevation is not handled by shadow info
+        @input_object.set_property('latitude', @entity["Latitude"].to_s)
+        @input_object.set_property('longitude', @entity["Longitude"].to_s)
+        @input_object.set_property('time_zone', @entity["TZOffset"].to_s)
+        # @input_object.set_property('elevation', ?)  # Elevation is not handled by shadow info
       end
     end
 
@@ -53,19 +51,14 @@ module LegacyOpenStudio
       return(false)
     end
 
-    # Adapter for unified IDF/epJSON access
-    def adapter
-      @adapter ||= InputObjectAdapter.new(@input_object)
-    end
-
     # Updates the entity with the current state of the input object.
     def update_entity
       if (valid_entity?)
-        @entity["City"] = adapter.get_field(1)
-        @entity["Latitude"] = adapter.get_field(2).to_f
-        @entity["Longitude"] = adapter.get_field(3).to_f
-        @entity["TZOffset"] = adapter.get_field(4).to_f
-        # ? = adapter.get_field(5).to_f   Elevation is not handled by shadow info
+        @entity["City"] = @input_object.name
+        @entity["Latitude"] = @input_object.get_property('latitude', 0).to_f
+        @entity["Longitude"] = @input_object.get_property('longitude', 0).to_f
+        @entity["TZOffset"] = @input_object.get_property('time_zone', 0).to_f
+        # ? = @input_object.get_property('elevation', 0).to_f   Elevation is not handled by shadow info
       end
     end
 

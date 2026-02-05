@@ -48,8 +48,10 @@ module LegacyOpenStudio
         # Check the base surface
         parent = @parent
         if (parent.class != BaseSurface)
+          parent_surface_name = @input_object.get_property('building_surface_name', '')
+          parent_surface_name = parent_surface_name.is_a?(JsonInputObject) ? parent_surface_name.name : parent_surface_name.to_s
           Plugin.model_manager.add_error("Error:  " + @input_object.key + "\n")
-          Plugin.model_manager.add_error("This sub surface is missing its base surface: " + adapter.get_field(4).to_s + "\n")
+          Plugin.model_manager.add_error("This sub surface is missing its base surface: " + parent_surface_name + "\n")
           Plugin.model_manager.add_error("A new zone object has been automatically created for this surface.\n")
           Plugin.model_manager.add_error("However it is still missing a base surface.\n")
 
@@ -87,8 +89,9 @@ module LegacyOpenStudio
 
 
           # Check if the sub surface is inside-out
-          if ((Plugin.model_manager.surface_geometry.adapter.get_field(2).upcase == "COUNTERCLOCKWISE" and not surface_polygon.normal.samedirection?(parent.entity.normal)) \
-            or (Plugin.model_manager.surface_geometry.adapter.get_field(2).upcase == "CLOCKWISE" and surface_polygon.normal.samedirection?(parent.entity.normal)))
+          vertex_order = Plugin.model_manager.surface_geometry.input_object.get_property('vertex_entry_direction', 'Counterclockwise')
+          if ((vertex_order.upcase == "COUNTERCLOCKWISE" and not surface_polygon.normal.samedirection?(parent.entity.normal)) \
+            or (vertex_order.upcase == "CLOCKWISE" and surface_polygon.normal.samedirection?(parent.entity.normal)))
             Plugin.model_manager.add_error("Warning:  " + @input_object.key + "\n")
             Plugin.model_manager.add_error("This sub surface is inside-out; outward normal does not match its base surface.\n")
             Plugin.model_manager.add_error("It has been automatically fixed.\n\n")
@@ -129,9 +132,9 @@ module LegacyOpenStudio
 
       if (valid_entity?)
         if (@parent.class == BaseSurface)
-          adapter.set_field(4, @parent.input_object)  # Parent should already have been updated.
+          @input_object.set_property('building_surface_name', @parent.input_object.name)
         else
-          adapter.set_field(4, "")
+          @input_object.set_property('building_surface_name', "")
         end
       end
     end
@@ -141,7 +144,14 @@ module LegacyOpenStudio
     def parent_from_input_object
       parent = nil
       if (@input_object)
-        parent = Plugin.model_manager.base_surfaces.find { |object| object.input_object.equal?(adapter.get_field(4)) }
+        parent_surface_ref = @input_object.get_property('building_surface_name', '')
+        if parent_surface_ref.is_a?(JsonInputObject)
+          # Already a reference to the object
+          parent = Plugin.model_manager.base_surfaces.find { |object| object.input_object.equal?(parent_surface_ref) }
+        else
+          # It's a string name
+          parent = Plugin.model_manager.base_surfaces.find { |object| object.input_object.name == parent_surface_ref.to_s }
+        end
       end
       return(parent)
     end
@@ -193,7 +203,7 @@ module LegacyOpenStudio
 
 
     def surface_type
-      return(adapter.get_field(2))
+      return(@input_object.get_property('surface_type', ''))
     end
 
 
@@ -245,7 +255,8 @@ module LegacyOpenStudio
     end
 
     def exterior?
-      return (adapter.get_field(5).nil? or adapter.get_field(5).to_s.empty?)
+      outside_boundary = @input_object.get_property('outside_boundary_condition_object', '')
+      return (outside_boundary.nil? or outside_boundary.to_s.empty?)
     end
 
     def default_construction
@@ -272,7 +283,7 @@ module LegacyOpenStudio
     end
 
     def multiplier
-      value = adapter.get_field(8).to_i
+      value = @input_object.get_property('multiplier', 1).to_i
       if (value > 0)
         return(value)
       else
@@ -285,7 +296,7 @@ module LegacyOpenStudio
     end
 
     def name
-      return @input_object.fields[1]
+      return @input_object.name
     end
 
     def unit_area
@@ -323,8 +334,8 @@ module LegacyOpenStudio
 
     # match this sub surface to another sub surface
     def set_other_side_sub_surface(other)
-      @input_object.fields[5] = other.name
-      @input_object.fields[3] = default_construction # after making interior
+      @input_object.set_property('outside_boundary_condition_object', other.name)
+      @input_object.set_property('construction_name', default_construction) # after making interior
       #if render set to by boundary then change materials to surface
           if (Plugin.model_manager.rendering_mode == 2)
               #apply material to front and back face
@@ -337,8 +348,8 @@ module LegacyOpenStudio
 
     # unmatch this sub surface with any other sub surface
     def unset_other_side_sub_surface
-      @input_object.fields[5] = ""
-      @input_object.fields[3] = default_construction # after making exterior
+      @input_object.set_property('outside_boundary_condition_object', '')
+      @input_object.set_property('construction_name', default_construction) # after making exterior
       #if render set to by boundary then change materials to surface
           if (Plugin.model_manager.rendering_mode == 2)
               #apply material to front and back face

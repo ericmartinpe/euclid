@@ -63,7 +63,7 @@ module LegacyOpenStudio
             time_step = 900.0
           else
             time_step_object = objects.to_a.first
-            time_step = 3600.0 / time_step_object.fields[1].to_f
+            time_step = 3600.0 / time_step_object.get_property('number_of_timesteps_per_hour', '4').to_f
           end
 
         when VARIABLE_FREQUENCY_DETAILED

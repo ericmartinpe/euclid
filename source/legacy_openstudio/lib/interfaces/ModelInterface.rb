@@ -13,7 +13,6 @@ require("euclid/lib/legacy_openstudio/lib/interfaces/SubSurface")
 require("euclid/lib/legacy_openstudio/lib/interfaces/AttachedShadingSurface")
 require("euclid/lib/legacy_openstudio/lib/interfaces/DetachedShadingSurface")
 require("euclid/lib/legacy_openstudio/lib/interfaces/OtherInterfaces")
-require("euclid/lib/legacy_openstudio/lib/interfaces/SimpleGeometry")
 require("euclid/lib/legacy_openstudio/lib/interfaces/DaylightingControls")
 require("euclid/lib/legacy_openstudio/lib/interfaces/OutputIlluminanceMap")
 
@@ -98,8 +97,7 @@ module LegacyOpenStudio
         Plugin.model_manager.add_error("A new Site:Location object has been added.\n\n")
       end
 
-      # Convert all simplified geometry objects to detailed ones.
-      SimpleGeometry.convert_to_detailed(@input_file)
+      # SimpleGeometry conversion is not needed for epJSON files (only supported detailed geometry)
 
       return(true)
     end

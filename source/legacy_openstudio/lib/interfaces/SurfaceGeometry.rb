@@ -3,7 +3,6 @@
 # See the file "License.txt" for additional terms and conditions.
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/DrawingInterface")
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 
 
 module LegacyOpenStudio
@@ -20,12 +19,6 @@ module LegacyOpenStudio
       super
     end
     
-    # Get an adapter for the input object
-    def adapter
-      @adapter ||= InputObjectAdapter.new(@input_object)
-    end
-
-
     def parent_from_input_object
       return(Plugin.model_manager.model_interface)
     end

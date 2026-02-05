@@ -212,7 +212,7 @@ Do you want to continue?", MB_OKCANCEL)
             # check if the reverse of this polygon equals the other polygon
             if (reverse_face_polygon.circular_eql?(base_surfaces[j].face_polygon))
 
-              @last_report << "Match, '#{base_surfaces[i].name}', '#{base_surfaces[i].input_object.fields[4]}', '#{base_surfaces[j].name}', '#{base_surfaces[j].input_object.fields[4]}' \n"
+              @last_report << "Match, '#{base_surfaces[i].name}', '#{base_surfaces[i].input_object.get_property('zone_name', '')}', '#{base_surfaces[j].name}', '#{base_surfaces[j].input_object.get_property('zone_name', '')}' \n"
 
               base_surfaces[i].set_other_side_surface(base_surfaces[j])
               base_surfaces[j].set_other_side_surface(base_surfaces[i])
@@ -299,7 +299,11 @@ Do you want to continue?", MB_OKCANCEL)
             # check if this polygon equals the reverse of the other polygon
             if (reverse_face_polygon.circular_eql?(sub_surfaces[j].face_polygon))
 
-              @last_report << "Match, '#{sub_surfaces[i].name}', '#{sub_surfaces[i].input_object.fields[4]}', '#{sub_surfaces[j].name}', '#{sub_surfaces[j].input_object.fields[4]}'\n"
+              base_surface_i = sub_surfaces[i].input_object.get_property('building_surface_name', '')
+              base_surface_i = base_surface_i.is_a?(JsonInputObject) ? base_surface_i.name : base_surface_i.to_s
+              base_surface_j = sub_surfaces[j].input_object.get_property('building_surface_name', '')
+              base_surface_j = base_surface_j.is_a?(JsonInputObject) ? base_surface_j.name : base_surface_j.to_s
+              @last_report << "Match, '#{sub_surfaces[i].name}', '#{base_surface_i}', '#{sub_surfaces[j].name}', '#{base_surface_j}'\n"
 
               sub_surfaces[i].set_other_side_sub_surface(sub_surfaces[j])
               sub_surfaces[j].set_other_side_sub_surface(sub_surfaces[i])
@@ -346,11 +350,12 @@ Do you want to continue?", MB_OKCANCEL)
 
       Plugin.model_manager.base_surfaces.each do |base_surface|
         if selection.contains?(base_surface.entity) or selection.contains?(base_surface.parent.entity)
-          if base_surface.input_object.fields[5].to_s.upcase == "SURFACE"
+          if base_surface.input_object.get_property('outside_boundary_condition', '').to_s.upcase == "SURFACE"
 
             # try to get the other side surface
             other_zone = ""
-            other_name = base_surface.input_object.fields[6].to_s
+            other_boundary_obj = base_surface.input_object.get_property('outside_boundary_condition_object', '')
+            other_name = other_boundary_obj.is_a?(JsonInputObject) ? other_boundary_obj.name : other_boundary_obj.to_s
             other_name_upcase = other_name.upcase
             other_surfaces = Plugin.model_manager.base_surfaces.collect { |other| other if other.name.upcase == other_name_upcase }
 
@@ -360,11 +365,14 @@ Do you want to continue?", MB_OKCANCEL)
               other_zone = "Not Found"
               other_name = other_name + " - Surface Not Found"
             else
-              other_zone = other_surfaces[0].input_object.fields[4]
+              zone_obj = other_surfaces[0].input_object.get_property('zone_name', '')
+              other_zone = zone_obj.is_a?(JsonInputObject) ? zone_obj.name : zone_obj.to_s
               other_surfaces[0].unset_other_side_surface
             end
 
-            @last_report << "Unmatch, '#{base_surface.name}', '#{base_surface.input_object.fields[4]}', '#{other_name}', '#{other_zone}'\n"
+            surface_zone = base_surface.input_object.get_property('zone_name', '')
+            surface_zone = surface_zone.is_a?(JsonInputObject) ? surface_zone.name : surface_zone.to_s
+            @last_report << "Unmatch, '#{base_surface.name}', '#{surface_zone}', '#{other_name}', '#{other_zone}'\n"
           end
         end
       end
@@ -374,11 +382,14 @@ Do you want to continue?", MB_OKCANCEL)
 
       Plugin.model_manager.sub_surfaces.each do |sub_surface|
         if selection.contains?(sub_surface.entity) or selection.contains?(sub_surface.parent.entity) or selection.contains?(sub_surface.parent.parent.entity)
-          if not sub_surface.input_object.fields[5].to_s.empty?
+          outside_boundary_obj = sub_surface.input_object.get_property('outside_boundary_condition_object', '')
+          outside_boundary_obj = outside_boundary_obj.is_a?(JsonInputObject) ? outside_boundary_obj.name : outside_boundary_obj.to_s
+          if not outside_boundary_obj.to_s.empty?
 
             # try to get the other side surface
             other_base_surface = ""
-            other_name = sub_surface.input_object.fields[5].to_s
+            other_boundary_obj = sub_surface.input_object.get_property('outside_boundary_condition_object', '')
+            other_name = other_boundary_obj.is_a?(JsonInputObject) ? other_boundary_obj.name : other_boundary_obj.to_s
             other_name_upcase = other_name.upcase
             other_sub_surfaces = Plugin.model_manager.sub_surfaces.collect { |other| other if other.name.upcase == other_name_upcase }
 
@@ -388,11 +399,14 @@ Do you want to continue?", MB_OKCANCEL)
               other_base_surface = "Not Found"
               other_name = other_name + " - SubSurface Not Found"
             else
-              other_base_surface = other_sub_surfaces[0].input_object.fields[4]
+              base_surf_obj = other_sub_surfaces[0].input_object.get_property('building_surface_name', '')
+              other_base_surface = base_surf_obj.is_a?(JsonInputObject) ? base_surf_obj.name : base_surf_obj.to_s
               other_sub_surfaces[0].unset_other_side_sub_surface
             end
 
-            @last_report << "Unmatch, '#{sub_surface.name}', '#{sub_surface.input_object.fields[4]}', '#{other_name}', '#{other_base_surface}'\n"
+            subsurface_base = sub_surface.input_object.get_property('building_surface_name', '')
+            subsurface_base = subsurface_base.is_a?(JsonInputObject) ? subsurface_base.name : subsurface_base.to_s
+            @last_report << "Unmatch, '#{sub_surface.name}', '#{subsurface_base}', '#{other_name}', '#{other_base_surface}'\n"
 
           end
         end

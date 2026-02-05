@@ -15,9 +15,9 @@ module LegacyOpenStudio
       if (not @drawing_interface.nil?)
         @input_object = @drawing_interface.input_object
 
-        @hash['NAME'] = @input_object.fields[1]
-        @hash['BASE_SURFACE'] = @input_object.fields[2].to_s
-        @hash['TRANSMITTANCE'] = @input_object.fields[3].to_s
+        @hash['NAME'] = @input_object.name
+        @hash['BASE_SURFACE'] = @input_object.get_property('base_surface_name', '').to_s
+        @hash['TRANSMITTANCE'] = @input_object.get_property('transmittance_schedule_name', '').to_s
 
         # Need better method here
         if (Plugin.model_manager.units_system == "SI")
@@ -29,8 +29,8 @@ module LegacyOpenStudio
         end
 
         @hash['AREA'] = area.round_to(Plugin.model_manager.length_precision).to_s + " " + Plugin.model_manager.units_hash['m2'][i]
-        @hash['VERTICES'] = @input_object.fields[4].to_s  # this should be a string already!
-        @hash['OBJECT_TEXT'] = @input_object.to_idf
+        @hash['VERTICES'] = @input_object.get_property('number_of_vertices', '').to_s
+        @hash['OBJECT_TEXT'] = format_object_text(@input_object)
       end
 
     end
@@ -39,26 +39,26 @@ module LegacyOpenStudio
     def report
       input_object_copy = @input_object.copy
 
-      @input_object.fields[1] = @hash['NAME'].strip
+      @input_object.set_property('name', @hash['NAME'].strip)
 
       # Lookup base surface object
       objects = Plugin.model_manager.input_file.find_objects_by_class_name("BUILDINGSURFACE:DETAILED")
       if (object = objects.find { |object| object.name == @hash['BASE_SURFACE'] })
-        @input_object.fields[2] = object
+        @input_object.set_property('base_surface_name', object.name)
       else
-        @input_object.fields[2] = @hash['BASE_SURFACE']
+        @input_object.set_property('base_surface_name', @hash['BASE_SURFACE'])
       end
 
       # Lookup transmittance schedule object
       objects = Plugin.model_manager.input_file.find_objects_by_class_name("SCHEDULE:YEAR", "SCHEDULE:COMPACT", "SCHEDULE:FILE")
       if (object = objects.find { |object| object.name == @hash['TRANSMITTANCE'] })
-        @input_object.fields[3] = object
+        @input_object.set_property('transmittance_schedule_name', object.name)
       else
-        @input_object.fields[3] = @hash['TRANSMITTANCE']
+        @input_object.set_property('transmittance_schedule_name', @hash['TRANSMITTANCE'])
       end
 
       # Update object text with changes
-      @hash['OBJECT_TEXT'] = @input_object.to_idf
+      @hash['OBJECT_TEXT'] = format_object_text(@input_object)
 
       populate_hash
 

@@ -3,7 +3,6 @@
 # See the file "License.txt" for additional terms and conditions.
 
 require("euclid/lib/legacy_openstudio/lib/dialogs/DialogInterface")
-require("euclid/lib/legacy_openstudio/lib/inputfile/InputObjectAdapter")
 
 
 module LegacyOpenStudio
@@ -44,7 +43,7 @@ module LegacyOpenStudio
         @hash['VERTICES'] = @input_object.get_property('number_of_vertices', '').to_s
         @hash['UNIT_AREA'] = unit_area.round_to(Plugin.model_manager.length_precision).to_s + " " + Plugin.model_manager.units_hash['m2'][i]
         @hash['TOTAL_AREA'] = total_area.round_to(Plugin.model_manager.length_precision).to_s + " " + Plugin.model_manager.units_hash['m2'][i]
-        @hash['OBJECT_TEXT'] = @input_object.to_idf
+        @hash['OBJECT_TEXT'] = format_object_text(@input_object)
       end
 
     end
@@ -126,7 +125,7 @@ module LegacyOpenStudio
       # Possibly warn if > 1 and using Full Interior solar distribution
 
       # Update object text with changes
-      @hash['OBJECT_TEXT'] = @input_object.to_idf
+      @hash['OBJECT_TEXT'] = format_object_text(@input_object)
 
       # Update object summary because multiplier could change
       populate_hash

@@ -262,12 +262,12 @@ module LegacyOpenStudio
             input_object = Plugin.model_manager.base_surfaces[index].input_object
 
             if Plugin.model_manager.base_surfaces[index].in_selection?(selection) and
-              input_object.fields[1].to_s.upcase.include?(name) and
-              input_object.fields[2].to_s.upcase.include?(type) and
-              input_object.fields[3].to_s.upcase.include?(construction) and
-              input_object.fields[5].to_s.upcase.include?(outside_boundary_condition) and
-              input_object.fields[7].to_s.upcase.include?(sun) and
-              input_object.fields[8].to_s.upcase.include?(wind) and
+              input_object.name.to_s.upcase.include?(name) and
+              input_object.get_property('surface_type', '').to_s.upcase.include?(type) and
+              input_object.get_property('construction_name', '').to_s.upcase.include?(construction) and
+              input_object.get_property('outside_boundary_condition', '').to_s.upcase.include?(outside_boundary_condition) and
+              input_object.get_property('sun_exposure', '').to_s.upcase.include?(sun) and
+              input_object.get_property('wind_exposure', '').to_s.upcase.include?(wind) and
               shading_control.empty? and frame_and_divider.empty?
 
                # unhide face
@@ -281,7 +281,7 @@ module LegacyOpenStudio
                Plugin.model_manager.base_surfaces[index].parent.entity.visible = true
 
                # add to report
-               @last_report << "#{input_object.class_name}, #{input_object.fields[1].to_s}\n"
+               @last_report << "#{input_object.class_name}, #{input_object.name.to_s}\n"
 
             end
           end
@@ -297,12 +297,12 @@ module LegacyOpenStudio
             input_object = Plugin.model_manager.sub_surfaces[index].input_object
 
             if Plugin.model_manager.sub_surfaces[index].in_selection?(selection) and
-              input_object.fields[1].to_s.upcase.include?(name) and
-              input_object.fields[2].to_s.upcase.include?(type) and
-              input_object.fields[3].to_s.upcase.include?(construction) and
+              input_object.name.to_s.upcase.include?(name) and
+              input_object.get_property('surface_type', '').to_s.upcase.include?(type) and
+              input_object.get_property('construction_name', '').to_s.upcase.include?(construction) and
               outside_boundary_condition.empty? and sun.empty? and wind.empty?
-              input_object.fields[7].to_s.upcase.include?(shading_control)
-              input_object.fields[8].to_s.upcase.include?(frame_and_divider)
+              input_object.get_property('shading_control_name', '').to_s.upcase.include?(shading_control)
+              input_object.get_property('frame_and_divider_name', '').to_s.upcase.include?(frame_and_divider)
 
                # unhide face
                Plugin.model_manager.sub_surfaces[index].entity.visible = true
@@ -321,7 +321,7 @@ module LegacyOpenStudio
                Plugin.model_manager.sub_surfaces[index].parent.parent.entity.visible = true
 
                # add to report
-               @last_report << "#{input_object.class_name}, #{input_object.fields[1].to_s}\n"
+               @last_report << "#{input_object.class_name}, #{input_object.name.to_s}\n"
             end
           end
         end
@@ -338,8 +338,8 @@ module LegacyOpenStudio
             input_object = Plugin.model_manager.shading_surfaces[index].input_object
 
             if Plugin.model_manager.shading_surfaces[index].in_selection?(selection) and
-               input_object.fields[0].to_s.upcase.include?(idf_class) and
-               input_object.fields[1].to_s.upcase.include?(name) and
+               input_object.class_name.to_s.upcase.include?(idf_class) and
+               input_object.name.to_s.upcase.include?(name) and
                type.empty? and construction.empty? and
                outside_boundary_condition.empty? and sun.empty? and wind.empty? and
                shading_control.empty? and frame_and_divider.empty?
@@ -361,7 +361,7 @@ module LegacyOpenStudio
                Plugin.model_manager.shading_surfaces[index].parent.parent.entity.visible = true
 
                # add to report
-               @last_report << "#{input_object.class_name}, #{input_object.fields[1].to_s}\n"
+               @last_report << "#{input_object.class_name}, #{input_object.name.to_s}\n"
             end
 
           end
@@ -385,8 +385,8 @@ module LegacyOpenStudio
             input_object = Plugin.model_manager.shading_surfaces[index].input_object
 
             if Plugin.model_manager.shading_surfaces[index].in_selection?(selection) and
-               input_object.fields[0].to_s.upcase.include?(idf_class) and
-               input_object.fields[1].to_s.upcase.include?(name) and
+               input_object.class_name.to_s.upcase.include?(idf_class) and
+               input_object.name.to_s.upcase.include?(name) and
                type.empty? and construction.empty? and
                outside_boundary_condition.empty? and sun.empty? and wind.empty? and
                shading_control.empty? and frame_and_divider.empty?
@@ -402,7 +402,7 @@ module LegacyOpenStudio
                Plugin.model_manager.shading_surfaces[index].parent.entity.visible = true
 
                # add to report
-               @last_report << "#{input_object.class_name}, #{input_object.fields[1].to_s}\n"
+               @last_report << "#{input_object.class_name}, #{input_object.name.to_s}\n"
             end
 
           end
