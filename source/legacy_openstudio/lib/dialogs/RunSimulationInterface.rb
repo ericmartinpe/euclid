@@ -211,12 +211,6 @@ module LegacyOpenStudio
       run_period.set_property('end_day_of_month', @hash['END_DATE'])
       run_period.set_property('end_year', @hash['END_YEAR'].to_i) unless @hash['END_YEAR'].empty?
       run_period.set_property('day_of_week_for_start_day', @hash['START_DAY'])
-
-      # DLM@20101109: this fix removes a warning in the E+ error file but introduces a fatal error
-      # when the last field of the run period object is blank
-      # fill in fields to required length
-      #(7..11).each {|i| run_period.fields[i] = "" if not run_period.fields[i]}
-
       return(true)
     end
 
