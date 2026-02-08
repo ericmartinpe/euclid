@@ -11,6 +11,7 @@ require("euclid/lib/legacy_openstudio/lib/dialogs/ProgressDialog")
 require("euclid/lib/legacy_openstudio/lib/inputfile/JsonInputObject")
 require("euclid/lib/legacy_openstudio/lib/inputfile/FieldMapper")
 require("euclid/lib/legacy_openstudio/lib/inputfile/EpJsonFile")
+require("euclid/lib/legacy_openstudio/lib/inputfile/IdfToEpjsonConverter")
 
 require("euclid/lib/legacy_openstudio/lib/interfaces/ModelInterface")
 
@@ -337,10 +338,10 @@ module LegacyOpenStudio
       
       @input_file.write(temp_epjson, update_progress)
       
-      # Convert to IDF
+      # Convert to IDF with field comments
       update_progress.call(80, "Converting to IDF format...") if update_progress
       
-      idf_path = IdfToEpjsonConverter.convert_to_idf(temp_epjson, path)
+      idf_path = IdfToEpjsonConverter.convert_to_idf(temp_epjson, path, true)
       
       unless idf_path
         add_error("Failed to convert to IDF format.\n")
@@ -349,13 +350,6 @@ module LegacyOpenStudio
         FileUtils.rm_f(temp_epjson)
         return
       end
-      
-      # Sort and format the IDF file
-      update_progress.call(90, "Sorting and formatting IDF...") if update_progress
-      
-      # energyplus_version is already in "25-1-0" format
-      version = @input_file.energyplus_version
-      IdfToEpjsonConverter.sort_idf_file(idf_path, version)
       
       # Clean up temp file
       FileUtils.rm_f(temp_epjson)

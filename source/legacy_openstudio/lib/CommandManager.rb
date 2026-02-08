@@ -118,7 +118,9 @@ module LegacyOpenStudio
         default_name = "untitled" + default_ext
       end
       
-      if (path = UI.save_panel("Save EnergyPlus Input File", Plugin.model_manager.input_file_dir, default_name))
+      # Note: UI.save_panel doesn't support file filters in SketchUp
+      # Users can manually type .idf or .epJSON extension to choose format
+      if (path = UI.save_panel("Save EnergyPlus Input File (use .idf or .epJSON extension)", Plugin.model_manager.input_file_dir, default_name))
         Plugin.model_manager.save_input_file(path)
       end
     end
