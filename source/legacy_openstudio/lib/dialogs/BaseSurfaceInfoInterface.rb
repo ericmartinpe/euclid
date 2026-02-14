@@ -50,31 +50,6 @@ module LegacyOpenStudio
       end
 
     end
-    
-    def format_object_text(input_object)
-      text = "#{input_object.class_name},\n"
-      text += "  #{input_object.name};\n\n"
-      
-      # Add basic properties
-      text += "Surface Type: #{input_object.get_property('surface_type', '')}\n"
-      text += "Construction: #{input_object.get_property('construction_name', '')}\n"
-      text += "Zone: #{input_object.get_property('zone_name', '')}\n"
-      text += "Outside Boundary: #{input_object.get_property('outside_boundary_condition', '')}\n"
-      
-      # Add vertices
-      vertices = input_object.get_property('vertices', [])
-      if vertices && vertices.is_a?(Array) && !vertices.empty?
-        text += "\nVertices (#{vertices.length}):\n"
-        vertices.each_with_index do |vertex, i|
-          x = vertex['vertex_x_coordinate'] || 0
-          y = vertex['vertex_y_coordinate'] || 0
-          z = vertex['vertex_z_coordinate'] || 0
-          text += "  #{i+1}: (#{x}, #{y}, #{z})\n"
-        end
-      end
-      
-      text
-    end
 
 
     def report
